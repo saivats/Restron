@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restron Kitchen Display</title>
+    <meta http-equiv="refresh" content="5"> <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #222; color: white; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+
+        #orders-container { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
+
+        .order-card {
+            background-color: #333;
+            border-left: 8px solid #ff9800; /* Orange for Pending */
+            width: 300px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .table-no { font-weight: bold; color: #ffcc00; font-size: 1.4em; }
+        .order-id { font-size: 0.8em; color: #777; }
+
+        .items { margin-bottom: 15px; color: #ddd; font-size: 1.1em; line-height: 1.4; }
+
+        /* The Done Button */
+        .done-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .done-btn:hover { background-color: #218838; }
+        .done-btn:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🧑‍🍳 Kitchen Live Orders</h1>
+    </div>
+
+    <div id="orders-container">
+        <p style="text-align:center; width:100%">Connecting to Kitchen...</p>
+    </div>
+
+    <script>
+        // 1. Fetch Orders
+        fetch('http://127.0.0.1:8000/kitchen-display/')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('orders-container');
+                container.innerHTML = '';
+
+                if (data.length === 0) {
+                    container.innerHTML = '<p style="color:#777;">No Pending Orders. Relax! ☕</p>';
+                    return;
+                }
+
+                // 2. Create Cards
+                data.forEach(order => {
+                    const card = `
+                        <div class="order-card">
+                            <div class="card-header">
+                                <span class="table-no">Table ${order.table_number}</span>
+                                <span class="order-id">#${order.id}</span>
+                            </div>
+                            <div class="items">
+                                ${order.items_summary}
+                            </div>
+                            <button class="done-btn" onclick="markDone(${order.id})">✔ Mark Ready</button>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+            });
+
+        // 3. Handle the Button Click
+        function markDone(orderId) {
+            fetch(`http://127.0.0.1:8000/order/${orderId}/done`, { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page immediately to remove the card
+                        location.reload();
+                    } else {
+                        alert("Error updating order.");
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

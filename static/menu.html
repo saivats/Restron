@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restron Menu</title>
+    <style>
+        /* CSS: Making it look like an App */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f9; margin: 0; padding-bottom: 80px; }
+
+        /* Header */
+        header { background: #ff5722; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        /* Menu Grid */
+        .menu-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; padding: 20px; }
+
+        /* Food Card */
+        .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .card-info h3 { margin: 0 0 5px 0; font-size: 1.1em; color: #333; }
+        .card-info p { margin: 0; color: #777; font-weight: bold; }
+
+        /* + / - Controls */
+        .controls { display: flex; align-items: center; gap: 10px; }
+        .btn-qty { background: #eee; border: none; width: 35px; height: 35px; border-radius: 50%; font-size: 1.2em; cursor: pointer; color: #333; font-weight: bold; }
+        .btn-qty:active { background: #ddd; }
+        .qty-display { font-weight: bold; font-size: 1.1em; min-width: 20px; text-align: center; }
+
+        /* Bottom Cart Bar */
+        .cart-bar { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
+        .place-order-btn { background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-size: 1em; font-weight: bold; cursor: pointer; }
+        .place-order-btn:disabled { background: #ccc; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2>🍔 Restron Menu</h2>
+    </header>
+
+    <div class="menu-container" id="menu-list">
+        <p style="text-align:center; width:100%">Loading Menu...</p>
+    </div>
+
+    <div class="cart-bar">
+        <div>
+            <span style="display:block; font-size:0.8em; color:#777">Total Items</span>
+            <strong id="total-count">0</strong>
+        </div>
+        <button class="place-order-btn" id="order-btn" onclick="submitOrder()" disabled>Place Order</button>
+    </div>
+
+    <script>
+        // 1. STATE: This variable holds the cart in the browser's memory
+        // Format: { "1": 2, "5": 1 }  -> ID 1 has 2 qty, ID 5 has 1 qty
+        let cart = {};
+        let menuItems = [];
+
+        // 2. LOAD MENU: Fetch from Python when page opens
+        async function loadMenu() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/menu/');
+                menuItems = await response.json();
+                renderMenu();
+            } catch (error) {
+                console.error("Error loading menu:", error);
+                document.getElementById('menu-list').innerHTML = "<p>Error connecting to server. Is PyCharm running?</p>";
+            }
+        }
+
+        // 3. RENDER: Create the HTML for each item
+        function renderMenu() {
+            const container = document.getElementById('menu-list');
+            container.innerHTML = ''; // Clear loading text
+
+            menuItems.forEach(item => {
+                // If item is in cart, get qty, else 0
+                const currentQty = cart[item.id] || 0;
+
+                const cardHTML = `
+                    <div class="card">
+                        <div class="card-info">
+                            <h3>${item.name}</h3>
+                            <p>₹${item.price}</p>
+                        </div>
+                        <div class="controls">
+                            <button class="btn-qty" onclick="updateQty(${item.id}, -1)">-</button>
+                            <span class="qty-display" id="qty-${item.id}">${currentQty}</span>
+                            <button class="btn-qty" onclick="updateQty(${item.id}, 1)">+</button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        // 4. LOGIC: Handle + and - clicks
+        function updateQty(id, change) {
+            if (!cart[id]) cart[id] = 0;
+            cart[id] += change;
+
+            // Prevent negative numbers
+            if (cart[id] < 0) cart[id] = 0;
+
+            // Update the number on the screen immediately (No refresh needed)
+            document.getElementById(`qty-${id}`).innerText = cart[id];
+
+            updateCartUI();
+        }
+
+        // 5. UI: Update the bottom bar
+        function updateCartUI() {
+            let totalItems = 0;
+            for (let id in cart) {
+                totalItems += cart[id];
+            }
+            document.getElementById('total-count').innerText = totalItems;
+
+            // Enable/Disable Order Button
+            document.getElementById('order-btn').disabled = (totalItems === 0);
+        }
+
+        // 6. SEND: Convert Cart to JSON and send to Python
+        async function submitOrder() {
+            // Convert our simplified 'cart' object into the List structure Python wants
+            // Python wants: items: [ {menu_item_id: 1, quantity: 2}, ... ]
+
+            const orderItems = [];
+            for (let id in cart) {
+                if (cart[id] > 0) {
+                    orderItems.push({
+                        "menu_item_id": parseInt(id),
+                        "quantity": cart[id]
+                    });
+                }
+            }
+
+            if (orderItems.length === 0) return;
+
+            const payload = {
+                "table_number": 5, // Hardcoded for now. In real life, this comes from the QR URL
+                "items": orderItems
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/order/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("Order Placed Successfully! 🍳");
+                    cart = {}; // Clear cart
+                    renderMenu(); // Reset UI
+                    updateCartUI();
+                } else {
+                    alert("Something went wrong!");
+                }
+            } catch (error) {
+                console.error("Error placing order:", error);
+            }
+        }
+
+        // Start the app
+        loadMenu();
+    </script>
+</body>
+</html>
