@@ -1,167 +1,223 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restron Menu</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Desi Zaika Menu</title>
+
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#db421f",
+                        "background-light": "#FDFBF7",
+                        "text-main": "#3E2723",
+                        "text-sub": "#5D4037",
+                        "accent": "#CBA135"
+                    },
+                    fontFamily: { "display": ["Epilogue", "sans-serif"] },
+                    backgroundImage: {
+                        'mandala-pattern': "url('https://www.transparenttextures.com/patterns/black-linen.png')",
+                    }
+                },
+            },
+        }
+    </script>
     <style>
-        /* CSS: Making it look like an App */
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f9; margin: 0; padding-bottom: 80px; }
-
-        /* Header */
-        header { background: #ff5722; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
-        /* Menu Grid */
-        .menu-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; padding: 20px; }
-
-        /* Food Card */
-        .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .card-info h3 { margin: 0 0 5px 0; font-size: 1.1em; color: #333; }
-        .card-info p { margin: 0; color: #777; font-weight: bold; }
-
-        /* + / - Controls */
-        .controls { display: flex; align-items: center; gap: 10px; }
-        .btn-qty { background: #eee; border: none; width: 35px; height: 35px; border-radius: 50%; font-size: 1.2em; cursor: pointer; color: #333; font-weight: bold; }
-        .btn-qty:active { background: #ddd; }
-        .qty-display { font-weight: bold; font-size: 1.1em; min-width: 20px; text-align: center; }
-
-        /* Bottom Cart Bar */
-        .cart-bar { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
-        .place-order-btn { background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-size: 1em; font-weight: bold; cursor: pointer; }
-        .place-order-btn:disabled { background: #ccc; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .ornate-divider { display: flex; align-items: center; text-align: center; margin-bottom: 1rem; }
+        .ornate-divider::before, .ornate-divider::after { content: ''; flex: 1; border-bottom: 2px double #db421f; opacity: 0.3; }
+        .ornate-divider:not(:empty)::before { margin-right: .5em; }
+        .ornate-divider:not(:empty)::after { margin-left: .5em; }
+        .glass-effect { background: rgba(253, 251, 247, 0.95); backdrop-filter: blur(8px); }
     </style>
 </head>
-<body>
+<body class="bg-background-light text-text-main font-display antialiased pb-32">
 
-    <header>
-        <h2>🍔 Restron Menu</h2>
+    <header class="fixed top-0 inset-x-0 z-50 border-b border-[#db421f]/20 glass-effect transition-all duration-300">
+        <div class="flex items-center justify-between px-4 h-16 max-w-lg mx-auto">
+            <div class="flex flex-col items-center w-full">
+                <h1 class="text-xl font-bold tracking-tight text-primary uppercase" style="letter-spacing: 0.1em;">Desi Zaika</h1>
+                <span class="text-[10px] uppercase tracking-widest opacity-60 font-medium">Est. 1947</span>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto hide-scrollbar border-t border-[#db421f]/5 py-2">
+            <div class="flex gap-3 px-4 min-w-max" id="category-nav"></div>
+        </div>
     </header>
 
-    <div class="menu-container" id="menu-list">
-        <p style="text-align:center; width:100%">Loading Menu...</p>
-    </div>
-
-    <div class="cart-bar">
-        <div>
-            <span style="display:block; font-size:0.8em; color:#777">Total Items</span>
-            <strong id="total-count">0</strong>
+    <main class="relative w-full max-w-lg mx-auto pt-36 px-4 min-h-screen">
+        <div class="relative w-full h-40 rounded-xl overflow-hidden mb-8 shadow-lg group">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+            <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop" alt="Ambience"/>
+            <div class="absolute bottom-0 left-0 right-0 p-5 z-20 text-center">
+                <h2 class="text-white text-2xl font-bold leading-tight mb-1">Royal flavors, timeless tradition</h2>
+                <p class="text-white/80 text-sm font-light">Family Restaurant</p>
+            </div>
         </div>
-        <button class="place-order-btn" id="order-btn" onclick="submitOrder()" disabled>Place Order</button>
+
+        <div id="menu-container">
+            <p class="text-center mt-10 text-gray-500">Loading Menu...</p>
+        </div>
+    </main>
+
+    <div class="fixed bottom-0 inset-x-0 z-50 p-4 max-w-lg mx-auto pointer-events-none">
+        <div class="bg-text-main text-white rounded-xl shadow-2xl p-4 flex items-center justify-between pointer-events-auto ring-1 ring-white/10 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/black-linen.png')]"></div>
+            <div class="flex flex-col z-10">
+                <span class="text-xs uppercase tracking-wider text-white/60 font-medium">Your Order</span>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-lg font-bold" id="total-items">0 Items</span>
+                    <span class="text-white/40">|</span>
+                    <span class="text-lg font-bold" id="total-price">₹0</span>
+                </div>
+            </div>
+            <button onclick="submitOrder()" id="view-cart-btn" disabled class="z-10 bg-primary hover:bg-primary-dark disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 shadow-lg pointer-events-auto">
+                <span>Place Order</span>
+                <span class="material-symbols-outlined !text-[20px]">arrow_forward</span>
+            </button>
+        </div>
     </div>
 
     <script>
-        // 1. STATE: This variable holds the cart in the browser's memory
-        // Format: { "1": 2, "5": 1 }  -> ID 1 has 2 qty, ID 5 has 1 qty
         let cart = {};
         let menuItems = [];
 
-        // 2. LOAD MENU: Fetch from Python when page opens
         async function loadMenu() {
             try {
-                const response = await fetch('http://127.0.0.1:8000/menu/');
+                const response = await fetch('/menu/');
                 menuItems = await response.json();
                 renderMenu();
-            } catch (error) {
-                console.error("Error loading menu:", error);
-                document.getElementById('menu-list').innerHTML = "<p>Error connecting to server. Is PyCharm running?</p>";
+            } catch (error) { console.error(error); }
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('menu-container');
+            const navContainer = document.getElementById('category-nav');
+            container.innerHTML = ''; navContainer.innerHTML = '';
+
+            // Filter out unavailable items (Managed by Manager)
+            const availableItems = menuItems.filter(item => item.is_available);
+
+            const categories = {};
+            availableItems.forEach(item => {
+                if (!categories[item.category]) categories[item.category] = [];
+                categories[item.category].push(item);
+            });
+
+            for (const [catName, items] of Object.entries(categories)) {
+                const navLink = document.createElement('a');
+                navLink.className = "px-4 py-2 rounded-full bg-[#f3eae8] text-text-main text-xs font-medium border border-[#db421f]/10 hover:border-primary/50 transition-colors whitespace-nowrap";
+                navLink.href = `#${catName.replace(/\s+/g, '-').toLowerCase()}`;
+                navLink.innerText = catName;
+                navContainer.appendChild(navLink);
+
+                const sectionId = catName.replace(/\s+/g, '-').toLowerCase();
+                let sectionHTML = `<div class="mb-8 scroll-mt-40" id="${sectionId}"><div class="ornate-divider"><span class="text-lg font-bold text-primary mx-4 uppercase tracking-wide">${catName}</span></div>`;
+
+                items.forEach(item => {
+                    const qty = cart[item.id] || 0;
+
+                    let buttonHTML = qty === 0
+                        ? `<button onclick="updateQty(${item.id}, 1)" class="text-primary text-xs font-bold border border-primary/30 bg-primary/5 px-4 py-2 rounded-lg uppercase hover:bg-primary hover:text-white transition-all">Add</button>`
+                        : `<div class="flex items-center bg-primary/10 rounded-lg h-8 border border-primary/20"><button onclick="updateQty(${item.id}, -1)" class="w-8 h-full text-primary hover:bg-primary/20">-</button><span class="text-sm font-bold text-primary w-6 text-center">${qty}</span><button onclick="updateQty(${item.id}, 1)" class="w-8 h-full text-primary hover:bg-primary/20">+</button></div>`;
+
+                    const dotColor = item.is_veg ? "green-600" : "red-600";
+
+                    // TEXT ONLY CARD (No Image)
+                    sectionHTML += `
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-[#db421f]/10 mb-3 relative flex flex-col">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1 pr-2">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <div class="flex justify-center size-3 border border-${dotColor} rounded-sm p-[1px] shrink-0"><div class="size-1.5 bg-${dotColor} rounded-full"></div></div>
+                                        <h3 class="text-text-main text-lg font-bold leading-tight">${item.name}</h3>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end gap-1 shrink-0">
+                                    <span class="text-text-main font-bold text-base">₹${item.price}</span>
+                                </div>
+                            </div>
+
+                            <p class="text-text-sub/80 text-sm italic mb-3 leading-relaxed border-l-2 border-primary/20 pl-3">
+                                ${item.description || ''}
+                            </p>
+
+                            <div class="self-end">
+                                ${buttonHTML}
+                            </div>
+                        </div>`;
+                });
+                sectionHTML += `</div>`;
+                container.innerHTML += sectionHTML;
             }
         }
 
-        // 3. RENDER: Create the HTML for each item
-        function renderMenu() {
-            const container = document.getElementById('menu-list');
-            container.innerHTML = ''; // Clear loading text
-
-            menuItems.forEach(item => {
-                // If item is in cart, get qty, else 0
-                const currentQty = cart[item.id] || 0;
-
-                const cardHTML = `
-                    <div class="card">
-                        <div class="card-info">
-                            <h3>${item.name}</h3>
-                            <p>₹${item.price}</p>
-                        </div>
-                        <div class="controls">
-                            <button class="btn-qty" onclick="updateQty(${item.id}, -1)">-</button>
-                            <span class="qty-display" id="qty-${item.id}">${currentQty}</span>
-                            <button class="btn-qty" onclick="updateQty(${item.id}, 1)">+</button>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += cardHTML;
-            });
-        }
-
-        // 4. LOGIC: Handle + and - clicks
         function updateQty(id, change) {
             if (!cart[id]) cart[id] = 0;
             cart[id] += change;
-
-            // Prevent negative numbers
             if (cart[id] < 0) cart[id] = 0;
-
-            // Update the number on the screen immediately (No refresh needed)
-            document.getElementById(`qty-${id}`).innerText = cart[id];
-
-            updateCartUI();
+            renderMenu(); updateCartFooter();
         }
 
-        // 5. UI: Update the bottom bar
-        function updateCartUI() {
-            let totalItems = 0;
-            for (let id in cart) {
-                totalItems += cart[id];
-            }
-            document.getElementById('total-count').innerText = totalItems;
-
-            // Enable/Disable Order Button
-            document.getElementById('order-btn').disabled = (totalItems === 0);
+        function updateCartFooter() {
+            let totalCount = 0; let totalPrice = 0;
+            menuItems.forEach(item => {
+                const qty = cart[item.id] || 0;
+                if (qty > 0) { totalCount += qty; totalPrice += (item.price * qty); }
+            });
+            document.getElementById('total-items').innerText = `${totalCount} Items`;
+            document.getElementById('total-price').innerText = `₹${totalPrice}`;
+            document.getElementById('view-cart-btn').disabled = (totalCount === 0);
         }
 
-        // 6. SEND: Convert Cart to JSON and send to Python
+        // --- UPDATED SUBMIT FUNCTION ---
         async function submitOrder() {
-            // Convert our simplified 'cart' object into the List structure Python wants
-            // Python wants: items: [ {menu_item_id: 1, quantity: 2}, ... ]
-
             const orderItems = [];
             for (let id in cart) {
-                if (cart[id] > 0) {
-                    orderItems.push({
-                        "menu_item_id": parseInt(id),
-                        "quantity": cart[id]
-                    });
-                }
+                if (cart[id] > 0) orderItems.push({ "menu_item_id": parseInt(id), "quantity": cart[id] });
             }
-
             if (orderItems.length === 0) return;
 
-            const payload = {
-                "table_number": 5, // Hardcoded for now. In real life, this comes from the QR URL
-                "items": orderItems
-            };
+            // Ask for Table Number OR 'D' for Delivery
+            const inputVal = prompt("Enter Table Number (or type 'D' for Delivery):", "1");
+            if (!inputVal) return;
+
+            let tableNum = 0;
+            let type = "Dine-in";
+
+            if (inputVal.toLowerCase() === 'd' || inputVal.toLowerCase() === 'delivery') {
+                type = "Delivery";
+                tableNum = 0;
+            } else {
+                tableNum = parseInt(inputVal) || 0;
+            }
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/order/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                const response = await fetch('/order/', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "table_number": tableNum,
+                        "items": orderItems,
+                        "order_type": type
+                    })
                 });
-
                 if (response.ok) {
-                    alert("Order Placed Successfully! 🍳");
-                    cart = {}; // Clear cart
-                    renderMenu(); // Reset UI
-                    updateCartUI();
-                } else {
-                    alert("Something went wrong!");
+                    alert(type === "Delivery" ? "Delivery Order Placed! 🛵" : "Order Placed! 🍽️");
+                    cart = {}; renderMenu(); updateCartFooter();
                 }
-            } catch (error) {
-                console.error("Error placing order:", error);
-            }
+            } catch (error) { alert("Network error."); }
         }
-
-        // Start the app
         loadMenu();
     </script>
 </body>
