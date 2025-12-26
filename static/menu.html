@@ -11,6 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -25,9 +27,6 @@
                         "accent": "#CBA135"
                     },
                     fontFamily: { "display": ["Epilogue", "sans-serif"] },
-                    backgroundImage: {
-                        'mandala-pattern': "url('https://www.transparenttextures.com/patterns/black-linen.png')",
-                    }
                 },
             },
         }
@@ -37,31 +36,18 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .ornate-divider { display: flex; align-items: center; text-align: center; margin-bottom: 1rem; }
         .ornate-divider::before, .ornate-divider::after { content: ''; flex: 1; border-bottom: 2px double #db421f; opacity: 0.3; }
-        .ornate-divider:not(:empty)::before { margin-right: .5em; }
-        .ornate-divider:not(:empty)::after { margin-left: .5em; }
         .glass-effect { background: rgba(253, 251, 247, 0.95); backdrop-filter: blur(8px); }
 
-        /* Search Input */
         #search-input {
             width: 100%; padding: 12px 20px; border-radius: 30px;
             border: 1px solid #e0e0e0; background: #fff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            font-size: 16px; outline: none; transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-size: 16px; outline: none; transition: all 0.3s;
         }
         #search-input:focus { border-color: #db421f; box-shadow: 0 4px 12px rgba(219, 66, 31, 0.15); }
 
-        /* Modal Styles */
-        #order-modal {
-            backdrop-filter: blur(4px);
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        .modal-content {
-            animation: slideUp 0.3s ease-out;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        #order-modal { backdrop-filter: blur(4px); background-color: rgba(0, 0, 0, 0.5); }
+        .modal-content { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body class="bg-background-light text-text-main font-display antialiased pb-32">
@@ -78,7 +64,7 @@
 
     <main class="relative w-full max-w-lg mx-auto pt-36 px-4 min-h-screen">
         <div class="mb-6 relative">
-            <input type="text" id="search-input" placeholder="Search menu..." onkeyup="filterMenu()">
+            <input type="text" id="search-input" placeholder="Search menu..." oninput="filterMenu()">
         </div>
 
         <div id="menu-container">
@@ -110,47 +96,78 @@
                 <h3 class="text-white font-bold text-lg uppercase tracking-wide">Finalize Order</h3>
                 <p class="text-white/80 text-xs">Enter details to confirm</p>
             </div>
-
             <div class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-text-sub uppercase mb-1">Table Number</label>
-                    <input type="text" id="modal-table" placeholder="Enter No. or 'D' for Delivery"
-                           class="w-full border-gray-300 rounded-lg focus:border-primary focus:ring-primary text-sm p-3">
+                    <input type="text" id="modal-table" placeholder="Enter No. or 'D' for Delivery" class="w-full border-gray-300 rounded-lg focus:border-primary p-3">
                 </div>
-
                 <div>
-                    <label class="block text-xs font-bold text-text-sub uppercase mb-1">Phone Number <span class="text-gray-400 font-normal">(Optional)</span></label>
-                    <input type="tel" id="modal-phone" placeholder="For Loyalty Discounts"
-                           class="w-full border-gray-300 rounded-lg focus:border-primary focus:ring-primary text-sm p-3">
+                    <label class="block text-xs font-bold text-text-sub uppercase mb-1">Phone <span class="text-gray-400 font-normal">(Optional)</span></label>
+                    <input type="tel" id="modal-phone" placeholder="For Loyalty Discounts" class="w-full border-gray-300 rounded-lg focus:border-primary p-3">
                 </div>
             </div>
-
             <div class="p-4 bg-gray-50 flex gap-3">
                 <button onclick="closeModal()" class="flex-1 py-3 text-sm font-bold text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-100">Cancel</button>
-                <button onclick="confirmOrder()" class="flex-1 py-3 text-sm font-bold text-white bg-primary rounded-xl hover:bg-primary-dark shadow-md">Confirm Order</button>
+                <button onclick="confirmOrder()" class="flex-1 py-3 text-sm font-bold text-white bg-primary rounded-xl hover:bg-primary-dark shadow-md">Confirm</button>
             </div>
         </div>
     </div>
 
     <script>
+        // --- CONFIGURATION ---
+        // UPDATE THESE WITH YOUR RESTAURANT'S EXACT LOCATION
+        const RESTAURANT_LAT = 28.6366;
+        const RESTAURANT_LNG = 77.4430;
+        const ALLOWED_RADIUS_KM = 0.5; // 500 meters
+        let userInRange = true; // Default to true (safe fallback), updated by checkLocation
+
         let cart = {};
         let menuItems = [];
+        let fuse;
+
+        // --- GEO CHECK ---
+        function checkLocation() {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const dist = getDistanceFromLatLonInKm(pos.coords.latitude, pos.coords.longitude, RESTAURANT_LAT, RESTAURANT_LNG);
+                if (dist > ALLOWED_RADIUS_KM) {
+                    userInRange = false;
+                    const btn = document.getElementById('view-cart-btn');
+                    btn.disabled = true;
+                    btn.innerText = "❌ Out of Range";
+                    btn.classList.add("bg-gray-500");
+                    alert(`You are ${dist.toFixed(2)}km away. Orders restricted to 500m.`);
+                }
+            }, (err) => console.log("Loc access denied"));
+        }
+
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            var R = 6371;
+            var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1);
+            var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        function deg2rad(deg) { return deg * (Math.PI/180) }
 
         async function loadMenu() {
             try {
                 const response = await fetch('/menu/');
                 menuItems = await response.json();
+
+                // Init Fuzzy Search
+                fuse = new Fuse(menuItems, { keys: ['name', 'category'], threshold: 0.3 });
+
                 renderMenu(menuItems);
+                checkLocation();
             } catch (error) { console.error(error); }
         }
 
         function filterMenu() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const filtered = menuItems.filter(item =>
-                item.name.toLowerCase().includes(query) ||
-                item.category.toLowerCase().includes(query)
-            );
-            renderMenu(filtered);
+            const query = document.getElementById('search-input').value;
+            if (!query) { renderMenu(menuItems); return; }
+            const result = fuse.search(query);
+            renderMenu(result.map(r => r.item));
         }
 
         function renderMenu(itemsToRender) {
@@ -161,7 +178,7 @@
             const availableItems = itemsToRender.filter(item => item.is_available);
 
             if(availableItems.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500 mt-10">No items found.</p>';
+                container.innerHTML = '<p class="text-center text-gray-500 mt-10">No items match your search.</p>';
                 return;
             }
 
@@ -172,25 +189,21 @@
             });
 
             for (const [catName, items] of Object.entries(categories)) {
-                // Nav Link
                 const navLink = document.createElement('a');
                 navLink.className = "px-4 py-2 rounded-full bg-[#f3eae8] text-text-main text-xs font-medium border border-[#db421f]/10 hover:border-primary/50 transition-colors whitespace-nowrap";
                 navLink.href = `#${catName.replace(/\s+/g, '-').toLowerCase()}`;
                 navLink.innerText = catName;
                 navContainer.appendChild(navLink);
 
-                // Section
                 const sectionId = catName.replace(/\s+/g, '-').toLowerCase();
                 let sectionHTML = `<div class="mb-8 scroll-mt-40" id="${sectionId}"><div class="ornate-divider"><span class="text-lg font-bold text-primary mx-4 uppercase tracking-wide">${catName}</span></div>`;
 
                 items.forEach(item => {
                     const qty = cart[item.id] || 0;
-
+                    const dotColor = item.is_veg ? "green-600" : "red-600";
                     let buttonHTML = qty === 0
                         ? `<button onclick="updateQty(${item.id}, 1)" class="text-primary text-xs font-bold border border-primary/30 bg-primary/5 px-4 py-2 rounded-lg uppercase hover:bg-primary hover:text-white transition-all">Add</button>`
                         : `<div class="flex items-center bg-primary/10 rounded-lg h-8 border border-primary/20"><button onclick="updateQty(${item.id}, -1)" class="w-8 h-full text-primary hover:bg-primary/20">-</button><span class="text-sm font-bold text-primary w-6 text-center">${qty}</span><button onclick="updateQty(${item.id}, 1)" class="w-8 h-full text-primary hover:bg-primary/20">+</button></div>`;
-
-                    const dotColor = item.is_veg ? "green-600" : "red-600";
 
                     sectionHTML += `
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-[#db421f]/10 mb-3 relative flex flex-col">
@@ -205,14 +218,8 @@
                                     <span class="text-text-main font-bold text-base">₹${item.price}</span>
                                 </div>
                             </div>
-
-                            <p class="text-text-sub/80 text-sm italic mb-3 leading-relaxed border-l-2 border-primary/20 pl-3">
-                                ${item.description || ''}
-                            </p>
-
-                            <div class="self-end">
-                                ${buttonHTML}
-                            </div>
+                            <p class="text-text-sub/80 text-sm italic mb-3 leading-relaxed border-l-2 border-primary/20 pl-3">${item.description || ''}</p>
+                            <div class="self-end">${buttonHTML}</div>
                         </div>`;
                 });
                 sectionHTML += `</div>`;
@@ -235,68 +242,41 @@
             });
             document.getElementById('total-items').innerText = `${totalCount} Items`;
             document.getElementById('total-price').innerText = `₹${totalPrice}`;
-            document.getElementById('view-cart-btn').disabled = (totalCount === 0);
+            const btn = document.getElementById('view-cart-btn');
+            btn.disabled = (totalCount === 0 || !userInRange);
         }
-
-        // --- NEW MODAL FUNCTIONS ---
 
         function openModal() {
             document.getElementById('order-modal').classList.remove('hidden');
-            // Auto focus on table input
             setTimeout(() => document.getElementById('modal-table').focus(), 100);
         }
-
-        function closeModal() {
-            document.getElementById('order-modal').classList.add('hidden');
-        }
+        function closeModal() { document.getElementById('order-modal').classList.add('hidden'); }
 
         async function confirmOrder() {
             const tableInput = document.getElementById('modal-table').value.trim();
             const phoneInput = document.getElementById('modal-phone').value.trim();
 
-            if (!tableInput) {
-                alert("Please enter a Table Number or 'D' for Delivery.");
-                return;
-            }
+            if (!tableInput) { alert("Table Number required!"); return; }
 
             const orderItems = [];
             for (let id in cart) {
                 if (cart[id] > 0) orderItems.push({ "menu_item_id": parseInt(id), "quantity": cart[id] });
             }
 
-            let tableNum = 0;
-            let type = "Dine-in";
-
-            if (tableInput.toLowerCase() === 'd' || tableInput.toLowerCase() === 'delivery') {
-                type = "Delivery";
-                tableNum = 0;
-            } else {
-                tableNum = parseInt(tableInput) || 0;
-            }
+            let tableNum = 0, type = "Dine-in";
+            if (tableInput.toLowerCase() === 'd' || tableInput.toLowerCase() === 'delivery') { type = "Delivery"; tableNum = 0; }
+            else { tableNum = parseInt(tableInput) || 0; }
 
             try {
                 const response = await fetch('/order/', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        "table_number": tableNum,
-                        "items": orderItems,
-                        "order_type": type,
-                        "customer_phone": phoneInput || null
-                    })
+                    body: JSON.stringify({ "table_number": tableNum, "items": orderItems, "order_type": type, "customer_phone": phoneInput || null })
                 });
 
                 const resData = await response.json();
-
                 if (response.ok) {
-                    let msg = type === "Delivery" ? "Delivery Order Placed! 🛵" : "Order Placed! 🍽️";
-                    if (resData.discount > 0) {
-                        msg += `\n🎉 Discount Applied: ₹${resData.discount}`;
-                    }
-                    alert(msg);
-                    cart = {};
-                    document.getElementById('modal-table').value = ""; // Reset form
-                    document.getElementById('modal-phone').value = "";
-                    closeModal();
+                    alert(type === "Delivery" ? "Delivery Order Placed! 🛵" : "Order Placed! 🍽️");
+                    cart = {}; closeModal(); document.getElementById('modal-table').value="";
                     filterMenu(); updateCartFooter();
                 }
             } catch (error) { alert("Network error."); }

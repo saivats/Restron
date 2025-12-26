@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Waiter Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+    <style>
+        body { font-family: monospace; background: #eee; padding: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .search-box { width: 100%; padding: 12px; font-size: 16px; margin-bottom: 10px; border: 2px solid #333; }
+        .item-row { background: white; padding: 10px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        .qty-btn { width: 35px; height: 35px; border: none; background: #ddd; font-weight: bold; font-size: 1.2em; }
+        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #333; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .place-btn { background: #28a745; color: white; border: none; padding: 10px 20px; font-weight: bold; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>🤵 Waiter Mode</h2>
+        <button onclick="logout()">Exit</button>
+    </div>
+
+    <input class="search-box" id="search" placeholder="Search item (Fuzzy)..." oninput="doSearch()">
+
+    <div id="list">Loading...</div>
+    <div style="height: 80px;"></div> <div class="cart-bar">
+        <span id="summary">0 items | ₹0</span>
+        <button class="place-btn" onclick="placeOrder()">SEND TO KITCHEN</button>
+    </div>
+
+    <script>
+        let menu = [], cart = {}, fuse;
+
+        async function init() {
+            const res = await fetch('/menu/');
+            menu = await res.json();
+            fuse = new Fuse(menu, { keys: ['name', 'category'], threshold: 0.4 });
+            render(menu);
+        }
+
+        function render(items) {
+            const div = document.getElementById('list');
+            div.innerHTML = '';
+            items.forEach(i => {
+                if(!i.is_available) return;
+                const qty = cart[i.id] || 0;
+                div.innerHTML += `
+                    <div class="item-row">
+                        <div><b>${i.name}</b><br><small>₹${i.price}</small></div>
+                        <div style="display:flex; gap:5px; align-items:center;">
+                            ${qty > 0 ? `<button class="qty-btn" onclick="mod(${i.id}, -1)">-</button>` : ''}
+                            <span>${qty > 0 ? qty : ''}</span>
+                            <button class="qty-btn" style="background:#ff9800; color:white;" onclick="mod(${i.id}, 1)">+</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function doSearch() {
+            const q = document.getElementById('search').value;
+            if(!q) return render(menu);
+            const res = fuse.search(q);
+            render(res.map(r => r.item));
+        }
+
+        function mod(id, diff) {
+            cart[id] = (cart[id] || 0) + diff;
+            if(cart[id] <= 0) delete cart[id];
+            updateCart();
+            doSearch(); // Refresh view
+        }
+
+        function updateCart() {
+            let count = 0, total = 0;
+            for(let id in cart) {
+                const item = menu.find(i => i.id == parseInt(id));
+                count += cart[id];
+                total += cart[id] * item.price;
+            }
+            document.getElementById('summary').innerText = `${count} items | ₹${total}`;
+        }
+
+        async function placeOrder() {
+            if(Object.keys(cart).length === 0) return alert("Empty Cart!");
+            const table = prompt("Table Number?");
+            if(!table) return;
+
+            const items = [];
+            for(let id in cart) items.push({menu_item_id: parseInt(id), quantity: cart[id]});
+
+            await fetch('/order/', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    table_number: parseInt(table),
+                    items: items,
+                    order_type: "Dine-in",
+                    taken_by: "Waiter"
+                })
+            });
+            alert("Order Sent!");
+            cart = {}; updateCart(); doSearch();
+        }
+
+        function logout() { fetch('/logout', {method:'POST'}).then(() => window.location.href='/'); }
+        init();
+    </script>
+</body>
+</html>

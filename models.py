@@ -4,6 +4,14 @@ from database import Base
 import datetime
 
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    password_hash = Column(String)
+    role = Column(String)  # "owner", "manager", "waiter"
+
+
 class MenuItem(Base):
     __tablename__ = "menu_items"
     id = Column(Integer, primary_key=True, index=True)
@@ -21,8 +29,8 @@ class Customer(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     phone = Column(String, unique=True, index=True)
-    relation = Column(String, default="Regular")  # e.g. "Owner Friend", "VIP"
-    discount_percent = Column(Float, default=0.0)  # e.g. 5.0 for 5%
+    relation = Column(String, default="Regular")
+    discount_percent = Column(Float, default=0.0)
     visit_count = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
@@ -32,18 +40,16 @@ class Order(Base):
     id = Column(Integer, primary_key=True, index=True)
     table_number = Column(Integer)
     status = Column(String, default="Pending")
-
-    # Financials
-    subtotal = Column(Float, default=0.0)  # Price before discount
-    discount_applied = Column(Float, default=0.0)  # Amount subtracted
-    total_amount = Column(Float, default=0.0)  # Final price
-
+    subtotal = Column(Float, default=0.0)
+    discount_applied = Column(Float, default=0.0)
+    total_amount = Column(Float, default=0.0)
     items_summary = Column(String)
     order_type = Column(String, default="Dine-in")
+    customer_phone = Column(String, ForeignKey("customers.phone"), nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-    # Link to Customer (Optional, can be null if guest)
-    customer_phone = Column(String, ForeignKey("customers.phone"), nullable=True)
+    # New: Who took the order?
+    taken_by = Column(String, default="Customer")  # "Customer", "Waiter-Rahul", etc.
 
     items = relationship("OrderItem", back_populates="order")
 
