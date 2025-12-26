@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 # 5. MANUALLY replace '[YOUR-PASSWORD]' with: Restron2025Shop
 
 # 👇 PASTE YOUR LINK INSIDE THESE QUOTES 👇
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres.jzuvinbqupubrcwbcqxn:DesiZaika2025@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres"
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres.jzuvinbqupubrcwbcqxn:DesiZaika2026@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres"
 # (Note: I kept the password 'Restron2025Shop' in the link above as an example.
 # If your link looks different, just paste yours and type 'Restron2025Shop' in the password section.)
 
