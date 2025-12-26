@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restron Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #222; color: white; }
+        .grid { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+        .panel { background: #333; padding: 20px; border-radius: 10px; flex: 1; min-width: 300px; }
+        h2 { border-bottom: 1px solid #555; padding-bottom: 10px; color: #ff9800; margin-top:0; }
+
+        /* Forms */
+        input, select { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px; border:none; box-sizing: border-box; }
+        button { padding: 10px; background: #ff9800; border: none; color: white; cursor: pointer; border-radius: 4px; width: 100%; font-weight: bold; }
+        button:hover { background: #f57c00; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #444; font-size: 0.9em; }
+        th { color: #888; }
+
+        .status-tag { padding: 3px 6px; border-radius: 4px; font-size: 0.8em; }
+        .pending { background: #e65100; } .completed { background: #1b5e20; }
+
+        /* Switch */
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cc0000; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #28a745; }
+        input:checked + .slider:before { transform: translateX(16px); }
+        .menu-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #444; }
+    </style>
+</head>
+<body>
+    <h1>👨‍💼 Manager Dashboard</h1>
+
+    <div class="grid">
+        <div class="panel">
+            <h2>👥 Customer Database (CRM)</h2>
+            <input id="c-phone" placeholder="Phone Number (Unique ID)">
+            <div style="display:flex; gap:10px;">
+                <input id="c-name" placeholder="Customer Name">
+                <input id="c-disc" type="number" placeholder="Discount % (e.g. 5)" style="width:80px;">
+            </div>
+            <select id="c-rel">
+                <option value="Regular">Regular Customer</option>
+                <option value="Owner Friend">Owner Friend</option>
+                <option value="VIP">VIP</option>
+                <option value="Staff">Staff</option>
+            </select>
+            <button onclick="saveCustomer()">Save / Update Customer</button>
+            <p id="crm-msg" style="color:#28a745; margin-top:5px; height:20px;"></p>
+        </div>
+
+        <div class="panel">
+            <h2>📝 Inventory Request</h2>
+            <input type="text" id="inv-item" placeholder="e.g. 5kg Tomatoes">
+            <button onclick="sendRequest()">Send Request</button>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="panel" style="flex:2;">
+            <h2>🔥 Running Orders</h2>
+            <div id="active-orders">Loading...</div>
+        </div>
+        <div class="panel" style="flex:2;">
+            <h2>📜 Recent History</h2>
+            <div id="history-orders">Loading...</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="panel">
+            <h2>🔴 Stock Control (86)</h2>
+            <div id="menu-list">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        async function saveCustomer() {
+            const phone = document.getElementById('c-phone').value;
+            const name = document.getElementById('c-name').value;
+            const disc = document.getElementById('c-disc').value || 0;
+            const rel = document.getElementById('c-rel').value;
+
+            if(!phone || !name) return alert("Phone and Name required!");
+
+            const res = await fetch('/customers/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name, phone, discount_percent: parseFloat(disc), relation: rel })
+            });
+
+            const data = await res.json();
+            document.getElementById('crm-msg').innerText = `✅ Saved: ${data.name}`;
+            setTimeout(() => document.getElementById('crm-msg').innerText = "", 3000);
+
+            // Clear inputs
+            document.getElementById('c-phone').value = "";
+            document.getElementById('c-name').value = "";
+            document.getElementById('c-disc').value = "";
+        }
+
+        async function loadDashboard() {
+            const res = await fetch('/manager/orders/');
+            const data = await res.json();
+            renderTable('active-orders', data.active, true);
+            renderTable('history-orders', data.history, false);
+
+            const resMenu = await fetch('/menu/');
+            const menu = await resMenu.json();
+            const menuContainer = document.getElementById('menu-list');
+            menuContainer.innerHTML = '';
+            menu.forEach(item => {
+                menuContainer.innerHTML += `
+                    <div class="menu-row">
+                        <span>${item.name}</span>
+                        <label class="switch">
+                            <input type="checkbox" ${item.is_available ? 'checked' : ''} onchange="toggleStock(${item.id}, this)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>`;
+            });
+        }
+
+        function renderTable(elementId, orders, isActive) {
+            const container = document.getElementById(elementId);
+            if(orders.length === 0) {
+                container.innerHTML = "<p style='color:#777'>No orders found.</p>";
+                return;
+            }
+            let html = `<table><thead><tr><th>ID</th><th>Table</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>`;
+            orders.forEach(o => {
+                html += `<tr>
+                    <td>#${o.id}</td>
+                    <td>${o.order_type === 'Delivery' ? '🛵' : 'Table ' + o.table_number}</td>
+                    <td style="color:#ccc;">${o.items_summary}</td>
+                    <td>₹${o.total_amount}</td>
+                    <td><span class="status-tag ${isActive ? 'pending' : 'completed'}">${o.status}</span></td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        async function toggleStock(id, el) {
+            await fetch(`/menu/${id}/availability`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ is_available: el.checked }) });
+        }
+
+        async function sendRequest() {
+            const val = document.getElementById('inv-item').value;
+            if(val) {
+                await fetch('/inventory/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ item_name: val }) });
+                document.getElementById('inv-item').value = "";
+                alert("Request Sent!");
+            }
+        }
+
+        loadDashboard();
+        setInterval(loadDashboard, 10000);
+    </script>
+</body>
+</html>

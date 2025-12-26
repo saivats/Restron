@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Restron Kitchen Display</title>
-    <meta http-equiv="refresh" content="10">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #222; color: white; padding: 20px; }
         .header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
@@ -10,12 +10,13 @@
 
         .order-card {
             background-color: #333;
-            border-left: 8px solid #ff9800; /* Orange for Pending */
+            border-left: 8px solid #ff9800; /* Default Pending */
             width: 300px;
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             display: flex; flex-direction: column; justify-content: space-between;
+            position: relative;
         }
 
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -29,24 +30,22 @@
         }
         .done-btn:hover { background-color: #218838; }
 
-        /* Delivery Tag Style */
         .delivery-tag {
-            background: #ff5722;
-            color: white;
-            padding: 8px;
-            text-align: center;
-            font-weight: bold;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            background: #ff5722; color: white; padding: 8px; text-align: center; font-weight: bold;
+            border-radius: 4px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;
             animation: pulse 2s infinite;
         }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.8; }
-            100% { opacity: 1; }
+
+        /* TIMER STYLES */
+        .timer-badge {
+            font-weight: bold; padding: 5px 10px; border-radius: 4px; text-align: center; margin-bottom: 10px; font-family: monospace; font-size: 1.1em;
         }
+        .time-ok { background: #1b5e20; color: #a5d6a7; border: 1px solid #2e7d32; }
+        .time-warn { background: #e65100; color: #ffcc80; border: 1px solid #ef6c00; }
+        .time-late { background: #b71c1c; color: white; border: 1px solid #ff5252; animation: flashRed 1s infinite; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+        @keyframes flashRed { 0% { background: #b71c1c; } 50% { background: #d32f2f; } 100% { background: #b71c1c; } }
     </style>
 </head>
 <body>
@@ -54,48 +53,102 @@
     <div id="orders-container"><p style="text-align:center; width:100%">Connecting to Kitchen...</p></div>
 
     <script>
-        // 1. Fetch Orders
-        fetch('/kitchen-display/')
-            .then(response => response.json())
-            .then(data => {
-                const container = document.getElementById('orders-container');
-                container.innerHTML = '';
+        let orders = [];
 
-                if (data.length === 0) {
-                    container.innerHTML = '<p style="color:#777;">No Pending Orders. Relax! ☕</p>';
-                    return;
-                }
+        async function fetchOrders() {
+            try {
+                const response = await fetch('/kitchen-display/');
+                orders = await response.json();
+                renderOrders();
+            } catch (err) { console.error("Fetch error", err); }
+        }
 
-                data.forEach(order => {
-                    // Logic: Is this a Delivery?
-                    const deliveryTag = order.order_type === "Delivery"
-                        ? '<div class="delivery-tag">🛵 DELIVERY - PACK IT</div>'
-                        : '';
+        function renderOrders() {
+            const container = document.getElementById('orders-container');
+            container.innerHTML = '';
 
-                    const tableName = order.order_type === 'Delivery' ? 'No Table' : 'Table ' + order.table_number;
+            if (orders.length === 0) {
+                container.innerHTML = '<p style="color:#777;">No Pending Orders. Relax! ☕</p>';
+                return;
+            }
 
-                    const card = `
-                        <div class="order-card">
-                            ${deliveryTag}
-                            <div class="card-header">
-                                <span class="table-no">${tableName}</span>
-                                <span class="order-id">#${order.id}</span>
-                            </div>
-                            <div class="items">${order.items_summary}</div>
-                            <button class="done-btn" onclick="markDone(${order.id})">✔ Mark Ready</button>
+            orders.forEach(order => {
+                const deliveryTag = order.order_type === "Delivery" ? '<div class="delivery-tag">🛵 DELIVERY - PACK IT</div>' : '';
+                const tableName = order.order_type === 'Delivery' ? 'No Table' : 'Table ' + order.table_number;
+
+                // Calculate Time
+                // Note: Server sends UTC. We treat it as "Order Time".
+                // We calculate difference locally.
+                const orderTime = new Date(order.created_at + "Z"); // Append Z to treat as UTC
+
+                // HTML Placeholder for Timer (updated by updateTimers function)
+                const timerHtml = `<div id="timer-${order.id}" class="timer-badge time-ok">Loading...</div>`;
+
+                const card = `
+                    <div class="order-card" data-time="${orderTime.getTime()}">
+                        ${deliveryTag}
+                        ${timerHtml}
+                        <div class="card-header">
+                            <span class="table-no">${tableName}</span>
+                            <span class="order-id">#${order.id}</span>
                         </div>
-                    `;
-                    container.innerHTML += card;
-                });
+                        <div class="items">${order.items_summary}</div>
+                        <button class="done-btn" onclick="markDone(${order.id})">✔ Mark Ready</button>
+                    </div>
+                `;
+                container.innerHTML += card;
             });
+            updateTimers(); // Run once immediately
+        }
+
+        function updateTimers() {
+            const cards = document.querySelectorAll('.order-card');
+            const now = new Date().getTime();
+
+            cards.forEach(card => {
+                const startTime = parseInt(card.getAttribute('data-time'));
+                const orderId = card.querySelector('.order-id').innerText.replace('#', '');
+                const timerEl = document.getElementById(`timer-${orderId}`);
+
+                const diffMs = now - startTime;
+                const diffSec = Math.floor(diffMs / 1000);
+                const diffMin = Math.floor(diffSec / 60);
+
+                const threshold = 15; // 15 Minutes
+
+                if (diffMin < threshold) {
+                    // ON TIME
+                    const leftMin = 14 - diffMin; // 14 because we are in the current minute
+                    const leftSec = 59 - (diffSec % 60);
+                    const display = `${String(leftMin).padStart(2, '0')}:${String(leftSec).padStart(2, '0')}`;
+
+                    timerEl.innerText = `⏱️ Time Left: ${display}`;
+                    timerEl.className = (diffMin >= 10) ? "timer-badge time-warn" : "timer-badge time-ok";
+                } else {
+                    // LATE
+                    const lateMs = diffMs - (threshold * 60 * 1000);
+                    const lateSecTotal = Math.floor(lateMs / 1000);
+                    const lateMin = Math.floor(lateSecTotal / 60);
+                    const lateSec = lateSecTotal % 60;
+                    const display = `${String(lateMin).padStart(2, '0')}:${String(lateSec).padStart(2, '0')}`;
+
+                    timerEl.innerText = `⚠️ LATE BY: ${display}`;
+                    timerEl.className = "timer-badge time-late";
+                }
+            });
+        }
 
         function markDone(orderId) {
-            fetch(`/order/${orderId}/done`, { method: 'POST' })
-                .then(response => {
-                    if (response.ok) { location.reload(); }
-                    else { alert("Error updating order."); }
-                });
+            fetch(`/order/${orderId}/done`, { method: 'POST' }).then(() => fetchOrders());
         }
+
+        // Initial Load
+        fetchOrders();
+        // Poll for new orders every 10s
+        setInterval(fetchOrders, 10000);
+        // Update Timers every 1s
+        setInterval(updateTimers, 1000);
+
     </script>
 </body>
 </html>

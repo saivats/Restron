@@ -18,6 +18,7 @@
                 extend: {
                     colors: {
                         "primary": "#db421f",
+                        "primary-dark": "#b93518",
                         "background-light": "#FDFBF7",
                         "text-main": "#3E2723",
                         "text-sub": "#5D4037",
@@ -39,31 +40,45 @@
         .ornate-divider:not(:empty)::before { margin-right: .5em; }
         .ornate-divider:not(:empty)::after { margin-left: .5em; }
         .glass-effect { background: rgba(253, 251, 247, 0.95); backdrop-filter: blur(8px); }
+
+        /* Search Input */
+        #search-input {
+            width: 100%; padding: 12px 20px; border-radius: 30px;
+            border: 1px solid #e0e0e0; background: #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            font-size: 16px; outline: none; transition: all 0.3s;
+        }
+        #search-input:focus { border-color: #db421f; box-shadow: 0 4px 12px rgba(219, 66, 31, 0.15); }
+
+        /* Modal Styles */
+        #order-modal {
+            backdrop-filter: blur(4px);
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-background-light text-text-main font-display antialiased pb-32">
 
     <header class="fixed top-0 inset-x-0 z-50 border-b border-[#db421f]/20 glass-effect transition-all duration-300">
-        <div class="flex items-center justify-between px-4 h-16 max-w-lg mx-auto">
-            <div class="flex flex-col items-center w-full">
-                <h1 class="text-xl font-bold tracking-tight text-primary uppercase" style="letter-spacing: 0.1em;">Desi Zaika</h1>
-                <span class="text-[10px] uppercase tracking-widest opacity-60 font-medium">Est. 1947</span>
-            </div>
+        <div class="flex flex-col items-center w-full px-4 pt-2">
+            <h1 class="text-xl font-bold tracking-tight text-primary uppercase" style="letter-spacing: 0.1em;">Desi Zaika</h1>
+            <span class="text-[10px] uppercase tracking-widest opacity-60 font-medium">Est. 1947</span>
         </div>
-
-        <div class="overflow-x-auto hide-scrollbar border-t border-[#db421f]/5 py-2">
-            <div class="flex gap-3 px-4 min-w-max" id="category-nav"></div>
+        <div class="overflow-x-auto hide-scrollbar border-t border-[#db421f]/5 py-2 px-4">
+            <div class="flex gap-3 min-w-max" id="category-nav"></div>
         </div>
     </header>
 
     <main class="relative w-full max-w-lg mx-auto pt-36 px-4 min-h-screen">
-        <div class="relative w-full h-40 rounded-xl overflow-hidden mb-8 shadow-lg group">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
-            <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000&auto=format&fit=crop" alt="Ambience"/>
-            <div class="absolute bottom-0 left-0 right-0 p-5 z-20 text-center">
-                <h2 class="text-white text-2xl font-bold leading-tight mb-1">Royal flavors, timeless tradition</h2>
-                <p class="text-white/80 text-sm font-light">Family Restaurant</p>
-            </div>
+        <div class="mb-6 relative">
+            <input type="text" id="search-input" placeholder="Search menu..." onkeyup="filterMenu()">
         </div>
 
         <div id="menu-container">
@@ -71,7 +86,7 @@
         </div>
     </main>
 
-    <div class="fixed bottom-0 inset-x-0 z-50 p-4 max-w-lg mx-auto pointer-events-none">
+    <div class="fixed bottom-0 inset-x-0 z-40 p-4 max-w-lg mx-auto pointer-events-none">
         <div class="bg-text-main text-white rounded-xl shadow-2xl p-4 flex items-center justify-between pointer-events-auto ring-1 ring-white/10 relative overflow-hidden">
             <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/black-linen.png')]"></div>
             <div class="flex flex-col z-10">
@@ -82,10 +97,38 @@
                     <span class="text-lg font-bold" id="total-price">₹0</span>
                 </div>
             </div>
-            <button onclick="submitOrder()" id="view-cart-btn" disabled class="z-10 bg-primary hover:bg-primary-dark disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 shadow-lg pointer-events-auto">
+            <button onclick="openModal()" id="view-cart-btn" disabled class="z-10 bg-primary hover:bg-primary-dark disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 shadow-lg pointer-events-auto transition-colors">
                 <span>Place Order</span>
                 <span class="material-symbols-outlined !text-[20px]">arrow_forward</span>
             </button>
+        </div>
+    </div>
+
+    <div id="order-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="modal-content bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden border-2 border-primary/20">
+            <div class="bg-primary p-4 text-center">
+                <h3 class="text-white font-bold text-lg uppercase tracking-wide">Finalize Order</h3>
+                <p class="text-white/80 text-xs">Enter details to confirm</p>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-text-sub uppercase mb-1">Table Number</label>
+                    <input type="text" id="modal-table" placeholder="Enter No. or 'D' for Delivery"
+                           class="w-full border-gray-300 rounded-lg focus:border-primary focus:ring-primary text-sm p-3">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-text-sub uppercase mb-1">Phone Number <span class="text-gray-400 font-normal">(Optional)</span></label>
+                    <input type="tel" id="modal-phone" placeholder="For Loyalty Discounts"
+                           class="w-full border-gray-300 rounded-lg focus:border-primary focus:ring-primary text-sm p-3">
+                </div>
+            </div>
+
+            <div class="p-4 bg-gray-50 flex gap-3">
+                <button onclick="closeModal()" class="flex-1 py-3 text-sm font-bold text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-100">Cancel</button>
+                <button onclick="confirmOrder()" class="flex-1 py-3 text-sm font-bold text-white bg-primary rounded-xl hover:bg-primary-dark shadow-md">Confirm Order</button>
+            </div>
         </div>
     </div>
 
@@ -97,17 +140,30 @@
             try {
                 const response = await fetch('/menu/');
                 menuItems = await response.json();
-                renderMenu();
+                renderMenu(menuItems);
             } catch (error) { console.error(error); }
         }
 
-        function renderMenu() {
+        function filterMenu() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = menuItems.filter(item =>
+                item.name.toLowerCase().includes(query) ||
+                item.category.toLowerCase().includes(query)
+            );
+            renderMenu(filtered);
+        }
+
+        function renderMenu(itemsToRender) {
             const container = document.getElementById('menu-container');
             const navContainer = document.getElementById('category-nav');
             container.innerHTML = ''; navContainer.innerHTML = '';
 
-            // Filter out unavailable items (Managed by Manager)
-            const availableItems = menuItems.filter(item => item.is_available);
+            const availableItems = itemsToRender.filter(item => item.is_available);
+
+            if(availableItems.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 mt-10">No items found.</p>';
+                return;
+            }
 
             const categories = {};
             availableItems.forEach(item => {
@@ -116,12 +172,14 @@
             });
 
             for (const [catName, items] of Object.entries(categories)) {
+                // Nav Link
                 const navLink = document.createElement('a');
                 navLink.className = "px-4 py-2 rounded-full bg-[#f3eae8] text-text-main text-xs font-medium border border-[#db421f]/10 hover:border-primary/50 transition-colors whitespace-nowrap";
                 navLink.href = `#${catName.replace(/\s+/g, '-').toLowerCase()}`;
                 navLink.innerText = catName;
                 navContainer.appendChild(navLink);
 
+                // Section
                 const sectionId = catName.replace(/\s+/g, '-').toLowerCase();
                 let sectionHTML = `<div class="mb-8 scroll-mt-40" id="${sectionId}"><div class="ornate-divider"><span class="text-lg font-bold text-primary mx-4 uppercase tracking-wide">${catName}</span></div>`;
 
@@ -134,7 +192,6 @@
 
                     const dotColor = item.is_veg ? "green-600" : "red-600";
 
-                    // TEXT ONLY CARD (No Image)
                     sectionHTML += `
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-[#db421f]/10 mb-3 relative flex flex-col">
                             <div class="flex justify-between items-start mb-2">
@@ -167,7 +224,7 @@
             if (!cart[id]) cart[id] = 0;
             cart[id] += change;
             if (cart[id] < 0) cart[id] = 0;
-            renderMenu(); updateCartFooter();
+            filterMenu(); updateCartFooter();
         }
 
         function updateCartFooter() {
@@ -181,26 +238,40 @@
             document.getElementById('view-cart-btn').disabled = (totalCount === 0);
         }
 
-        // --- UPDATED SUBMIT FUNCTION ---
-        async function submitOrder() {
+        // --- NEW MODAL FUNCTIONS ---
+
+        function openModal() {
+            document.getElementById('order-modal').classList.remove('hidden');
+            // Auto focus on table input
+            setTimeout(() => document.getElementById('modal-table').focus(), 100);
+        }
+
+        function closeModal() {
+            document.getElementById('order-modal').classList.add('hidden');
+        }
+
+        async function confirmOrder() {
+            const tableInput = document.getElementById('modal-table').value.trim();
+            const phoneInput = document.getElementById('modal-phone').value.trim();
+
+            if (!tableInput) {
+                alert("Please enter a Table Number or 'D' for Delivery.");
+                return;
+            }
+
             const orderItems = [];
             for (let id in cart) {
                 if (cart[id] > 0) orderItems.push({ "menu_item_id": parseInt(id), "quantity": cart[id] });
             }
-            if (orderItems.length === 0) return;
-
-            // Ask for Table Number OR 'D' for Delivery
-            const inputVal = prompt("Enter Table Number (or type 'D' for Delivery):", "1");
-            if (!inputVal) return;
 
             let tableNum = 0;
             let type = "Dine-in";
 
-            if (inputVal.toLowerCase() === 'd' || inputVal.toLowerCase() === 'delivery') {
+            if (tableInput.toLowerCase() === 'd' || tableInput.toLowerCase() === 'delivery') {
                 type = "Delivery";
                 tableNum = 0;
             } else {
-                tableNum = parseInt(inputVal) || 0;
+                tableNum = parseInt(tableInput) || 0;
             }
 
             try {
@@ -209,15 +280,28 @@
                     body: JSON.stringify({
                         "table_number": tableNum,
                         "items": orderItems,
-                        "order_type": type
+                        "order_type": type,
+                        "customer_phone": phoneInput || null
                     })
                 });
+
+                const resData = await response.json();
+
                 if (response.ok) {
-                    alert(type === "Delivery" ? "Delivery Order Placed! 🛵" : "Order Placed! 🍽️");
-                    cart = {}; renderMenu(); updateCartFooter();
+                    let msg = type === "Delivery" ? "Delivery Order Placed! 🛵" : "Order Placed! 🍽️";
+                    if (resData.discount > 0) {
+                        msg += `\n🎉 Discount Applied: ₹${resData.discount}`;
+                    }
+                    alert(msg);
+                    cart = {};
+                    document.getElementById('modal-table').value = ""; // Reset form
+                    document.getElementById('modal-phone').value = "";
+                    closeModal();
+                    filterMenu(); updateCartFooter();
                 }
             } catch (error) { alert("Network error."); }
         }
+
         loadMenu();
     </script>
 </body>
