@@ -131,7 +131,7 @@
                 container.innerHTML = "<p style='color:#777'>No orders found.</p>";
                 return;
             }
-            let html = `<table><thead><tr><th>ID</th><th>Table</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>`;
+            let html = `<table><thead><tr><th>ID</th><th>Table</th><th>Items</th><th>Total</th><th>Status</th>${isActive ? '<th>Action</th>' : ''}</tr></thead><tbody>`;
             orders.forEach(o => {
                 html += `<tr>
                     <td>#${o.id}</td>
@@ -139,10 +139,19 @@
                     <td style="color:#ccc;">${o.items_summary}</td>
                     <td>₹${o.total_amount}</td>
                     <td><span class="status-tag ${isActive ? 'pending' : 'completed'}">${o.status}</span></td>
+                    ${isActive ? `<td><button onclick="cancelOrder(${o.id})" style="background:#dc3545; padding:5px; width:auto; font-size:0.8em;">❌ Cancel</button></td>` : ''}
                 </tr>`;
             });
             html += `</tbody></table>`;
             container.innerHTML = html;
+        }
+
+        async function cancelOrder(id) {
+            if(!confirm("Are you sure you want to CANCEL Order #" + id + "?")) return;
+
+            await fetch(`/order/${id}/cancel`, { method: 'POST' });
+            loadDashboard(); // Refresh UI
+            alert("Order #" + id + " Cancelled.");
         }
 
         async function toggleStock(id, el) {

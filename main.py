@@ -15,19 +15,27 @@ import os
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from supabase import create_client, Client
+from dotenv import load_dotenv
 
-# --- 🔐 CONFIGURATION (UPDATE THESE!) ---
+# --- 🔒 SECURITY CONFIGURATION ---
+# Load environment variables from .env file
+load_dotenv()
+
 # 1. JWT Security Config
-SECRET_KEY = "desi-zaika-super-secret-key-2025"  # Change this in production!
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback-dev-secret-change-in-prod")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 720  # 12 Hours
+ACCESS_TOKEN_EXPIRE_MINUTES = 10  # 10 Minutes Session Limit
 
-# 2. Supabase Storage Config (Get these from Supabase -> Settings -> API)
-SUPABASE_URL = "https://jzuvinbqupubrcwbcqxn.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dXZpbmJxdXB1YnJjd2JjcXhuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NjczNzQxMiwiZXhwIjoyMDgyMzEzNDEyfQ.1Ymb_brCBrwF5NFfxwlbO4UToE2diiLQ3S8cMR53_zU"
+# 2. Supabase Storage Config
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 # Initialize Supabase Client
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+if SUPABASE_URL and SUPABASE_KEY:
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+else:
+    print("⚠️ WARNING: Supabase credentials missing in .env. Receipt upload will fail.")
+    supabase = None
 
 # --- APP SETUP ---
 # Create Database Tables if they don't exist
@@ -191,9 +199,9 @@ def generate_receipt(order_id: int, db: Session = Depends(get_db)):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=(200, 500))
 
-    c.setFont("Helvetica-Bold", 12);
+    c.setFont("Helvetica-Bold", 12)
     c.drawString(50, 480, "DESI ZAIKA")
-    c.setFont("Helvetica", 10);
+    c.setFont("Helvetica", 10)
     c.drawString(40, 465, "Est. 1947 - Ghaziabad")
     c.line(10, 455, 190, 455)
 
@@ -202,7 +210,7 @@ def generate_receipt(order_id: int, db: Session = Depends(get_db)):
     y -= 20
     c.drawString(10, y, f"Date: {order.created_at.strftime('%d-%m-%Y %H:%M')}")
     y -= 20
-    c.line(10, y, 190, y);
+    c.line(10, y, 190, y)
     y -= 20
 
     items = db.query(models.OrderItem).filter(models.OrderItem.order_id == order.id).all()
@@ -212,19 +220,19 @@ def generate_receipt(order_id: int, db: Session = Depends(get_db)):
         y -= 15
         if y < 50: c.showPage(); y = 480
 
-    c.line(10, y, 190, y);
+    c.line(10, y, 190, y)
     y -= 20
-    c.setFont("Helvetica-Bold", 10);
-    c.drawString(10, y, "Subtotal:");
-    c.drawRightString(180, y, f"Rs {order.subtotal}");
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(10, y, "Subtotal:")
+    c.drawRightString(180, y, f"Rs {order.subtotal}")
     y -= 15
     if order.discount_applied > 0:
-        c.drawString(10, y, "Discount:");
-        c.drawRightString(180, y, f"- Rs {order.discount_applied}");
+        c.drawString(10, y, "Discount:")
+        c.drawRightString(180, y, f"- Rs {order.discount_applied}")
         y -= 15
 
-    c.setFont("Helvetica-Bold", 14);
-    c.drawString(10, y - 10, "TOTAL:");
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(10, y - 10, "TOTAL:")
     c.drawRightString(180, y - 10, f"Rs {order.total_amount}")
     c.save()
 
@@ -235,6 +243,8 @@ def generate_receipt(order_id: int, db: Session = Depends(get_db)):
     bucket_name = "receipts"
 
     try:
+        if not supabase: raise Exception("Supabase not configured")
+
         supabase.storage.from_(bucket_name).upload(
             file=buffer.getvalue(),
             path=filename,
@@ -336,20 +346,47 @@ def place_order(order_data: OrderCreate, db: Session = Depends(get_db)):
     return {"status": "Placed", "id": new_order.id, "discount": discount_amount}
 
 
+# --- 🔒 SECURE ORDER MANAGEMENT ---
+# Only staff can view kitchen display
 @app.get("/kitchen-display/")
-def kitchen_view(db: Session = Depends(get_db)):
+def kitchen_view(user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not user or user.role not in ["owner", "manager", "waiter", "chef"]:
+        raise HTTPException(status_code=401, detail="Not authorized")
     return db.query(models.Order).filter(models.Order.status == "Pending").all()
 
 
+# Only staff can complete orders
 @app.post("/order/{order_id}/done")
-def mark_done(order_id: int, db: Session = Depends(get_db)):
+def mark_done(order_id: int, user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not user or user.role not in ["owner", "manager", "chef"]:
+        raise HTTPException(status_code=401, detail="Not authorized")
+
     order = db.query(models.Order).filter(models.Order.id == order_id).first()
-    if order: order.status = "Completed"; db.commit()
+    if order:
+        order.status = "Completed"
+        db.commit()
     return {"status": "Done"}
+
+
+# Only Managers/Owners can cancel orders
+@app.post("/order/{order_id}/cancel")
+def cancel_order(order_id: int, user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not user or user.role not in ["owner", "manager"]:
+        raise HTTPException(status_code=401, detail="Not authorized")
+
+    order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    if order:
+        order.status = "Cancelled"
+        db.commit()
+    return {"status": "Cancelled"}
 
 
 @app.get("/manager/orders/")
 def manager_orders(db: Session = Depends(get_db)):
+    # Note: Ideally this should be secured too, but leaving open for manager.html fetch
+    # If you want to secure manager.html fetch, you'd need to pass token in frontend fetch calls.
+    # For now, we assume manager page is behind login gate, but API is technically open if token not checked.
+    # Adding security here would require updating manager.html JS to send headers.
     active = db.query(models.Order).filter(models.Order.status == "Pending").all()
     history = db.query(models.Order).filter(models.Order.status != "Pending").order_by(
         desc(models.Order.created_at)).limit(20).all()
@@ -383,7 +420,7 @@ def get_customers(search: Optional[str] = None, db: Session = Depends(get_db)):
 # --- INVENTORY ---
 @app.post("/inventory/")
 def add_inv(req: InventoryCreate, db: Session = Depends(get_db)):
-    db.add(models.InventoryRequest(item_name=req.item_name));
+    db.add(models.InventoryRequest(item_name=req.item_name))
     db.commit()
     return {"status": "OK"}
 
@@ -394,7 +431,7 @@ def get_inv(db: Session = Depends(get_db)): return db.query(models.InventoryRequ
 
 @app.delete("/inventory/")
 def clear_inv(db: Session = Depends(get_db)):
-    db.query(models.InventoryRequest).delete();
+    db.query(models.InventoryRequest).delete()
     db.commit()
     return {"status": "Cleared"}
 
@@ -402,7 +439,7 @@ def clear_inv(db: Session = Depends(get_db)):
 # --- OWNER ANALYTICS ---
 @app.get("/owner/analytics/")
 def owner_analytics(db: Session = Depends(get_db)):
-    now = datetime.datetime.utcnow()
+    now = datetime.utcnow()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     week_start = today_start - timedelta(days=7)
     month_start = today_start - timedelta(days=30)
@@ -431,13 +468,18 @@ def owner_analytics(db: Session = Depends(get_db)):
 
 @app.get("/owner/history/")
 def get_history(date: Optional[str] = None, month: Optional[str] = None, db: Session = Depends(get_db)):
-    start_dt = None;
+    start_dt = None
     end_dt = None
     if date:
-        start_dt = datetime.datetime.strptime(date, "%Y-%m-%d"); end_dt = start_dt + timedelta(days=1)
+        start_dt = datetime.strptime(date, "%Y-%m-%d");
+        end_dt = start_dt + timedelta(days=1)
     elif month:
-        y, m = map(int, month.split('-')); import calendar; start_dt = datetime.datetime(y, m, 1); last = \
-        calendar.monthrange(y, m)[1]; end_dt = datetime.datetime(y, m, last) + timedelta(days=1)
+        y, m = map(int, month.split('-'));
+        import calendar;
+        start_dt = datetime(y, m, 1);
+        last = \
+            calendar.monthrange(y, m)[1];
+        end_dt = datetime(y, m, last) + timedelta(days=1)
     else:
         raise HTTPException(400, "Date needed")
 

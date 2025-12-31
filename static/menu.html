@@ -118,8 +118,8 @@
         // UPDATE THESE WITH YOUR RESTAURANT'S EXACT LOCATION
         const RESTAURANT_LAT = 28.6366;
         const RESTAURANT_LNG = 77.4430;
-        const ALLOWED_RADIUS_KM = 0.5; // 500 meters
-        let userInRange = true; // Default to true (safe fallback), updated by checkLocation
+        const ALLOWED_RADIUS_KM = 0.05; // 50 METERS
+        let userInRange = false;
 
         let cart = {};
         let menuItems = [];
@@ -136,7 +136,10 @@
                     btn.disabled = true;
                     btn.innerText = "❌ Out of Range";
                     btn.classList.add("bg-gray-500");
-                    alert(`You are ${dist.toFixed(2)}km away. Orders restricted to 500m.`);
+                    alert(`You are ${dist.toFixed(2)}km away. Orders restricted to 50m.`);
+                } else {
+                    userInRange = true;
+                    updateCartFooter(); // Re-enable button if cart has items
                 }
             }, (err) => console.log("Loc access denied"));
         }
@@ -243,6 +246,8 @@
             document.getElementById('total-items').innerText = `${totalCount} Items`;
             document.getElementById('total-price').innerText = `₹${totalPrice}`;
             const btn = document.getElementById('view-cart-btn');
+
+            // Allow button if items exist AND user is in range
             btn.disabled = (totalCount === 0 || !userInRange);
         }
 
@@ -253,6 +258,21 @@
         function closeModal() { document.getElementById('order-modal').classList.add('hidden'); }
 
         async function confirmOrder() {
+            // 1. Check strict 10-minute re-verification rule
+            const lastOrderTime = localStorage.getItem('lastOrderTime');
+            if (lastOrderTime) {
+                const diffMinutes = (Date.now() - parseInt(lastOrderTime)) / 1000 / 60;
+                if (diffMinutes > 10) {
+                    alert("🕒 Session expired (10 mins limit). Verifying location again...");
+                    // Force re-check
+                    checkLocation();
+                    if (!userInRange) {
+                        alert("❌ You must be within 50m to place a new order.");
+                        return;
+                    }
+                }
+            }
+
             const tableInput = document.getElementById('modal-table').value.trim();
             const phoneInput = document.getElementById('modal-phone').value.trim();
 
@@ -273,9 +293,12 @@
                     body: JSON.stringify({ "table_number": tableNum, "items": orderItems, "order_type": type, "customer_phone": phoneInput || null })
                 });
 
-                const resData = await response.json();
                 if (response.ok) {
                     alert(type === "Delivery" ? "Delivery Order Placed! 🛵" : "Order Placed! 🍽️");
+
+                    // SAVE TIME OF ORDER
+                    localStorage.setItem('lastOrderTime', Date.now().toString());
+
                     cart = {}; closeModal(); document.getElementById('modal-table').value="";
                     filterMenu(); updateCartFooter();
                 }
