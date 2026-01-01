@@ -57,10 +57,23 @@
 
         async function fetchOrders() {
             try {
-                const response = await fetch('/kitchen-display/');
+                const response = await fetch('/kitchen-display/', {
+                    credentials: 'include'  // Include cookies for authentication
+                });
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    throw new Error('Failed to fetch orders');
+                }
                 orders = await response.json();
                 renderOrders();
-            } catch (err) { console.error("Fetch error", err); }
+            } catch (err) {
+                console.error("Fetch error", err);
+                document.getElementById('orders-container').innerHTML =
+                    '<p style="color:#ff5722; text-align:center;">❌ Connection Error. Check console.</p>';
+            }
         }
 
         function renderOrders() {
@@ -138,8 +151,28 @@
             });
         }
 
-        function markDone(orderId) {
-            fetch(`/order/${orderId}/done`, { method: 'POST' }).then(() => fetchOrders());
+        async function markDone(orderId) {
+            try {
+                const response = await fetch(`/order/${orderId}/done`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+                    alert(`Failed to mark order as done: ${errorData.detail || 'Unknown error'}`);
+                    return;
+                }
+                
+                const result = await response.json();
+                fetchOrders(); // Refresh orders list
+            } catch (err) {
+                console.error('Error marking done:', err);
+                alert('Network error: ' + err.message);
+            }
         }
 
         // Initial Load

@@ -27,7 +27,7 @@ class MenuItem(Base):
 class Customer(Base):
     __tablename__ = "customers"
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String)
+    name = Column(String, nullable=True)  # Allow NULL names
     phone = Column(String, unique=True, index=True)
     relation = Column(String, default="Regular")
     discount_percent = Column(Float, default=0.0)
@@ -42,6 +42,7 @@ class Order(Base):
     status = Column(String, default="Pending")
     subtotal = Column(Float, default=0.0)
     discount_applied = Column(Float, default=0.0)
+    gst_amount = Column(Float, default=0.0)  # GST calculation (5% of subtotal)
     total_amount = Column(Float, default=0.0)
     items_summary = Column(String)
     order_type = Column(String, default="Dine-in")
@@ -50,6 +51,13 @@ class Order(Base):
 
     # New: Who took the order?
     taken_by = Column(String, default="Customer")  # "Customer", "Waiter-Rahul", etc.
+
+    # Payment tracking
+    payment_method = Column(String, nullable=True)  # "Cash", "Card", "UPI"
+    paid_at = Column(DateTime, nullable=True)
+
+    # Table occupancy
+    table_status = Column(String, default="Occupied")  # "Occupied", "Available"
 
     items = relationship("OrderItem", back_populates="order")
 

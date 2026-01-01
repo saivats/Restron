@@ -4,21 +4,45 @@
     <title>Restron Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #222; color: white; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #222; color: white; margin: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { margin: 0; color: #ff9800; }
         .grid { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
         .panel { background: #333; padding: 20px; border-radius: 10px; flex: 1; min-width: 300px; }
         h2 { border-bottom: 1px solid #555; padding-bottom: 10px; color: #ff9800; margin-top:0; }
 
         /* Forms */
-        input, select { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px; border:none; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px; border:none; box-sizing: border-box; }
         button { padding: 10px; background: #ff9800; border: none; color: white; cursor: pointer; border-radius: 4px; width: 100%; font-weight: bold; }
         button:hover { background: #f57c00; }
+        button.secondary { background: #555; }
+        button.secondary:hover { background: #666; }
+        button.danger { background: #d32f2f; }
+        button.danger:hover { background: #c62828; }
 
         /* Tables */
         table { width: 100%; border-collapse: collapse; margin-top: 5px; }
         th, td { padding: 8px; text-align: left; border-bottom: 1px solid #444; font-size: 0.9em; }
         th { color: #888; }
 
+        /* Table Grid View */
+        .tables-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; }
+        .table-card { background: #2a2a2a; padding: 15px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+        .table-card.occupied { border-color: #ff5722; background: #3a1f1f; }
+        .table-card.available { border-color: #4caf50; background: #1f3a1f; }
+        .table-card:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .table-num { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .table-status { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .table-bill { font-size: 16px; font-weight: bold; color: #ff9800; margin-top: 5px; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); overflow-y: auto; }
+        .modal-content { background: #333; margin: 5% auto; padding: 25px; border-radius: 10px; max-width: 500px; position: relative; }
+        .modal-close { position: absolute; right: 15px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
+        .modal-close:hover { color: white; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+
+        /* Status tags */
         .status-tag { padding: 3px 6px; border-radius: 4px; font-size: 0.8em; }
         .pending { background: #e65100; } .completed { background: #1b5e20; }
 
@@ -30,14 +54,45 @@
         input:checked + .slider { background-color: #28a745; }
         input:checked + .slider:before { transform: translateX(16px); }
         .menu-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #444; }
+
+        /* Customer List */
+        .customer-list { max-height: 400px; overflow-y: auto; }
+        .customer-card { background: #2a2a2a; padding: 12px; margin-bottom: 8px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .customer-card:hover { background: #3a3a3a; transform: translateX(5px); }
+        .customer-name { font-weight: bold; font-size: 16px; }
+        .customer-info { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+        /* Big Action Button */
+        .big-btn { padding: 15px 30px; font-size: 18px; margin-bottom: 20px; }
+
+        /* Order Items List */
+        .order-items { background: #2a2a2a; padding: 10px; border-radius: 6px; margin-top: 10px; max-height: 200px; overflow-y: auto; }
+        .order-item { padding: 5px 0; border-bottom: 1px solid #444; }
     </style>
 </head>
 <body>
-    <h1>👨‍💼 Manager Dashboard</h1>
+    <div class="header">
+        <h1>👨‍💼 Manager Dashboard</h1>
+        <button class="big-btn" onclick="openPhoneOrderModal()">📞 New Phone Order</button>
+    </div>
+
+    <!-- TABLE VIEW -->
+    <div class="panel" style="width: 100%;">
+        <h2>🍽️ Tables (1-10)</h2>
+        <div class="tables-grid" id="tables-grid">Loading...</div>
+    </div>
 
     <div class="grid">
+        <!-- CUSTOMER DATABASE -->
+        <div class="panel" style="flex: 2;">
+            <h2>👥 Customer Database (A-Z)</h2>
+            <input id="customer-search" placeholder="Search by name or phone..." oninput="loadCustomers()">
+            <div class="customer-list" id="customer-list">Loading...</div>
+        </div>
+
+        <!-- CRM PANEL -->
         <div class="panel">
-            <h2>👥 Customer Database (CRM)</h2>
+            <h2>➕ Add/Update Customer</h2>
             <input id="c-phone" placeholder="Phone Number (Unique ID)">
             <div style="display:flex; gap:10px;">
                 <input id="c-name" placeholder="Customer Name">
@@ -51,10 +106,8 @@
             </select>
             <button onclick="saveCustomer()">Save / Update Customer</button>
             <p id="crm-msg" style="color:#28a745; margin-top:5px; height:20px;"></p>
-        </div>
 
-        <div class="panel">
-            <h2>📝 Inventory Request</h2>
+            <h2 style="margin-top:30px;">📝 Inventory Request</h2>
             <input type="text" id="inv-item" placeholder="e.g. 5kg Tomatoes">
             <button onclick="sendRequest()">Send Request</button>
         </div>
@@ -66,7 +119,10 @@
             <div id="active-orders">Loading...</div>
         </div>
         <div class="panel" style="flex:2;">
-            <h2>📜 Recent History</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 style="margin: 0;">📜 Recent History</h2>
+                <button onclick="resetTodayHistory()" style="background: #dc3545; padding: 8px 15px; font-size: 0.9em; width: auto;">🗑️ Reset Today</button>
+            </div>
             <div id="history-orders">Loading...</div>
         </div>
     </div>
@@ -78,19 +134,537 @@
         </div>
     </div>
 
+    <!-- CHECKOUT MODAL -->
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="modal-close" onclick="closeCheckoutModal()">&times;</span>
+            <h2>💳 Checkout Order</h2>
+            <div id="checkout-details"></div>
+            
+            <label>Customer Phone (for receipt):</label>
+            <input id="checkout-phone" placeholder="Enter phone number" oninput="lookupCustomer()" type="tel">
+            <div id="customer-info" style="margin: 10px 0; padding: 10px; background: #2a2a2a; border-radius: 6px; display: none;">
+                <div id="customer-details"></div>
+            </div>
+            
+            <div id="new-customer-form" style="display: none; margin: 10px 0; padding: 10px; background: #2a2a2a; border-radius: 6px;">
+                <p style="color: #ff9800; font-size: 12px; margin-bottom: 8px;">❓ New Customer - Add to database?</p>
+                <input id="new-customer-name" placeholder="Name (optional)" style="margin-bottom: 8px;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input id="new-customer-discount" type="number" placeholder="Discount %" style="width: 100px; margin-bottom: 0;" oninput="recalculateNewCustomerDiscount()" min="0" max="100">
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 12px;">
+                        <input type="checkbox" id="save-customer-check" checked>
+                        Save to database
+                    </label>
+                </div>
+            </div>
+            
+            <div id="bill-summary" style="margin: 15px 0; padding: 15px; background: #1a1a1a; border-radius: 6px;">
+                <div id="bill-breakdown"></div>
+            </div>
+            
+            <label>Payment Method:</label>
+            <select id="payment-method">
+                <option value="Cash">Cash</option>
+                <option value="Card">Card</option>
+                <option value="UPI">UPI</option>
+            </select>
+            
+            <div class="modal-actions">
+                <button class="secondary" onclick="closeCheckoutModal()">Cancel</button>
+                <button onclick="processCheckout()">Confirm Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="modal-close" onclick="closeSuccessModal()">&times;</span>
+            <h2 style="color: #4caf50;">✅ Payment Successful!</h2>
+            <div id="success-details"></div>
+            <div class="modal-actions" style="flex-direction: column; gap: 10px;">
+                <button onclick="sendWhatsAppReceipt()" style="background: #25D366; width: 100%;">
+                    📱 Send Receipt via WhatsApp
+                </button>
+                <button class="secondary" onclick="viewReceiptPDF()" style="width: 100%;">
+                    📄 View Receipt PDF
+                </button>
+                <button class="secondary" onclick="closeSuccessModal()" style="width: 100%;">
+                    ✖ Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHONE ORDER MODAL (Menu Interface) -->
+    <div id="phone-order-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="modal-close" onclick="closePhoneOrderModal()">&times;</span>
+            <h2>📞 Take Phone Order</h2>
+            <iframe id="menu-iframe" src="/mobile" style="width: 100%; height: 600px; border: none; border-radius: 8px;"></iframe>
+            <p style="color: #aaa; font-size: 12px; margin-top: 10px;">🎯 Use the menu above to take customer's order. Customer will enter phone number and details on final screen.</p>
+        </div>
+    </div>
+
     <script>
+        let currentOrder = null;
+        let currentCustomer = null;
+        let originalBillAmount = 0;
+        let receiptData = null;
+        let lastCheckoutPhone = null; // Store phone for receipt generation
+        let lastCheckoutOrderId = null; // Store order ID for receipt generation after modal close
+
+        async function loadTables() {
+            const res = await fetch('/manager/tables/');
+            const data = await res.json();
+            const grid = document.getElementById('tables-grid');
+            grid.innerHTML = '';
+
+            data.tables.forEach(table => {
+                const card = document.createElement('div');
+                card.className = `table-card ${table.status.toLowerCase()}`;
+                card.onclick = () => table.status === 'Occupied' ? openCheckoutModal(table) : null;
+
+                card.innerHTML = `
+                    <div class="table-num">Table ${table.table_number}</div>
+                    <div class="table-status">${table.status}</div>
+                    ${table.status === 'Occupied' ? `
+                        <div class="table-bill">₹${table.bill_amount}</div>
+                        <div style="font-size:11px; color:#ccc; margin-top:3px;">${table.created_at}</div>
+                    ` : ''}
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openCheckoutModal(table) {
+            currentOrder = table;
+            originalBillAmount = table.bill_amount;
+            currentCustomer = null;
+            receiptData = null;
+            
+            document.getElementById('checkout-modal').style.display = 'block';
+            document.getElementById('checkout-details').innerHTML = `
+                <p><strong>Order #${table.order_id}</strong></p>
+                <p><strong>Table ${table.table_number}</strong></p>
+                <div class="order-items">
+                    <p>${table.items_summary}</p>
+                </div>
+            `;
+            
+            // Reset form
+            document.getElementById('checkout-phone').value = '';
+            document.getElementById('customer-info').style.display = 'none';
+            document.getElementById('new-customer-form').style.display = 'none';
+            document.getElementById('new-customer-name').value = '';
+            document.getElementById('new-customer-discount').value = '';
+            document.getElementById('save-customer-check').checked = true;
+            
+            updateBillSummary(originalBillAmount, 0);
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').style.display = 'none';
+            // Don't clear currentOrder here - we need it for receipt generation
+            // It will be cleared when a new checkout starts or success modal closes
+            currentCustomer = null;
+        }
+
+        async function lookupCustomer() {
+            const phone = document.getElementById('checkout-phone').value.trim();
+            const customerInfoDiv = document.getElementById('customer-info');
+            const newCustomerForm = document.getElementById('new-customer-form');
+            
+            if (!phone || phone.length < 10) {
+                customerInfoDiv.style.display = 'none';
+                newCustomerForm.style.display = 'none';
+                updateBillSummary(originalBillAmount, 0);
+                return;
+            }
+            
+            try {
+                const res = await fetch(`/customers/lookup/${phone}`);
+                const data = await res.json();
+                
+                if (data.exists) {
+                    currentCustomer = data;
+                    customerInfoDiv.style.display = 'block';
+                    newCustomerForm.style.display = 'none';
+                    
+                    const discountAmount = (originalBillAmount * data.discount_percent) / 100;
+                    document.getElementById('customer-details').innerHTML = `
+                        <div style="color: #4caf50; font-weight: bold;">
+                            ✅ Customer: ${data.name || 'Anonymous'} (${data.relation})
+                        </div>
+                        <div style="color: #ff9800; margin-top: 5px;">
+                            💰 Discount: ${data.discount_percent}% (-₹${discountAmount.toFixed(2)})
+                        </div>
+                    `;
+                    
+                    updateBillSummary(originalBillAmount, discountAmount, data.discount_percent);
+                } else {
+                    currentCustomer = null;
+                    customerInfoDiv.style.display = 'none';
+                    newCustomerForm.style.display = 'block';
+                    updateBillSummary(originalBillAmount, 0);
+                }
+            } catch (error) {
+                console.error('Lookup error:', error);
+            }
+        }
+
+        function recalculateNewCustomerDiscount() {
+            if (!currentOrder || currentCustomer) return;
+            
+            const discountPercent = parseFloat(document.getElementById('new-customer-discount').value) || 0;
+            const discountAmount = (originalBillAmount * discountPercent) / 100;
+            updateBillSummary(originalBillAmount, discountAmount, discountPercent);
+        }
+
+        function updateBillSummary(subtotal, discount, discountPercent = 0) {
+            const gst = (subtotal - discount) * 0.05;
+            const total = subtotal - discount + gst;
+            
+            let html = `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>Original Bill:</span>
+                    <span>₹${subtotal.toFixed(2)}</span>
+                </div>
+            `;
+            
+            if (discount > 0) {
+                html += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #4caf50;">
+                        <span>Discount (${discountPercent}%):</span>
+                        <span>-₹${discount.toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>Subtotal after discount:</span>
+                        <span>₹${(subtotal - discount).toFixed(2)}</span>
+                    </div>
+                `;
+            }
+            
+            html += `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>GST (5%):</span>
+                    <span>₹${gst.toFixed(2)}</span>
+                </div>
+                <div style="border-top: 2px solid #555; margin-top: 10px; padding-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: bold; color: #ff9800;">
+                        <span>TOTAL:</span>
+                        <span>₹${total.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('bill-breakdown').innerHTML = html;
+        }
+
+        async function processCheckout() {
+            if (!currentOrder) return;
+
+            const paymentMethod = document.getElementById('payment-method').value;
+            const phone = document.getElementById('checkout-phone').value.trim();
+            
+            let customerName = null;
+            let customerDiscount = null;
+            let saveCustomer = false;
+            
+            if (phone) {
+                if (currentCustomer) {
+                    // Existing customer - no need to save
+                    customerDiscount = currentCustomer.discount_percent;
+                } else {
+                    // New customer
+                    customerName = document.getElementById('new-customer-name').value.trim() || null;
+                    customerDiscount = parseFloat(document.getElementById('new-customer-discount').value) || 0;
+                    saveCustomer = document.getElementById('save-customer-check').checked;
+                }
+            }
+
+            try {
+                const res = await fetch('/manager/checkout/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        order_id: currentOrder.order_id,
+                        payment_method: paymentMethod,
+                        customer_phone: phone || null,
+                        customer_name: customerName,
+                        customer_discount: customerDiscount,
+                        save_customer: saveCustomer
+                    })
+                });
+
+                if (res.ok) {
+                    const result = await res.json();
+                    
+                    // Store phone and order ID for later use in receipt
+                    lastCheckoutPhone = phone || null;
+                    lastCheckoutOrderId = currentOrder.order_id;
+                    
+                    closeCheckoutModal();
+                    
+                    // Generate receipt if phone provided (non-blocking)
+                    receiptData = null;
+                    if (phone) {
+                        try {
+                            const receiptRes = await fetch(`/receipt/${currentOrder.order_id}`);
+                            if (receiptRes.ok) {
+                                receiptData = await receiptRes.json();
+                            } else {
+                                console.warn('Receipt generation failed, but checkout was successful');
+                                // Continue anyway - checkout succeeded
+                            }
+                        } catch (receiptError) {
+                            console.warn('Receipt generation error:', receiptError);
+                            // Continue anyway - checkout succeeded
+                        }
+                    }
+                    
+                    // Show success modal
+                    showSuccessModal(result, paymentMethod);
+                    loadTables();
+                    loadDashboard();
+                } else {
+                    const error = await res.json().catch(() => ({ detail: 'Unknown error' }));
+                    alert(`❌ Checkout failed: ${error.detail || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert(`❌ Network error during checkout: ${error.message || 'Please check your connection and try again'}`);
+            }
+        }
+
+        function showSuccessModal(result, paymentMethod) {
+            const discountText = result.discount_applied > 0 
+                ? `<div style="color: #4caf50; margin-top: 10px;">💰 Discount Applied: ₹${result.discount_applied.toFixed(2)}</div>`
+                : '';
+            
+            document.getElementById('success-details').innerHTML = `
+                <p><strong>Order #${result.order_id}</strong></p>
+                <p>Paid: ₹${result.total.toFixed(2)} via ${paymentMethod}</p>
+                ${discountText}
+                ${currentCustomer ? `<p style="color: #aaa; margin-top: 10px;">Customer: ${currentCustomer.name || 'Anonymous'} (${document.getElementById('checkout-phone').value})</p>` : ''}
+            `;
+            document.getElementById('success-modal').style.display = 'block';
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').style.display = 'none';
+            // Clear order info after success modal is closed
+            currentOrder = null;
+            lastCheckoutOrderId = null;
+            lastCheckoutPhone = null;
+            receiptData = null;
+        }
+
+        function sendWhatsAppReceipt() {
+            if (!receiptData) {
+                // Try to generate receipt now
+                const orderId = lastCheckoutOrderId || (currentOrder ? currentOrder.order_id : null);
+                
+                if (!orderId) {
+                    alert('Order information not available. Please refresh the page.');
+                    return;
+                }
+                
+                // Get phone from stored value or input field
+                let phone = lastCheckoutPhone;
+                if (!phone) {
+                    const phoneInput = document.getElementById('checkout-phone');
+                    phone = phoneInput ? phoneInput.value.trim() : '';
+                }
+                
+                if (!phone) {
+                    alert('Phone number required for receipt. Please try checkout again with phone number.');
+                    return;
+                }
+                
+                // Show loading message
+                const sendBtn = event?.target || document.querySelector('button[onclick="sendWhatsAppReceipt()"]');
+                if (sendBtn) {
+                    const originalText = sendBtn.innerHTML;
+                    sendBtn.disabled = true;
+                    sendBtn.innerHTML = '⏳ Generating receipt...';
+                    
+                    // Try to generate receipt
+                    fetch(`/receipt/${orderId}`)
+                        .then(res => {
+                            if (res.ok) {
+                                return res.json();
+                            }
+                            throw new Error('Receipt generation failed');
+                        })
+                        .then(data => {
+                            receiptData = data;
+                            sendBtn.disabled = false;
+                            sendBtn.innerHTML = originalText;
+                            sendWhatsAppReceipt(); // Retry sending
+                        })
+                        .catch(err => {
+                            sendBtn.disabled = false;
+                            sendBtn.innerHTML = originalText;
+                            alert('Failed to generate receipt. Please try again later.');
+                            console.error('Receipt generation error:', err);
+                        });
+                } else {
+                    // Fallback if button not found
+                    fetch(`/receipt/${orderId}`)
+                        .then(res => {
+                            if (res.ok) {
+                                return res.json();
+                            }
+                            throw new Error('Receipt generation failed');
+                        })
+                        .then(data => {
+                            receiptData = data;
+                            sendWhatsAppReceipt(); // Retry sending
+                        })
+                        .catch(err => {
+                            alert('Failed to generate receipt. Please try again later.');
+                            console.error('Receipt generation error:', err);
+                        });
+                }
+                return;
+            }
+            
+            // Get phone from stored value or input field
+            let phone = lastCheckoutPhone;
+            if (!phone) {
+                const phoneInput = document.getElementById('checkout-phone');
+                phone = phoneInput ? phoneInput.value.trim() : '';
+            }
+            
+            if (!phone) {
+                alert('Phone number required for WhatsApp');
+                return;
+            }
+            
+            // Format phone number (remove +, spaces, etc.)
+            const cleanPhone = phone.replace(/[^0-9]/g, '');
+            const phoneWithCountryCode = cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone;
+            
+            const discountText = receiptData.discount > 0 
+                ? `\n\n💰 You saved ₹${receiptData.discount.toFixed(2)} today with your discount!`
+                : '';
+            
+            const message = encodeURIComponent(
+                `🍽️ Thank you for dining at Desi Zaika!\n\n` +
+                `📄 Your bill: ${receiptData.pdf_url}\n` +
+                `📋 Our menu: ${receiptData.menu_url}${discountText}\n\n` +
+                `Total paid: ₹${receiptData.total.toFixed(2)}\n\n` +
+                `See you again soon! 🎉`
+            );
+            
+            const whatsappUrl = `https://wa.me/${phoneWithCountryCode}?text=${message}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function viewReceiptPDF() {
+            if (!receiptData) {
+                // Try to generate receipt now
+                const orderId = lastCheckoutOrderId || (currentOrder ? currentOrder.order_id : null);
+                
+                if (!orderId) {
+                    alert('Order information not available. Please refresh the page.');
+                    return;
+                }
+                
+                // Show loading
+                const viewBtn = event?.target || document.querySelector('button[onclick="viewReceiptPDF()"]');
+                if (viewBtn) {
+                    const originalText = viewBtn.innerHTML;
+                    viewBtn.disabled = true;
+                    viewBtn.innerHTML = '⏳ Generating receipt...';
+                    
+                    fetch(`/receipt/${orderId}`)
+                        .then(res => {
+                            if (res.ok) {
+                                return res.json();
+                            }
+                            throw new Error('Receipt generation failed');
+                        })
+                        .then(data => {
+                            receiptData = data;
+                            viewBtn.disabled = false;
+                            viewBtn.innerHTML = originalText;
+                            window.open(receiptData.pdf_url, '_blank');
+                        })
+                        .catch(err => {
+                            viewBtn.disabled = false;
+                            viewBtn.innerHTML = originalText;
+                            alert('Failed to generate receipt. Please try again later.');
+                            console.error('Receipt generation error:', err);
+                        });
+                } else {
+                    // Fallback
+                    fetch(`/receipt/${orderId}`)
+                        .then(res => {
+                            if (res.ok) {
+                                return res.json();
+                            }
+                            throw new Error('Receipt generation failed');
+                        })
+                        .then(data => {
+                            receiptData = data;
+                            window.open(receiptData.pdf_url, '_blank');
+                        })
+                        .catch(err => {
+                            alert('Failed to generate receipt. Please try again later.');
+                            console.error('Receipt generation error:', err);
+                        });
+                }
+                return;
+            }
+            window.open(receiptData.pdf_url, '_blank');
+        }
+
+        async function loadCustomers() {
+            const search = document.getElementById('customer-search').value;
+            const res = await fetch(`/customers/?sort=alpha&search=${search}`);
+            const customers = await res.json();
+            const list = document.getElementById('customer-list');
+
+            if (customers.length === 0) {
+                list.innerHTML = '<p style="color:#777; text-align:center; padding:20px;">No customers found</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            customers.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'customer-card';
+                card.onclick = () => fillCustomerForm(c);
+                card.innerHTML = `
+                    <div class="customer-name">${c.name || 'Anonymous Customer'}</div>
+                    <div class="customer-info">📞 ${c.phone} | 🎫 ${c.relation} | 💰 ${c.discount_percent}% off | 📊 ${c.visit_count} visits</div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function fillCustomerForm(customer) {
+            document.getElementById('c-phone').value = customer.phone;
+            document.getElementById('c-name').value = customer.name;
+            document.getElementById('c-disc').value = customer.discount_percent;
+            document.getElementById('c-rel').value = customer.relation;
+        }
+
         async function saveCustomer() {
             const phone = document.getElementById('c-phone').value;
             const name = document.getElementById('c-name').value;
             const disc = document.getElementById('c-disc').value || 0;
             const rel = document.getElementById('c-rel').value;
 
-            if(!phone || !name) return alert("Phone and Name required!");
+            if(!phone) return alert("Phone number required!");
 
             const res = await fetch('/customers/', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ name, phone, discount_percent: parseFloat(disc), relation: rel })
+                body: JSON.stringify({ name: name || null, phone, discount_percent: parseFloat(disc), relation: rel })
             });
 
             const data = await res.json();
@@ -101,6 +675,8 @@
             document.getElementById('c-phone').value = "";
             document.getElementById('c-name').value = "";
             document.getElementById('c-disc').value = "";
+
+            loadCustomers();
         }
 
         async function loadDashboard() {
@@ -151,6 +727,7 @@
 
             await fetch(`/order/${id}/cancel`, { method: 'POST' });
             loadDashboard(); // Refresh UI
+            loadTables();
             alert("Order #" + id + " Cancelled.");
         }
 
@@ -167,8 +744,51 @@
             }
         }
 
+        async function resetTodayHistory() {
+            if(!confirm("⚠️ Are you sure you want to reset today's order history?\n\nThis will delete all completed and cancelled orders from today. This action cannot be undone.")) {
+                return;
+            }
+            
+            try {
+                const res = await fetch('/manager/reset-history/', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                if (res.ok) {
+                    const result = await res.json();
+                    alert(`✅ ${result.message}`);
+                    loadDashboard(); // Refresh the dashboard
+                } else {
+                    const error = await res.json().catch(() => ({ detail: 'Unknown error' }));
+                    alert(`❌ Failed to reset history: ${error.detail || 'Unknown error'}`);
+                }
+            } catch (error) {
+                alert('❌ Network error while resetting history');
+                console.error(error);
+            }
+        }
+
+        function openPhoneOrderModal() {
+            document.getElementById('phone-order-modal').style.display = 'block';
+            // Reload iframe to reset menu
+            document.getElementById('menu-iframe').src = '/mobile';
+        }
+
+        function closePhoneOrderModal() {
+            document.getElementById('phone-order-modal').style.display = 'none';
+        }
+
+        // Initial load
+        loadTables();
+        loadCustomers();
         loadDashboard();
-        setInterval(loadDashboard, 10000);
+
+        // Auto-refresh every 10 seconds
+        setInterval(() => {
+            loadTables();
+            loadDashboard();
+        }, 10000);
     </script>
 </body>
 </html>
