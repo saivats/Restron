@@ -220,17 +220,17 @@ def generate_receipt(order_id: int, db: Session = Depends(get_db)):
 
         # Premium Header with decorative box
         c.setLineWidth(2.5)
-        c.rect(8, y-50, 211, 45, stroke=1, fill=0)
+        c.rect(8, y - 50, 211, 45, stroke=1, fill=0)
         # Decorative corner elements
         c.setLineWidth(1)
-        c.line(8, y-5, 18, y-5)
-        c.line(8, y-5, 8, y-15)
-        c.line(219, y-5, 209, y-5)
-        c.line(219, y-5, 219, y-15)
-        c.line(8, y-50, 18, y-50)
-        c.line(8, y-50, 8, y-40)
-        c.line(219, y-50, 209, y-50)
-        c.line(219, y-50, 219, y-40)
+        c.line(8, y - 5, 18, y - 5)
+        c.line(8, y - 5, 8, y - 15)
+        c.line(219, y - 5, 209, y - 5)
+        c.line(219, y - 5, 219, y - 15)
+        c.line(8, y - 50, 18, y - 50)
+        c.line(8, y - 50, 8, y - 40)
+        c.line(219, y - 50, 209, y - 50)
+        c.line(219, y - 50, 219, y - 40)
         y -= 12
 
         c.setFont("Helvetica-Bold", 18)
@@ -288,13 +288,13 @@ def generate_receipt(order_id: int, db: Session = Depends(get_db)):
             c.drawString(12, y, item_name)
             # Draw quantity (centered in QTY column)
             qty_width = c.stringWidth(str(item.quantity), "Helvetica", 9)
-            c.drawString(145 + (25 - qty_width)/2, y, str(item.quantity))
+            c.drawString(145 + (25 - qty_width) / 2, y, str(item.quantity))
             # Draw amount (right aligned)
             amount = item.price * item.quantity
             c.drawRightString(215, y, f"₹{amount:.2f}")
             y -= 16  # Increased spacing between items
-            if y < 150: 
-                c.showPage() 
+            if y < 150:
+                c.showPage()
                 y = 880
 
         y -= 5
@@ -350,9 +350,9 @@ def generate_receipt(order_id: int, db: Session = Depends(get_db)):
         # Savings Message with decorative box
         if order.discount_applied > 0:
             c.setLineWidth(1)
-            c.rect(12, y-12, 193, 14, stroke=1, fill=0)
+            c.rect(12, y - 12, 193, 14, stroke=1, fill=0)
             c.setFont("Helvetica-Bold", 10)
-            c.drawCentredString(113, y-2, f" You saved ₹{order.discount_applied:.2f} with your VIP discount!")
+            c.drawCentredString(113, y - 2, f" You saved ₹{order.discount_applied:.2f} with your VIP discount!")
             y -= 22
 
         # Footer with decorative lines
@@ -463,65 +463,134 @@ def place_order(order_data: OrderCreate, db: Session = Depends(get_db)):
     try:
         if not order_data.items or len(order_data.items) == 0:
             raise HTTPException(status_code=400, detail="No items in order")
-        
-        subtotal = 0.0
-        discount_amount = 0.0
-        summary_list = []
 
+        # 1. Calculate costs for the NEW items being added
+        new_items_subtotal = 0.0
+        new_summary_list = []
         item_details = []
+
         for item in order_data.items:
             menu_item = db.query(models.MenuItem).filter(models.MenuItem.id == item.menu_item_id).first()
             if not menu_item:
                 continue
             if not menu_item.is_available:
                 raise HTTPException(status_code=400, detail=f"{menu_item.name} is currently unavailable")
+
             cost = menu_item.price * item.quantity
-            subtotal += cost
-            summary_list.append(f"{item.quantity}x {menu_item.name}")
+            new_items_subtotal += cost
+            new_summary_list.append(f"{item.quantity}x {menu_item.name}")
             item_details.append({
                 "name": menu_item.name, "qty": item.quantity, "price": menu_item.price,
                 "veg": menu_item.is_veg, "cat": menu_item.category
             })
 
-        if subtotal == 0:
+        if new_items_subtotal == 0:
             raise HTTPException(status_code=400, detail="Order total cannot be zero")
 
-        if order_data.customer_phone:
-            phone_clean = order_data.customer_phone.strip().replace(" ", "").replace("-", "")
-            customer = db.query(models.Customer).filter(models.Customer.phone == phone_clean).first()
-            if customer:
-                if customer.discount_percent > 0:
-                    discount_amount = round((subtotal * customer.discount_percent) / 100, 2)
-                customer.visit_count += 1
-                db.add(customer)
+        # 2. Check if there is an EXISTING active order for this table (Dine-in only)
+        existing_order = None
+        if order_data.order_type == "Dine-in":
+            existing_order = db.query(models.Order).filter(
+                models.Order.table_number == order_data.table_number,
+                models.Order.status == "Pending",
+                models.Order.order_type == "Dine-in"
+            ).first()
 
-        # Calculate GST (5%)
-        gst_amount = round((subtotal - discount_amount) * 0.05, 2)
-        final_total = round(subtotal - discount_amount + gst_amount, 2)
+        if existing_order:
+            # --- UPDATE EXISTING ORDER ---
 
-        new_order = models.Order(
-            table_number=order_data.table_number,
-            order_type=order_data.order_type,
-            status="Pending",
-            subtotal=round(subtotal, 2),
-            discount_applied=round(discount_amount, 2),
-            gst_amount=gst_amount,
-            total_amount=final_total,
-            items_summary=", ".join(summary_list),
-            customer_phone=order_data.customer_phone.strip() if order_data.customer_phone else None,
-            taken_by=order_data.taken_by,
-            table_status="Occupied" if order_data.order_type == "Dine-in" else "Available"
-        )
-        db.add(new_order)
-        db.commit()
-        db.refresh(new_order)
+            # Add new items to the OrderItem table linked to existing ID
+            for d in item_details:
+                db.add(models.OrderItem(
+                    order_id=existing_order.id,
+                    item_name=d['name'],
+                    quantity=d['qty'],
+                    price=d['price'],
+                    is_veg=d['veg'],
+                    category=d['cat']
+                ))
 
-        for d in item_details:
-            db.add(models.OrderItem(order_id=new_order.id, item_name=d['name'], quantity=d['qty'], price=d['price'],
-                                    is_veg=d['veg'], category=d['cat']))
+            # Update totals
+            existing_order.subtotal += new_items_subtotal
 
-        db.commit()
-        return {"status": "Placed", "id": new_order.id, "discount": discount_amount, "gst": gst_amount}
+            # Update summary string
+            if existing_order.items_summary:
+                existing_order.items_summary += ", " + ", ".join(new_summary_list)
+            else:
+                existing_order.items_summary = ", ".join(new_summary_list)
+
+            # Re-calculate Discount if a customer is already attached
+            # (If a new phone number is provided in this request, we update the customer link)
+            if order_data.customer_phone:
+                existing_order.customer_phone = order_data.customer_phone.strip()
+
+            # Recalculate discount amount based on new subtotal if a discount percent exists
+            current_discount_percent = 0
+            if existing_order.customer_phone:
+                customer = db.query(models.Customer).filter(
+                    models.Customer.phone == existing_order.customer_phone).first()
+                if customer:
+                    current_discount_percent = customer.discount_percent
+
+            # Apply discount logic
+            existing_order.discount_applied = round((existing_order.subtotal * current_discount_percent) / 100, 2)
+
+            # Recalculate GST & Total
+            existing_order.gst_amount = round((existing_order.subtotal - existing_order.discount_applied) * 0.05, 2)
+            existing_order.total_amount = round(
+                existing_order.subtotal - existing_order.discount_applied + existing_order.gst_amount, 2)
+
+            # Update who took the order if it wasn't "Customer"
+            if order_data.taken_by != "Customer":
+                existing_order.taken_by = order_data.taken_by
+
+            db.commit()
+            db.refresh(existing_order)
+            return {"status": "Updated", "id": existing_order.id, "total": existing_order.total_amount}
+
+        else:
+            # --- CREATE NEW ORDER (Standard Logic) ---
+
+            discount_amount = 0.0
+
+            # Handle Customer / Discount
+            if order_data.customer_phone:
+                phone_clean = order_data.customer_phone.strip().replace(" ", "").replace("-", "")
+                customer = db.query(models.Customer).filter(models.Customer.phone == phone_clean).first()
+                if customer:
+                    if customer.discount_percent > 0:
+                        discount_amount = round((new_items_subtotal * customer.discount_percent) / 100, 2)
+                    customer.visit_count += 1
+                    db.add(customer)
+
+            # Calculate GST (5%)
+            gst_amount = round((new_items_subtotal - discount_amount) * 0.05, 2)
+            final_total = round(new_items_subtotal - discount_amount + gst_amount, 2)
+
+            new_order = models.Order(
+                table_number=order_data.table_number,
+                order_type=order_data.order_type,
+                status="Pending",
+                subtotal=round(new_items_subtotal, 2),
+                discount_applied=round(discount_amount, 2),
+                gst_amount=gst_amount,
+                total_amount=final_total,
+                items_summary=", ".join(new_summary_list),
+                customer_phone=order_data.customer_phone.strip() if order_data.customer_phone else None,
+                taken_by=order_data.taken_by,
+                table_status="Occupied" if order_data.order_type == "Dine-in" else "Available"
+            )
+            db.add(new_order)
+            db.commit()
+            db.refresh(new_order)
+
+            for d in item_details:
+                db.add(models.OrderItem(order_id=new_order.id, item_name=d['name'], quantity=d['qty'], price=d['price'],
+                                        is_veg=d['veg'], category=d['cat']))
+
+            db.commit()
+            return {"status": "Placed", "id": new_order.id, "discount": discount_amount, "gst": gst_amount}
+
     except HTTPException:
         raise
     except Exception as e:
@@ -549,10 +618,10 @@ def mark_done(order_id: int, user: models.User = Depends(get_current_user), db: 
         order = db.query(models.Order).filter(models.Order.id == order_id).first()
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
-        
+
         if order.status == "Completed":
             return {"status": "Already completed"}
-        
+
         order.status = "Completed"
         db.commit()
         return {"status": "Done"}
@@ -574,13 +643,13 @@ def cancel_order(order_id: int, user: models.User = Depends(get_current_user), d
         order = db.query(models.Order).filter(models.Order.id == order_id).first()
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
-        
+
         if order.status == "Cancelled":
             return {"status": "Already cancelled"}
-        
+
         if order.payment_method:
             raise HTTPException(status_code=400, detail="Cannot cancel paid order")
-        
+
         order.status = "Cancelled"
         db.commit()
         return {"status": "Cancelled"}
@@ -609,18 +678,18 @@ def reset_today_history(user: models.User = Depends(get_current_user), db: Sessi
     """Reset order history - deletes today's completed/cancelled orders"""
     if not user or user.role not in ["manager", "owner"]:
         raise HTTPException(status_code=401, detail="Not authorized")
-    
+
     try:
         today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-        
+
         # Delete completed/cancelled orders from today
         deleted = db.query(models.Order).filter(
             models.Order.status.in_(["Completed", "Cancelled"]),
             models.Order.created_at >= today_start
         ).delete()
-        
+
         db.commit()
-        
+
         return {
             "status": "Success",
             "message": f"Reset {deleted} orders from today",
@@ -808,14 +877,14 @@ def checkout_order(checkout: CheckoutSchema, db: Session = Depends(get_db)):
         # Handle customer lookup and discount recalculation
         discount_to_apply = 0.0
         customer = None
-        
+
         if checkout.customer_phone:
             # Clean phone number
             phone_clean = checkout.customer_phone.strip().replace(" ", "").replace("-", "")
-            
+
             # Lookup existing customer
             customer = db.query(models.Customer).filter(models.Customer.phone == phone_clean).first()
-            
+
             if customer:
                 # Existing customer - use their discount
                 if customer.discount_percent > 0:
@@ -829,13 +898,15 @@ def checkout_order(checkout: CheckoutSchema, db: Session = Depends(get_db)):
                     # If False, just save phone number (anonymous customer)
                     customer = models.Customer(
                         phone=phone_clean,
-                        name=checkout.customer_name.strip() if (checkout.save_customer and checkout.customer_name and checkout.customer_name.strip()) else None,
-                        discount_percent=float(checkout.customer_discount) if (checkout.save_customer and checkout.customer_discount) else 0.0,
+                        name=checkout.customer_name.strip() if (
+                                    checkout.save_customer and checkout.customer_name and checkout.customer_name.strip()) else None,
+                        discount_percent=float(checkout.customer_discount) if (
+                                    checkout.save_customer and checkout.customer_discount) else 0.0,
                         relation="Regular"
                     )
                     db.add(customer)
                     db.flush()  # Flush to ensure customer is in database before setting foreign key
-                    
+
                     # Apply discount if provided
                     if checkout.customer_discount and float(checkout.customer_discount) > 0:
                         discount_to_apply = (order.subtotal * float(checkout.customer_discount)) / 100
@@ -845,16 +916,17 @@ def checkout_order(checkout: CheckoutSchema, db: Session = Depends(get_db)):
                     customer = db.query(models.Customer).filter(models.Customer.phone == phone_clean).first()
                     if not customer:
                         # If still no customer, we can't set the foreign key - skip setting customer_phone
-                        print(f"Warning: Could not create or find customer with phone {phone_clean}, skipping customer_phone assignment")
+                        print(
+                            f"Warning: Could not create or find customer with phone {phone_clean}, skipping customer_phone assignment")
                         phone_clean = None
-            
+
             # Recalculate bill with discount
             if discount_to_apply > 0:
                 order.discount_applied = round(discount_to_apply, 2)
                 # Recalculate GST on discounted amount
                 order.gst_amount = round((order.subtotal - discount_to_apply) * 0.05, 2)
                 order.total_amount = round(order.subtotal - discount_to_apply + order.gst_amount, 2)
-            
+
             # Only set customer_phone if customer exists in database (satisfies foreign key constraint)
             if phone_clean and customer:
                 order.customer_phone = phone_clean
