@@ -54,6 +54,15 @@
 
     <script>
         let orders = [];
+        let kitchenSocket = null;
+
+        function connectKitchenSocket() {
+            if (!('WebSocket' in window)) return;
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            kitchenSocket = new WebSocket(`${protocol}://${window.location.host}/orders/ws/kitchen`);
+            kitchenSocket.onmessage = () => fetchOrders();
+            kitchenSocket.onclose = () => setTimeout(connectKitchenSocket, 5000);
+        }
 
         async function fetchOrders() {
             try {
@@ -177,10 +186,14 @@
 
         // Initial Load
         fetchOrders();
+        connectKitchenSocket();
         // Poll for new orders every 10s
         setInterval(fetchOrders, 10000);
         // Update Timers every 1s
         setInterval(updateTimers, 1000);
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
+        }
 
     </script>
 </body>

@@ -1,5 +1,5 @@
-from app.db.database import Base
-from app.models.models import (
+from . import models
+from .models import (
     AuditLog,
     Customer,
     Ingredient,
@@ -21,7 +21,7 @@ from app.models.models import (
 )
 
 __all__ = [
-    "Base",
+    "models",
     "AuditLog",
     "Customer",
     "Ingredient",

@@ -1,0 +1,9 @@
+{
+  "name": "Restron POS",
+  "short_name": "Restron",
+  "start_url": "/mobile",
+  "display": "standalone",
+  "background_color": "#fdfbf7",
+  "theme_color": "#db421f",
+  "icons": []
+}

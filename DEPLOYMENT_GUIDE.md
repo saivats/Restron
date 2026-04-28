@@ -129,14 +129,14 @@ These are now active in the customer menu for location verification (50m radius)
 
 ---
 
-## 🗑️ Resetting Order History
+## Archiving Order History
 
 At the end of each day:
 1. Go to Manager Dashboard
-2. In "Recent History" section, click **"🗑️ Reset Today"** button
+2. In "Recent History" section, click **"Archive Today"**
 3. Confirm the action
-4. This will delete all completed/cancelled orders from today
-5. **Note**: This action cannot be undone - make sure you've reviewed today's data if needed
+4. This will hide completed/cancelled orders from dashboard views
+5. Financial records are preserved with `archived=true`; do not delete orders from the database
 
 ---
 

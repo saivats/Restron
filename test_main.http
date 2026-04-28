@@ -1,11 +1,18 @@
-# Test your FastAPI endpoints
+# Manual endpoint smoke tests
 
-GET http://127.0.0.1:8000/
+GET http://127.0.0.1:8000/health
 Accept: application/json
 
 ###
 
-GET http://127.0.0.1:8000/hello/User
+POST http://127.0.0.1:8000/auth/token
+Content-Type: application/x-www-form-urlencoded
+
+username=manager&password=manager123
+
+###
+
+GET http://127.0.0.1:8000/manager/orders/
 Accept: application/json
 
 ###

@@ -1,0 +1,429 @@
+Restron → Petpooja-level POS
+Complete build roadmap · No aggregator integrations · Small Indian businesses
+Critical fix
+Foundation
+Core product
+Differentiator
+SaaS layer
+Security holes (fix before sharing with anyone)
+🚨
+JWT token expires in 10 minutes — cashiers will be kicked out mid-shift. Change to 8–12 hours for POS roles.
+ACCESS_TOKEN_EXPIRE_MINUTES = 480
+🚨
+CORS is open to the entire internet. Lock it to your actual domain(s).
+allow_origins=["https://yourdomain.com"]
+🚨
+/manager/orders/ has a comment saying it is 'technically open' — add the auth dependency now before you forget.
+🚨
+SECRET_KEY has a fallback string in code. Remove it. Force crash if env var missing.
+Data integrity bugs
+🔥
+reset-history permanently DELETES financial records. This is your billing data. Replace with a soft-archive: add an 'archived' boolean column and filter it out of views. Never delete orders.
+🔥
+Receipt PDF generator has 'DESI ZAIKA', your Ghaziabad address and phone hardcoded. Extract to env vars immediately — this breaks the moment a second restaurant uses it.
+🔥
+GST hardcoded at 5% flat with a single gst_amount column. India has 5%, 12%, 18% slabs. Add a gst_rate column to MenuItem now before you have thousands of orders with wrong tax.
+⚠️
+duplicate try/except receipt block at the end of the receipt route — orphan code, remove it.
+Quick hardening
+⚠️
+Table count hardcoded to 10 in /manager/tables/. Move to a config or DB setting.
+⚠️
+datetime.utcnow() is deprecated in Python 3.11+. Replace with datetime.now(timezone.utc) throughout.
+⚠️
+items_summary stored as a plain string (concatenated names). This makes analytics brittle. Stop using it for anything except display — all aggregations must go through OrderItem.
+✓
+Exit criteria: No data loss. No security exposure. Safe to continue building.
+Target folder structure
+📁
+Split into a proper package. Your current flat layout will collapse under phase 4 (multi-tenant).
+app/
+├── api/
+│   ├── routes/
+│   │   ├── auth.py        # /token, /logout
+│   │   ├── menu.py        # /menu/*
+│   │   ├── orders.py      # /order/*, /kitchen-display/
+│   │   ├── checkout.py    # /manager/checkout/
+│   │   ├── customers.py   # /customers/*
+│   │   ├── inventory.py   # /inventory/*
+│   │   ├── analytics.py   # /owner/analytics/, /owner/history/
+│   │   └── tables.py      # /manager/tables/
+│   └── deps.py            # get_db, get_current_user, require_role
+├── services/
+│   ├── order_service.py   # place_order logic (move from main.py)
+│   ├── billing_service.py # GST calc, invoice numbering
+│   ├── receipt_service.py # PDF generation
+│   └── whatsapp_service.py
+├── models/
+│   └── models.py          # (your current models.py, unchanged for now)
+├── schemas/
+│   └── schemas.py         # (your current Pydantic models)
+├── core/
+│   ├── config.py          # all env vars loaded once
+│   ├── security.py        # jwt, password hashing
+│   ├── logging.py         # structured logging
+│   └── exceptions.py      # global error handlers
+├── db/
+│   └── database.py        # (your current database.py)
+└── main.py                # only app = FastAPI(), include_router()
+Key refactoring rules
+✅
+No business logic inside route functions. Routes call services, services call DB. Routes should be 5-10 lines max.
+✅
+Create a require_role() dependency in deps.py — replaces all the 'if not user or user.role not in [...]' blocks scattered in every route.
+✅
+All config in core/config.py using Pydantic Settings. One place for SECRET_KEY, SUPABASE_URL, DATABASE_URL, etc.
+✅
+Set up Alembic for migrations now. Your manual migrate_add_columns.py script is a trap at scale.
+✓
+Exit criteria: main.py is under 50 lines. New route can be added in under 5 minutes.
+Order lifecycle (upgrade your current 3-state system)
+🔄
+Current: PENDING → COMPLETED/CANCELLED. This is not how restaurants work.
+✅
+Proper KOT lifecycle:
+PLACED → KOT_SENT → PREPARING → READY → SERVED → CLOSED
+✅
+KOT (Kitchen Order Ticket): auto-print / push when order status changes to KOT_SENT. Add a kot_number field to Order.
+✅
+PLACED = cashier confirmed. KOT_SENT = ticket pushed to kitchen. PREPARING = chef acknowledged. READY = food ready. SERVED = waiter delivered. CLOSED = bill paid.
+WebSockets (replace your polling kitchen display)
+✅
+Use FastAPI WebSockets. When an order is placed or status changes, push to all connected kitchen screens instantly.
+✅
+Connection manager: maintain a dict of active WS connections per restaurant_id (prep for multi-tenant).
+✅
+Fallback: if WS disconnects, client polls every 5s. But WS should be primary.
+Item modifiers (big gap right now)
+✅
+Add an ItemModifier model: half/full portion, spice level, add-ons (extra cheese, no onion).
+✅
+Modifier affects price (half = -20%, extra cheese = +₹30). Store on OrderItem as a JSON field for flexibility.
+✅
+Show modifiers on KOT and receipt.
+Table management upgrade
+✅
+Table count must come from DB, not a hardcoded loop to 10. Add a Table model.
+✅
+Support table merging (combine 2 tables for large groups → one bill).
+✅
+Table transfer: move a running order from one table to another.
+✅
+Covers tracking: number of people at a table (useful for per-head analytics).
+Split billing
+✅
+Split by item: each person pays for what they ordered.
+✅
+Split equally: divide bill by N people.
+✅
+Each split generates its own receipt.
+✓
+Exit criteria: Kitchen display updates in under 500ms. Cashier can handle 60+ orders/hour without errors.
+GST fixes (critical for Indian market)
+🔧
+Current: single gst_amount column, hardcoded 5%. This is wrong.
+✅
+Add gst_rate column to MenuItem (5, 12, or 18%). Default 5% for restaurants.
+✅
+Split CGST and SGST on every order: each = gst_rate / 2. Store both separately in Order.
+✅
+GST on receipt must show: 'CGST @ 2.5%: ₹X' and 'SGST @ 2.5%: ₹X' — this is what the law requires.
+✅
+Add GSTIN field to restaurant profile. Show on invoice.
+✅
+Add HSN code field to MenuItem (optional but needed for larger restaurants).
+Invoice numbering (you have none right now)
+✅
+Proper invoice sequence: INV-2425-0001 format (financial year + sequential number).
+✅
+Daily reset option OR financial year reset — configurable per restaurant.
+✅
+Invoice number is permanent — never reuse, never skip.
+✅
+Add a separate Invoice model to track this independently from Order.
+Receipt templates
+✅
+Restaurant name, address, phone, GSTIN must come from DB/config — not hardcoded.
+✅
+Three receipt formats: 80mm thermal (your current), A5, and WhatsApp text format.
+✅
+KOT print format: item name, quantity, modifiers, table number, time. No prices on KOT.
+✅
+QR code on receipt pointing to digital copy URL.
+WhatsApp (make it async)
+🔧
+Current: receipt is generated synchronously inside the API call. If Supabase is slow, the checkout API hangs.
+✅
+Move WhatsApp sending to a background task using FastAPI BackgroundTasks (simple) or Celery+Redis (when you scale).
+✅
+Queue-based retry: if WhatsApp fails, retry 3 times with exponential backoff.
+✅
+Log WhatsApp delivery status per order (sent / failed / pending).
+✓
+Exit criteria: Invoice is legally valid. Receipt generation never blocks the cashier.
+What your code does now (and why it's a problem)
+⚠️
+You have this pattern in 15+ places: if not user or user.role not in ['owner', 'manager']. This is not scalable — one new role means editing every route.
+Permission-based RBAC
+✅
+Define permissions as constants, not roles:
+CAN_VIEW_ANALYTICS = 'analytics:read'
+CAN_CANCEL_ORDER = 'order:cancel'
+CAN_MANAGE_MENU = 'menu:write'
+CAN_MANAGE_STAFF = 'staff:write'
+✅
+Roles = sets of permissions. Store role-permission mapping in DB (not code).
+✅
+Create a require_permission(perm) FastAPI dependency. Use it in every route:
+Depends(require_permission('order:cancel'))
+✅
+UI restriction layer: frontend only shows buttons/sections the user has permission for. Never rely solely on backend hiding.
+Default roles
+👤
+Owner — all permissions including billing and staff management.
+👤
+Manager — everything except staff management and plan settings.
+👤
+Cashier — place orders, checkout, view tables. No analytics, no cancellation.
+👤
+Waiter — place orders, view table status. No checkout.
+👤
+Chef — view KOT, mark items ready. No billing access.
+Audit logs
+✅
+Every order creation, modification, cancellation, discount, refund — log who did it and when.
+✅
+AuditLog model: user_id, restaurant_id, action, entity_type, entity_id, before_state (JSON), after_state (JSON), timestamp.
+✅
+Owner can see full audit trail in dashboard. Cannot be deleted.
+✓
+Exit criteria: Zero if/role checks in route functions. Every sensitive action has an audit trail.
+The core change — restaurant_id everywhere
+🔧
+Every model needs restaurant_id. This is non-negotiable for a SaaS product. Your current models have none.
+✅
+Add Restaurant model: name, address, phone, gstin, logo_url, timezone, currency, plan_id.
+✅
+Add restaurant_id FK to: MenuItem, Order, OrderItem, Customer, Table, User, InventoryItem, AuditLog.
+✅
+Use Alembic migration for this — don't do it manually.
+Tenant isolation (critical)
+✅
+Every DB query must filter by restaurant_id automatically. Create a TenantSession wrapper or use SQLAlchemy event hooks.
+✅
+restaurant_id comes from the JWT token (added at login). Never from query params.
+✅
+Superadmin role can see all restaurants (for support/ops). Regular users see only their own.
+✅
+Row-level security test: user from Restaurant A must NEVER be able to see Restaurant B's data even if they guess an order ID.
+Restaurant onboarding
+✅
+Self-serve signup: name, email, password, restaurant name, city.
+✅
+Auto-create default menu categories, default roles, and a sample menu.
+✅
+Setup wizard: 5 steps (restaurant info → menu → tables → staff → go live).
+✓
+Exit criteria: Two different restaurants can use the same backend. Neither can see the other's data.
+Ingredient-level inventory
+✅
+Ingredient model: name, unit (g, ml, pieces), current_stock, min_stock_alert.
+✅
+Recipe mapping: Pizza = 200g flour + 50g cheese + 30ml sauce. Store as RecipeIngredient table.
+✅
+On order: auto-deduct ingredients when KOT is sent (not when order is placed — kitchen may not make it immediately).
+✅
+If an ingredient hits min_stock, auto-mark related menu items as unavailable (optional, configurable).
+Stock management
+✅
+Stock-in entries: add stock manually when supplies arrive. Log quantity, cost, supplier, date.
+✅
+Low stock alerts: show in owner dashboard. Daily WhatsApp alert optional.
+✅
+Wastage logging: manually log wasted ingredients.
+✅
+COGS (cost of goods sold) calculation: gives owners actual profit margin per item.
+Replace your current 'inventory' (it's just a request list)
+🔧
+Your current InventoryRequest model is just a text list with no structure. It does nothing useful. Archive it and build the above.
+✓
+Exit criteria: Owner gets a WhatsApp message when tomatoes are low. Stock is tracked automatically.
+Why this beats Petpooja for small shops
+🇮🇳
+Small dhabas, food courts, and kiosks have unreliable internet. If your POS stops when WiFi drops, they will not use it.
+💡
+Petpooja requires internet. This is your differentiator if you build it well.
+Technical approach
+✅
+Client-side storage: Use IndexedDB (via Dexie.js) to store menu, active orders, and pending actions locally.
+✅
+Sync queue: every action (place order, update status) goes into a local queue first, then syncs to server when online.
+✅
+Conflict resolution: last-write-wins for most fields. For payments, require manual resolution.
+✅
+Offline indicator: always visible in UI. Shows how many pending syncs are queued.
+✅
+Receipt printing must work offline: use a local thermal printer directly (ESC/POS protocol via Web Serial API or a local print server).
+Progressive Web App (PWA)
+✅
+Add a Service Worker. Cashier can install Restron on a tablet like an app without the App Store.
+✅
+Works offline after first load. No Play Store required.
+✓
+Exit criteria: Orders placed when WiFi is down sync automatically when connection restores. Restaurant never stops operating.
+Core dashboard (keep it simple)
+✅
+Today: revenue, orders, average order value, top 3 items.
+✅
+Trend: today vs yesterday, this week vs last week.
+✅
+Peak hours chart: when is the restaurant busiest. Your analytics route already computes this — just display it better.
+✅
+Table utilization: which tables generate most revenue.
+✅
+Payment method breakdown: cash vs UPI vs card.
+Reports (exportable)
+✅
+Daily sales report: GST-formatted, PDF export, can be given to accountant.
+✅
+Monthly GSTR-1 summary: aggregate sales by GST rate slab. This alone is worth paying for.
+✅
+Item-level profitability: revenue per item vs ingredient cost (requires inventory phase).
+✅
+Staff performance: orders taken per waiter, average service time.
+Customer analytics (you have CRM data — use it)
+✅
+Visit frequency: who are your regulars, who hasn't visited in 30 days.
+✅
+Customer lifetime value. RFM segmentation (Recency, Frequency, Monetary).
+✅
+These customers can be targeted for WhatsApp re-engagement campaigns.
+✓
+Exit criteria: Owner can answer: what did I earn today, this week, this month. What sold best. Who are my regulars.
+Database
+✅
+Add indexes: Order.status + restaurant_id, Order.created_at, OrderItem.order_id, Customer.phone. Your current models have almost no indexes.
+✅
+Connection pooling: use SQLAlchemy pool_size=10, max_overflow=20. Default is 5 which will bottleneck.
+✅
+Async DB queries: migrate to asyncpg + SQLAlchemy async session. FastAPI is async-native but your DB calls are sync blocking.
+✅
+Never query all orders without pagination. Your /manager/orders/ returns all history — add cursor-based pagination.
+Caching
+✅
+Cache menu in Redis (or in-memory) for 5 minutes. Menu barely changes — no reason to hit DB on every order page load.
+✅
+Cache customer lookup by phone. Your cashier lookup endpoint is called on every keystroke.
+✅
+Cache analytics aggregations. Daily revenue does not need a fresh DB query every 30 seconds.
+Background jobs
+✅
+Move WhatsApp sending, receipt PDF generation, and report generation to background workers (Celery + Redis or ARQ).
+✅
+Scheduled jobs: daily sales summary at 11pm, low stock alerts at 8am.
+Monitoring
+✅
+Add Sentry for error tracking. You currently have print() statements as error logging.
+✅
+Add structured logging (structlog) with request IDs. Every log line traceable to a request.
+✅
+Health check endpoint: /health returns DB status, Redis status, Supabase status.
+✅
+Uptime monitoring: use Better Uptime or UptimeRobot (free). Gets alerted before your customers are.
+✓
+Exit criteria: No lag under dinner rush (30+ concurrent users). Error rate < 0.1%.
+Speed optimizations for cashier
+✅
+Keyboard shortcuts: Enter to confirm order, Esc to cancel, arrow keys to navigate menu, number keys for quantity.
+✅
+Menu search with fuzzy matching: type 'btn' and find 'Butter Naan'. No category browsing needed.
+✅
+Quick-add buttons: pin your top 8 items to a favorites row. One tap, no searching.
+✅
+Recent orders panel: one-tap reorder for tables that always order the same thing.
+Role-specific UIs
+✅
+Cashier view: full screen, nothing but menu + cart + checkout. No distractions.
+✅
+Kitchen display: large fonts, high contrast, auto-sort by time. Ring/buzz on new order. Dark mode by default.
+✅
+Waiter view: table map with status colors. Tap table to see current order. Request bill button.
+✅
+Owner mobile dashboard: revenue widget, active orders count, alerts. Viewable from phone while at home.
+Indian-specific UX
+🇮🇳
+Veg/non-veg indicator on every item (you have this — make it prominent, Petpooja does it well).
+🇮🇳
+Multilingual menu: Hindi + English item names. Small towns often need this.
+🇮🇳
+UPI QR on bill: show a UPI QR code on the receipt automatically.
+🇮🇳
+Festival/seasonal specials: easy way to temporarily add items or discounts without touching the full menu.
+✓
+Exit criteria: Cashier can take an order without looking at the screen. New staff trained in under 30 minutes.
+Subscription plans
+✅
+Free tier: 1 restaurant, 1 user, 50 orders/month. Good for food stalls testing it out.
+✅
+Starter (₹499/month): 1 restaurant, 5 staff, unlimited orders, WhatsApp receipts.
+✅
+Pro (₹999/month): 1 restaurant, unlimited staff, inventory, analytics, GSTR export.
+✅
+Growth (₹1999/month): 3 restaurant locations, all features, priority support.
+💡
+Positioning: Petpooja starts at ₹4000-8000/month. You target ₹499-1999 range — the restaurants Petpooja ignores.
+Payments
+✅
+Integrate Razorpay Subscriptions. Auto-billing, auto-cancellation on failure.
+✅
+Plan limits enforced in middleware: if over order limit, reject with a clear upgrade prompt.
+✅
+Grace period: 3 days after payment failure before access is restricted.
+Superadmin panel
+✅
+List of all restaurants: plan, usage, last active, MRR.
+✅
+Manually override plan, add trial days, view any restaurant's logs.
+✅
+Churn alerts: restaurants that haven't logged in for 7 days.
+✅
+Usage metrics: orders processed, receipts sent, active users per day.
+Self-serve onboarding
+✅
+Signup → verify email → setup wizard → live in under 10 minutes. No call with you required.
+✅
+In-app onboarding checklist: 'Add your first menu item', 'Take a test order', 'Add a staff member'.
+✅
+Demo mode: pre-filled restaurant with fake data so prospects can explore before signing up.
+✓
+Exit criteria: ₹1 of MRR that required zero manual work from you.
+Infrastructure
+✅
+Backend: Railway or Render for simplicity, or AWS EC2 t3.small when you need more control. Keep it cheap until you have paying customers.
+✅
+DB: Supabase PostgreSQL (you're already using Supabase for storage — use it for DB too) OR Neon for a pure serverless Postgres.
+✅
+Frontend static files: serve from Cloudflare Pages or Vercel. Do NOT serve static files from FastAPI in production.
+✅
+Redis: Upstash Redis (serverless, has a free tier). Needed for caching and background jobs.
+CI/CD
+✅
+GitHub Actions: on push to main, run tests → lint → deploy to staging. Manual trigger to deploy to production.
+✅
+Alembic migrations run automatically before app starts (not create_all).
+✅
+Zero-downtime deploys: use uvicorn with multiple workers, rolling restart.
+Testing
+✅
+You have zero tests right now. Start with: order placement, checkout, GST calculation, auth, and permission checks.
+✅
+Use pytest + httpx. Aim for 70% coverage of service layer before launch.
+✅
+Load test: use Locust to simulate 30 concurrent cashiers placing orders. Fix before customers find the bottlenecks.
+Backups
+✅
+Automated daily DB backups with 30-day retention. Test restoring from backup before going live.
+✅
+Point-in-time recovery: PostgreSQL WAL archiving on Supabase (built-in on paid plans).
+✓
+Exit criteria: You can deploy a hotfix in under 10 minutes. A DB failure does not lose orders.

@@ -1,0 +1,4 @@
+alembic
+pydantic-settings
+pytest
+httpx
