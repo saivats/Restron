@@ -151,3 +151,26 @@ def require_role(roles: Iterable[str]) -> Callable:
         return user
 
     return role_checker
+
+
+def get_superadmin(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("superadmin_token")
+    if not token:
+        return None
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str | None = payload.get("sub")
+        role: str | None = payload.get("role")
+        if username is None or role != "superadmin":
+            return None
+    except JWTError:
+        return None
+
+    return db.query(models.SuperAdmin).filter(models.SuperAdmin.username == username).first()
+
+
+def require_superadmin(admin: models.SuperAdmin | None = Depends(get_superadmin)):
+    if not admin:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Superadmin authentication required")
+    return admin

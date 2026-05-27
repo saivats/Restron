@@ -1,15 +1,7 @@
 from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.core.config import (
-    BUSINESS_ADDRESS,
-    BUSINESS_GSTIN,
-    BUSINESS_NAME,
-    BUSINESS_PHONE,
-    BUSINESS_UPI_ID,
-    DEFAULT_RESTAURANT_ID,
-    DEFAULT_TABLE_COUNT,
-)
+from app.core.config import DEFAULT_RESTAURANT_ID, DEFAULT_TABLE_COUNT
 from app.db.database import Base, SessionLocal, engine
 from app.models import models
 
@@ -31,6 +23,7 @@ def _ensure_columns() -> None:
     with engine.begin() as conn:
         inspector = inspect(conn)
         bool_type = _column_type("BOOLEAN DEFAULT 0", "BOOLEAN DEFAULT FALSE")
+        bool_true_type = _column_type("BOOLEAN DEFAULT 1", "BOOLEAN DEFAULT TRUE")
         nullable_int = _column_type("INTEGER", "INTEGER")
         datetime_type = _column_type("DATETIME", "TIMESTAMP")
         json_type = _column_type("JSON", "JSONB")
@@ -72,6 +65,17 @@ def _ensure_columns() -> None:
             "hsn_code": "VARCHAR DEFAULT ''",
             "modifiers_json": json_type,
         }
+        restaurant_columns = {
+            "slug": "VARCHAR",
+            "owner_email": "VARCHAR",
+            "table_count": "INTEGER DEFAULT 10",
+            "gst_rate": "FLOAT DEFAULT 5.0",
+            "currency_symbol": "VARCHAR DEFAULT '₹'",
+            "is_active": bool_true_type + " NOT NULL",
+            "plan": "VARCHAR DEFAULT 'trial'",
+            "plan_expires_at": datetime_type,
+            "menu_pdf_url": "VARCHAR DEFAULT ''",
+        }
 
         for name, ddl in user_columns.items():
             _add_column(conn, inspector, "users", name, ddl)
@@ -83,6 +87,8 @@ def _ensure_columns() -> None:
             _add_column(conn, inspector, "orders", name, ddl)
         for name, ddl in order_item_columns.items():
             _add_column(conn, inspector, "order_items", name, ddl)
+        for name, ddl in restaurant_columns.items():
+            _add_column(conn, inspector, "restaurants", name, ddl)
 
 
 def _seed_foundation_rows() -> None:
@@ -92,13 +98,14 @@ def _seed_foundation_rows() -> None:
         if not restaurant:
             restaurant = models.Restaurant(
                 id=DEFAULT_RESTAURANT_ID,
-                name=BUSINESS_NAME,
-                address=BUSINESS_ADDRESS,
-                phone=BUSINESS_PHONE,
-                gstin=BUSINESS_GSTIN,
-                upi_id=BUSINESS_UPI_ID,
+                name="Default Restaurant",
+                slug="default",
+                is_active=True,
+                plan="trial",
             )
             db.add(restaurant)
+        elif not restaurant.slug:
+            restaurant.slug = "default"
 
         for table_number in range(1, DEFAULT_TABLE_COUNT + 1):
             exists = db.query(models.Table).filter(

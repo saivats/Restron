@@ -16,15 +16,32 @@ class Restaurant(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, default="Restron POS")
+    slug = Column(String, unique=True, index=True, nullable=True)
+    owner_email = Column(String, nullable=True)
     address = Column(String, default="")
     phone = Column(String, default="")
     gstin = Column(String, default="")
     logo_url = Column(String, default="")
+    table_count = Column(Integer, default=10)
+    gst_rate = Column(Float, default=5.0)
+    currency_symbol = Column(String, default="₹")
     timezone = Column(String, default="Asia/Kolkata")
     currency = Column(String, default="INR")
     plan_id = Column(String, default="free")
+    plan = Column(String, default="trial")
+    plan_expires_at = Column(DateTime, nullable=True)
+    is_active = Column(Boolean, default=True, nullable=False)
     upi_id = Column(String, default="")
+    menu_pdf_url = Column(String, default="")
     created_at = Column(DateTime, default=utc_now, nullable=False)
+
+
+class SuperAdmin(Base):
+    __tablename__ = "superadmins"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    password_hash = Column(String, nullable=False)
 
 
 class User(Base):
@@ -80,11 +97,12 @@ class ItemModifier(Base):
 
 class Customer(Base):
     __tablename__ = "customers"
+    __table_args__ = (UniqueConstraint("phone", "restaurant_id", name="uq_customer_phone_restaurant"),)
 
     id = Column(Integer, primary_key=True, index=True)
     restaurant_id = Column(Integer, ForeignKey("restaurants.id"), nullable=True, index=True)
     name = Column(String, nullable=True)
-    phone = Column(String, unique=True, index=True)
+    phone = Column(String, index=True)
     relation = Column(String, default="Regular")
     discount_percent = Column(Float, default=0.0)
     visit_count = Column(Integer, default=0)

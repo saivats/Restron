@@ -1,19 +1,28 @@
-from fastapi import Depends, FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from sqlalchemy import text
+from datetime import datetime, timedelta, timezone
 
-from app.api.deps import get_current_user
+from fastapi import Depends, FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from jose import JWTError, jwt
+from sqlalchemy import text
+from starlette.middleware.base import BaseHTTPMiddleware
+
+from app.api.deps import get_current_user, get_db
 from app.api.routes import analytics, auth, checkout, customers, inventory, legacy, menu, orders, tables
-from app.core.config import ALLOWED_ORIGINS, STATIC_DIR
+from app.api.routes import qr as qr_routes
+from app.api.routes import settings as settings_routes
+from app.api.routes import staff as staff_routes
+from app.api.routes import superadmin as superadmin_routes
+from app.core.config import ALGORITHM, ALLOWED_ORIGINS, SECRET_KEY, STATIC_DIR
+from app.core.security import create_access_token
 from app.db.database import SessionLocal
 from app.db.schema_guard import ensure_schema
 from app.models import models
 
 ensure_schema()
 
-app = FastAPI(title="Restron POS API", version="1.0.0")
+app = FastAPI(title="Restron POS API", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,6 +31,33 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class TokenRefreshMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        token = request.cookies.get("access_token")
+        if not token:
+            return response
+
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            exp = payload.get("exp")
+            if exp:
+                expire_time = datetime.fromtimestamp(exp, tz=timezone.utc)
+                remaining = expire_time - datetime.now(timezone.utc)
+                if timedelta(0) < remaining < timedelta(minutes=60):
+                    new_token = create_access_token(
+                        data={k: v for k, v in payload.items() if k != "exp"},
+                    )
+                    response.set_cookie(key="access_token", value=new_token, httponly=True, samesite="lax")
+        except (JWTError, Exception):
+            pass
+
+        return response
+
+
+app.add_middleware(TokenRefreshMiddleware)
 
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(auth.router, tags=["Authentication Legacy"])
@@ -33,6 +69,10 @@ app.include_router(customers.router, prefix="/customers", tags=["Customers"])
 app.include_router(inventory.router, prefix="/inventory", tags=["Inventory"])
 app.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 app.include_router(tables.router, prefix="/tables", tags=["Tables"])
+app.include_router(staff_routes.router, prefix="/staff", tags=["Staff"])
+app.include_router(settings_routes.router, prefix="/restaurant", tags=["Restaurant Settings"])
+app.include_router(qr_routes.router, prefix="/restaurant", tags=["QR Codes"])
+app.include_router(superadmin_routes.router, prefix="/superadmin", tags=["Super Admin"])
 app.include_router(legacy.router, tags=["Legacy Screen Compatibility"])
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
@@ -42,10 +82,74 @@ def static_file(name: str) -> FileResponse:
     return FileResponse(STATIC_DIR / name)
 
 
-def role_page(user: models.User | None, roles: set[str], filename: str) -> FileResponse:
-    if not user or (user.role not in roles and user.role != "superadmin"):
+def _resolve_restaurant(slug: str, db):
+    return db.query(models.Restaurant).filter(models.Restaurant.slug == slug).first()
+
+
+@app.get("/r/{slug}/login", response_class=HTMLResponse)
+async def slug_login_page(slug: str):
+    return static_file("login.html")
+
+
+@app.get("/r/{slug}/mobile", response_class=HTMLResponse)
+async def slug_mobile(slug: str):
+    return static_file("menu.html")
+
+
+@app.get("/r/{slug}/kitchen", response_class=HTMLResponse)
+async def slug_kitchen(slug: str, user: models.User | None = Depends(get_current_user)):
+    if not user or (user.role not in {"chef", "manager", "owner"} and user.role != "superadmin"):
         return static_file("login.html")
-    return static_file(filename)
+    return static_file("kitchen.html")
+
+
+@app.get("/r/{slug}/waiter", response_class=HTMLResponse)
+async def slug_waiter(slug: str, user: models.User | None = Depends(get_current_user)):
+    if not user or (user.role not in {"waiter", "manager", "owner"} and user.role != "superadmin"):
+        return static_file("login.html")
+    return static_file("waiter.html")
+
+
+@app.get("/r/{slug}/manager", response_class=HTMLResponse)
+async def slug_manager(slug: str, user: models.User | None = Depends(get_current_user)):
+    if not user or (user.role not in {"manager", "owner"} and user.role != "superadmin"):
+        return static_file("login.html")
+    return static_file("manager.html")
+
+
+@app.get("/r/{slug}/owner", response_class=HTMLResponse)
+async def slug_owner(slug: str, user: models.User | None = Depends(get_current_user)):
+    if not user or (user.role not in {"owner"} and user.role != "superadmin"):
+        return static_file("login.html")
+    return static_file("owner.html")
+
+
+@app.get("/r/{slug}/admin", response_class=HTMLResponse)
+async def slug_admin(slug: str, user: models.User | None = Depends(get_current_user)):
+    if not user or (user.role not in {"manager", "owner"} and user.role != "superadmin"):
+        return static_file("login.html")
+    return static_file("admin.html")
+
+
+@app.get("/r/{slug}/receipt/{order_id}")
+async def slug_receipt(slug: str, order_id: int, user: models.User | None = Depends(get_current_user)):
+    from app.api.deps import user_restaurant_id
+    from app.services.receipt_service import generate_receipt_logic
+    db = SessionLocal()
+    try:
+        return generate_receipt_logic(order_id, db, restaurant_id=user_restaurant_id(user) if user else None)
+    finally:
+        db.close()
+
+
+@app.get("/superadmin/login", response_class=HTMLResponse)
+async def superadmin_login_page():
+    return static_file("superadmin_login.html")
+
+
+@app.get("/superadmin/dashboard", response_class=HTMLResponse)
+async def superadmin_dashboard_page():
+    return static_file("superadmin.html")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -55,37 +159,53 @@ async def read_index():
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page():
-    return static_file("login.html")
+    return RedirectResponse(url="/r/default/login")
 
 
 @app.get("/owner", response_class=HTMLResponse)
 async def owner_dashboard(user: models.User | None = Depends(get_current_user)):
-    return role_page(user, {"owner"}, "owner.html")
+    slug = _get_user_slug(user)
+    return RedirectResponse(url=f"/r/{slug}/owner")
 
 
 @app.get("/manager", response_class=HTMLResponse)
 async def manager_dashboard(user: models.User | None = Depends(get_current_user)):
-    return role_page(user, {"manager", "owner"}, "manager.html")
+    slug = _get_user_slug(user)
+    return RedirectResponse(url=f"/r/{slug}/manager")
 
 
 @app.get("/waiter", response_class=HTMLResponse)
 async def waiter_dashboard(user: models.User | None = Depends(get_current_user)):
-    return role_page(user, {"waiter", "manager", "owner"}, "waiter.html")
+    slug = _get_user_slug(user)
+    return RedirectResponse(url=f"/r/{slug}/waiter")
 
 
 @app.get("/kitchen", response_class=HTMLResponse)
 async def kitchen_dashboard(user: models.User | None = Depends(get_current_user)):
-    return role_page(user, {"chef", "manager", "owner"}, "kitchen.html")
+    slug = _get_user_slug(user)
+    return RedirectResponse(url=f"/r/{slug}/kitchen")
 
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard(user: models.User | None = Depends(get_current_user)):
-    return role_page(user, {"manager", "owner"}, "admin.html")
+    slug = _get_user_slug(user)
+    return RedirectResponse(url=f"/r/{slug}/admin")
 
 
 @app.get("/mobile", response_class=HTMLResponse)
 async def mobile_app():
-    return static_file("menu.html")
+    return RedirectResponse(url="/r/default/mobile")
+
+
+def _get_user_slug(user: models.User | None) -> str:
+    if not user or not user.restaurant_id:
+        return "default"
+    db = SessionLocal()
+    try:
+        restaurant = db.get(models.Restaurant, user.restaurant_id)
+        return restaurant.slug if restaurant and restaurant.slug else "default"
+    finally:
+        db.close()
 
 
 @app.get("/manifest.json")
@@ -109,4 +229,8 @@ def health():
     finally:
         db.close()
 
-    return {"status": "ok" if db_status == "ok" else "degraded", "database": db_status}
+    return {
+        "status": "ok" if db_status == "ok" else "degraded",
+        "database": db_status,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }

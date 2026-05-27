@@ -18,7 +18,6 @@
         th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; font-size: 0.9em; }
         th { background: #f8f8f8; color: #555; }
 
-        /* Tags for Order Log */
         .tag { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8em; }
         .tag-dine { background: #e3f2fd; color: #1565c0; }
         .tag-del { background: #fff3e0; color: #ef6c00; }
@@ -27,102 +26,214 @@
         button { padding: 10px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; }
         button.green { background: #28a745; width: 100%; }
         button.red { background: #dc3545; width: 100%; }
+
+        .tabs { display: flex; gap: 0; margin-bottom: 20px; }
+        .tab-btn { padding: 12px 24px; background: #ddd; color: #555; border: none; cursor: pointer; font-weight: bold; font-size: 1em; }
+        .tab-btn.active { background: #ff5722; color: white; }
+        .tab-btn:first-child { border-radius: 6px 0 0 6px; }
+        .tab-btn:last-child { border-radius: 0 6px 6px 0; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .staff-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f9f9f9; border-radius: 6px; margin-bottom: 8px; }
+        .staff-role { padding: 3px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; background: #e3f2fd; color: #1565c0; }
+
+        .settings-form label { display: block; font-weight: 600; color: #555; margin-top: 12px; margin-bottom: 4px; font-size: 0.9em; }
+        .settings-form input { width: 100%; box-sizing: border-box; }
+
+        .subscription-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; }
+        .subscription-overlay .msg { background: #d32f2f; color: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 500px; font-size: 1.2em; line-height: 1.6; }
     </style>
 </head>
 <body>
+    <div class="subscription-overlay" id="sub-overlay">
+        <div class="msg">
+            <h2>⚠️ Subscription Expired</h2>
+            <p>Your subscription has expired. Please contact Restron support to renew.</p>
+        </div>
+    </div>
+
     <h1>👑 Owner Dashboard</h1>
 
-    <div class="grid">
-        <div class="card">
-            <span class="number" id="rev-today">₹0</span>
-            <span class="label">Today</span>
-        </div>
-        <div class="card">
-            <span class="number" id="rev-week">₹0</span>
-            <span class="label">Week</span>
-        </div>
-        <div class="card">
-            <span class="number" id="rev-month">₹0</span>
-            <span class="label">Month</span>
-        </div>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+        <button class="tab-btn" onclick="switchTab('staff')">👥 Staff</button>
+        <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
     </div>
 
-    <div class="grid">
-        <div class="card">
-            <h2>📊 Performance</h2>
-            <div class="list-row"><span>Lifetime Revenue</span> <b id="metric-total" style="color:#28a745;">₹0</b></div>
-            <div class="list-row"><span>Avg Order (AOV)</span> <b id="metric-aov">₹0</b></div>
-            <div class="list-row"><span>Peak Hour</span> <b id="metric-peak">--</b></div>
-        </div>
-        <div class="card">
-            <h2>🔥 Best Sellers (Month)</h2>
-            <div id="best-sellers-month">Loading...</div>
-        </div>
-    </div>
-
-    <div class="grid">
-        <div class="card" style="flex: 2;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>📅 Master History Report</h2>
-                <div>
-                    <select id="search-type" onchange="toggleInput()">
-                        <option value="date">By Date (Detailed)</option>
-                        <option value="month">By Month (Summary)</option>
-                    </select>
-                    <input type="date" id="hist-date">
-                    <input type="month" id="hist-month" style="display:none;">
-                    <button onclick="getHistory()">Get Report</button>
-                </div>
+    <div id="tab-dashboard" class="tab-content active">
+        <div class="grid">
+            <div class="card">
+                <span class="number" id="rev-today">₹0</span>
+                <span class="label">Today</span>
             </div>
+            <div class="card">
+                <span class="number" id="rev-week">₹0</span>
+                <span class="label">Week</span>
+            </div>
+            <div class="card">
+                <span class="number" id="rev-month">₹0</span>
+                <span class="label">Month</span>
+            </div>
+        </div>
 
-            <div id="hist-result" style="display:none; margin-top:20px;">
-                <div style="display:flex; gap:20px; padding:15px; background:#f1f1f1; border-radius:5px; font-weight:bold; margin-bottom:20px;">
-                    <span>💰 Revenue: <span id="h-rev" style="color:#28a745;">0</span></span>
-                    <span>🥬 Veg Sold: <span id="h-veg">0</span></span>
-                    <span>🍗 Non-Veg Sold: <span id="h-non">0</span></span>
+        <div class="grid">
+            <div class="card">
+                <h2>📊 Performance</h2>
+                <div class="list-row"><span>Lifetime Revenue</span> <b id="metric-total" style="color:#28a745;">₹0</b></div>
+                <div class="list-row"><span>Avg Order (AOV)</span> <b id="metric-aov">₹0</b></div>
+                <div class="list-row"><span>Peak Hour</span> <b id="metric-peak">--</b></div>
+            </div>
+            <div class="card">
+                <h2>🔥 Best Sellers (Month)</h2>
+                <div id="best-sellers-month">Loading...</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card" style="flex: 2;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2>📅 Master History Report</h2>
+                    <div>
+                        <select id="search-type" onchange="toggleInput()">
+                            <option value="date">By Date (Detailed)</option>
+                            <option value="month">By Month (Summary)</option>
+                        </select>
+                        <input type="date" id="hist-date">
+                        <input type="month" id="hist-month" style="display:none;">
+                        <button onclick="getHistory()">Get Report</button>
+                    </div>
                 </div>
 
-                <div id="log-container" style="display:none;">
-                    <h3>📝 Full Order Log (A-Z)</h3>
-                    <div style="max-height: 400px; overflow-y: auto;">
-                        <table id="log-table">
-                            <thead><tr><th>ID</th><th>Time</th><th>Type</th><th>Table</th><th>Items Ordered</th><th>Bill</th></tr></thead>
+                <div id="hist-result" style="display:none; margin-top:20px;">
+                    <div style="display:flex; gap:20px; padding:15px; background:#f1f1f1; border-radius:5px; font-weight:bold; margin-bottom:20px;">
+                        <span>💰 Revenue: <span id="h-rev" style="color:#28a745;">0</span></span>
+                        <span>🥬 Veg Sold: <span id="h-veg">0</span></span>
+                        <span>🍗 Non-Veg Sold: <span id="h-non">0</span></span>
+                    </div>
+
+                    <div id="log-container" style="display:none;">
+                        <h3>📝 Full Order Log (A-Z)</h3>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <table id="log-table">
+                                <thead><tr><th>ID</th><th>Time</th><th>Type</th><th>Table</th><th>Items Ordered</th><th>Bill</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top:20px;">📦 Item Summary</h3>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        <table id="h-table">
+                            <thead><tr><th>Item Name</th><th>Qty Sold</th></tr></thead>
                             <tbody></tbody>
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <h3 style="margin-top:20px;">📦 Item Summary</h3>
-                <div style="max-height: 200px; overflow-y: auto;">
-                    <table id="h-table">
-                        <thead><tr><th>Item Name</th><th>Qty Sold</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+        <div class="grid">
+            <div class="card">
+                <h2>🛒 Shopping List</h2>
+                <div id="inv-list">Loading...</div>
+                <button onclick="clearList()" class="red" style="margin-top:10px;">Clear List</button>
+            </div>
+            <div class="card">
+                <h2>➕ Add Dish</h2>
+                <input id="name" placeholder="Name" style="width:100%;">
+                <input id="price" placeholder="Price" style="width:100%;">
+                <input id="cat" placeholder="Category" style="width:100%;">
+                <button onclick="addItem()" class="green" style="margin-top:5px;">Add to Menu</button>
             </div>
         </div>
     </div>
 
-    <div class="grid">
-        <div class="card">
-            <h2>🛒 Shopping List</h2>
-            <div id="inv-list">Loading...</div>
-            <button onclick="clearList()" class="red" style="margin-top:10px;">Clear List</button>
+    <div id="tab-staff" class="tab-content">
+        <div class="grid">
+            <div class="card" style="flex:2;">
+                <h2>👥 Staff Members</h2>
+                <div id="staff-list">Loading...</div>
+            </div>
+            <div class="card">
+                <h2>➕ Add Staff</h2>
+                <input id="staff-username" placeholder="Username" style="width:100%;">
+                <input id="staff-password" type="password" placeholder="Password" style="width:100%;">
+                <select id="staff-role" style="width:100%;">
+                    <option value="waiter">Waiter</option>
+                    <option value="manager">Manager</option>
+                    <option value="chef">Chef</option>
+                    <option value="cashier">Cashier</option>
+                </select>
+                <button onclick="addStaff()" class="green" style="margin-top:5px;">Add Staff Member</button>
+                <p id="staff-msg" style="color:#28a745; margin-top:5px; height:20px;"></p>
+            </div>
         </div>
-        <div class="card">
-            <h2>➕ Add Dish</h2>
-            <input id="name" placeholder="Name" style="width:100%;">
-            <input id="price" placeholder="Price" style="width:100%;">
-            <input id="cat" placeholder="Category" style="width:100%;">
-            <button onclick="addItem()" class="green" style="margin-top:5px;">Add to Menu</button>
+    </div>
+
+    <div id="tab-settings" class="tab-content">
+        <div class="grid">
+            <div class="card settings-form" style="flex:2; max-width:600px;">
+                <h2>⚙️ Restaurant Settings</h2>
+                <label>Restaurant Name</label>
+                <input id="set-name" style="width:100%;">
+                <label>Address</label>
+                <input id="set-address" style="width:100%;">
+                <label>Phone</label>
+                <input id="set-phone" style="width:100%;">
+                <label>GSTIN</label>
+                <input id="set-gstin" style="width:100%;">
+                <label>UPI ID</label>
+                <input id="set-upi" style="width:100%;">
+                <label>Logo URL</label>
+                <input id="set-logo" style="width:100%;">
+                <label>Table Count</label>
+                <input id="set-tables" type="number" style="width:100%;">
+                <label>GST Rate (%)</label>
+                <input id="set-gst" type="number" step="0.1" style="width:100%;">
+                <label>Currency Symbol</label>
+                <input id="set-currency" style="width:100%;">
+                <label>Menu PDF URL</label>
+                <input id="set-menu-pdf" style="width:100%;">
+                <button onclick="saveSettings()" class="green" style="margin-top:15px;">Save Settings</button>
+                <p id="settings-msg" style="color:#28a745; margin-top:5px; height:20px;"></p>
+            </div>
         </div>
     </div>
 
     <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            event.target.classList.add('active');
+            if (tab === 'staff') loadStaff();
+            if (tab === 'settings') loadSettings();
+        }
+
         function toggleInput() {
             const type = document.getElementById('search-type').value;
             document.getElementById('hist-date').style.display = (type === 'date') ? 'inline-block' : 'none';
             document.getElementById('hist-month').style.display = (type === 'month') ? 'inline-block' : 'none';
+        }
+
+        async function checkSubscription() {
+            try {
+                const res = await fetch('/restaurant/status/');
+                if (res.ok) {
+                    const data = await res.json();
+                    let expired = false;
+                    if (data.is_active === false) expired = true;
+                    if (data.plan_expires_at) {
+                        const expDate = new Date(data.plan_expires_at);
+                        if (expDate < new Date()) expired = true;
+                    }
+                    if (expired) {
+                        const overlay = document.getElementById('sub-overlay');
+                        overlay.style.display = 'flex';
+                    }
+                }
+            } catch (e) { }
         }
 
         async function loadData() {
@@ -168,13 +279,11 @@
             document.getElementById('h-veg').innerText = data.veg_sold;
             document.getElementById('h-non').innerText = data.non_veg_sold;
 
-            // 1. Fill Item Summary (Always visible)
             const sumBody = document.querySelector('#h-table tbody');
             sumBody.innerHTML = '';
             if(data.items.length === 0) sumBody.innerHTML = "<tr><td colspan='2'>No sales.</td></tr>";
             else data.items.forEach(i => sumBody.innerHTML += `<tr><td>${i.name}</td><td>${i.qty}</td></tr>`);
 
-            // 2. Fill Detailed Log (Only for Date search)
             const logContainer = document.getElementById('log-container');
             if (type === 'date' && data.detailed_logs) {
                 logContainer.style.display = 'block';
@@ -188,7 +297,6 @@
                         const typeTag = order.type === 'Delivery'
                             ? `<span class="tag tag-del">🛵 DELIVERY</span>`
                             : `<span class="tag tag-dine">🍽️ DINE-IN</span>`;
-
                         logBody.innerHTML += `
                             <tr>
                                 <td>#${order.id}</td>
@@ -221,6 +329,108 @@
             loadData();
         }
 
+        async function loadStaff() {
+            const res = await fetch('/staff/');
+            const staff = await res.json();
+            const list = document.getElementById('staff-list');
+            if (!staff.length) {
+                list.innerHTML = '<p style="color:#aaa;">No staff members found.</p>';
+                return;
+            }
+            list.innerHTML = '';
+            staff.forEach(s => {
+                list.innerHTML += `
+                    <div class="staff-row">
+                        <div>
+                            <strong>${s.username}</strong>
+                            <span class="staff-role">${s.role.toUpperCase()}</span>
+                        </div>
+                        ${s.role !== 'owner' ? `<button onclick="removeStaff(${s.id}, '${s.username}')" style="background:#dc3545; padding:6px 12px; width:auto; font-size:0.85em;">Remove</button>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        async function addStaff() {
+            const username = document.getElementById('staff-username').value.trim();
+            const password = document.getElementById('staff-password').value;
+            const role = document.getElementById('staff-role').value;
+            if (!username || !password) return alert("Username and password required!");
+
+            const res = await fetch('/staff/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username, password, role })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById('staff-msg').innerText = `✅ Created: ${data.username} (${data.role})`;
+                document.getElementById('staff-username').value = '';
+                document.getElementById('staff-password').value = '';
+                setTimeout(() => document.getElementById('staff-msg').innerText = '', 3000);
+                loadStaff();
+            } else {
+                alert(data.detail || 'Failed to create staff');
+            }
+        }
+
+        async function removeStaff(id, name) {
+            if (!confirm(`Remove staff member "${name}"?`)) return;
+            const res = await fetch(`/staff/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                loadStaff();
+            } else {
+                const data = await res.json();
+                alert(data.detail || 'Failed to remove staff');
+            }
+        }
+
+        async function loadSettings() {
+            const res = await fetch('/restaurant/settings/');
+            if (!res.ok) return;
+            const data = await res.json();
+            document.getElementById('set-name').value = data.name || '';
+            document.getElementById('set-address').value = data.address || '';
+            document.getElementById('set-phone').value = data.phone || '';
+            document.getElementById('set-gstin').value = data.gstin || '';
+            document.getElementById('set-upi').value = data.upi_id || '';
+            document.getElementById('set-logo').value = data.logo_url || '';
+            document.getElementById('set-tables').value = data.table_count || 10;
+            document.getElementById('set-gst').value = data.gst_rate || 5.0;
+            document.getElementById('set-currency').value = data.currency_symbol || '₹';
+            document.getElementById('set-menu-pdf').value = data.menu_pdf_url || '';
+        }
+
+        async function saveSettings() {
+            const payload = {
+                name: document.getElementById('set-name').value || undefined,
+                address: document.getElementById('set-address').value || undefined,
+                phone: document.getElementById('set-phone').value || undefined,
+                gstin: document.getElementById('set-gstin').value || undefined,
+                upi_id: document.getElementById('set-upi').value || undefined,
+                logo_url: document.getElementById('set-logo').value || undefined,
+                table_count: parseInt(document.getElementById('set-tables').value) || undefined,
+                gst_rate: parseFloat(document.getElementById('set-gst').value) || undefined,
+                currency_symbol: document.getElementById('set-currency').value || undefined,
+                menu_pdf_url: document.getElementById('set-menu-pdf').value || undefined,
+            };
+            Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+
+            const res = await fetch('/restaurant/settings/', {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                document.getElementById('settings-msg').innerText = '✅ Settings saved!';
+                setTimeout(() => document.getElementById('settings-msg').innerText = '', 3000);
+            } else {
+                const data = await res.json();
+                alert(data.detail || 'Failed to save settings');
+            }
+        }
+
+        checkSubscription();
         loadData();
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/service-worker.js').catch(console.warn);

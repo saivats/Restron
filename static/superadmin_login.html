@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restron Super Admin Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { background: #111; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #1a1a2e; padding: 40px; border-radius: 12px; width: 340px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.5); border: 1px solid #333; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #333; border-radius: 6px; box-sizing: border-box; background: #222; color: white; font-size: 1em; }
+        button { width: 100%; padding: 12px; background: #6c5ce7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1em; margin-top: 10px; }
+        button:hover { background: #5a4bd1; }
+        h2 { color: #a29bfe; margin-top: 0; font-size: 1.4em; }
+        .subtitle { color: #666; font-size: 0.85em; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>🔑 Super Admin</h2>
+        <p class="subtitle">Restron Platform Management</p>
+        <input id="u" placeholder="Username">
+        <input id="p" type="password" placeholder="Password">
+        <button onclick="login()">Access Dashboard</button>
+        <p id="msg" style="color:#e74c3c; margin-top:10px; font-size:0.9em;"></p>
+    </div>
+    <script>
+        async function login() {
+            const u = document.getElementById('u').value;
+            const p = document.getElementById('p').value;
+            const formData = new FormData();
+            formData.append('username', u);
+            formData.append('password', p);
+
+            try {
+                const res = await fetch('/superadmin/token', { method: 'POST', body: formData });
+                if (res.ok) {
+                    window.location.href = '/superadmin/dashboard';
+                } else {
+                    const err = await res.json().catch(() => ({ detail: 'Login failed' }));
+                    document.getElementById('msg').innerText = err.detail || "Invalid credentials";
+                }
+            } catch (error) {
+                document.getElementById('msg').innerText = "Network error. Please try again.";
+            }
+        }
+
+        document.getElementById('p').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+    </script>
+</body>
+</html>

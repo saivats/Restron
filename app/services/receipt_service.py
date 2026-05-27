@@ -1,37 +1,35 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.core.config import (
-    BUSINESS_ADDRESS,
-    BUSINESS_GSTIN,
-    BUSINESS_LOCATION,
-    BUSINESS_NAME,
-    BUSINESS_PHONE,
-    BUSINESS_TAGLINE,
-    BUSINESS_UPI_ID,
-    PUBLIC_BASE_URL,
-)
+from app.core.config import PUBLIC_BASE_URL
 from app.models import models
 
 
 def _business_profile(db: Session, restaurant_id: int) -> dict:
     restaurant = db.get(models.Restaurant, restaurant_id)
+    if not restaurant:
+        raise HTTPException(status_code=500, detail=f"Restaurant {restaurant_id} not found — cannot generate receipt")
+
     return {
-        "name": restaurant.name if restaurant else BUSINESS_NAME,
-        "tagline": BUSINESS_TAGLINE,
-        "location": restaurant.timezone if restaurant else BUSINESS_LOCATION,
-        "address": restaurant.address if restaurant and restaurant.address else BUSINESS_ADDRESS,
-        "phone": restaurant.phone if restaurant and restaurant.phone else BUSINESS_PHONE,
-        "gstin": restaurant.gstin if restaurant and restaurant.gstin else BUSINESS_GSTIN,
-        "upi_id": restaurant.upi_id if restaurant and restaurant.upi_id else BUSINESS_UPI_ID,
+        "name": restaurant.name,
+        "tagline": "Cloud-powered restaurant billing",
+        "location": restaurant.address or "",
+        "address": restaurant.address or "",
+        "phone": restaurant.phone or "",
+        "gstin": restaurant.gstin or "",
+        "upi_id": restaurant.upi_id or "",
+        "currency_symbol": restaurant.currency_symbol or "₹",
+        "gst_rate": restaurant.gst_rate or 5.0,
+        "slug": restaurant.slug or "default",
     }
 
 
 def generate_whatsapp_text(receipt: dict) -> str:
+    currency = receipt["business"].get("currency_symbol", "₹")
     return (
         f"Thank you for dining at {receipt['business']['name']}!\n"
         f"Invoice: {receipt.get('invoice_number') or receipt['order_id']}\n"
-        f"Total paid: INR {receipt['total']:.2f}\n"
+        f"Total paid: {currency}{receipt['total']:.2f}\n"
         f"Digital copy: {receipt['digital_url']}\n"
         "See you again soon."
     )
@@ -43,6 +41,9 @@ def generate_receipt_logic(order_id: int, db: Session, *, restaurant_id: int | N
         raise HTTPException(status_code=404, detail="Order not found")
 
     business = _business_profile(db, order.restaurant_id)
+    slug = business["slug"]
+    currency = business["currency_symbol"]
+
     items_list = [
         {
             "name": item.item_name,
@@ -55,7 +56,9 @@ def generate_receipt_logic(order_id: int, db: Session, *, restaurant_id: int | N
         }
         for item in order.items
     ]
-    digital_url = f"{PUBLIC_BASE_URL}/receipt/{order.id}"
+    digital_url = f"{PUBLIC_BASE_URL}/r/{slug}/receipt/{order.id}"
+    menu_url = f"{PUBLIC_BASE_URL}/r/{slug}/mobile"
+    receipt_upload_path = f"receipts/{order.restaurant_id}/receipt_{order.id}.pdf"
 
     receipt = {
         "business": business,
@@ -79,7 +82,9 @@ def generate_receipt_logic(order_id: int, db: Session, *, restaurant_id: int | N
         "digital_url": digital_url,
         "qr_url": f"{PUBLIC_BASE_URL}/static/qr-placeholder.png",
         "pdf_url": digital_url,
-        "menu_url": f"{PUBLIC_BASE_URL}/mobile",
+        "menu_url": menu_url,
+        "currency_symbol": currency,
+        "receipt_upload_path": receipt_upload_path,
     }
     receipt["whatsapp_text"] = generate_whatsapp_text(receipt)
     return receipt

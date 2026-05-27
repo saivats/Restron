@@ -9,32 +9,65 @@
         input { width: 100%; padding: 10px; margin: 10px 0; border: none; border-radius: 5px; box-sizing: border-box; }
         button { width: 100%; padding: 10px; background: #ff5722; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
         h2 { color: #ff9800; margin-top: 0; }
+        .inactive-banner { background: #d32f2f; color: white; padding: 20px; border-radius: 8px; text-align: center; font-size: 1.1em; line-height: 1.5; }
     </style>
 </head>
 <body>
-    <div class="box">
+    <div class="box" id="login-box">
         <h2>🔒 Staff Login</h2>
         <input id="u" placeholder="Username">
         <input id="p" type="password" placeholder="Password">
         <button onclick="login()">Login</button>
         <p id="msg" style="color:red; margin-top:10px; font-size:0.9em;"></p>
     </div>
+    <div class="box inactive-banner" id="inactive-box" style="display:none;">
+        <h2>⚠️ Account Inactive</h2>
+        <p>This account is inactive. Please contact Restron support to renew.</p>
+    </div>
     <script>
+        function getSlug() {
+            const parts = window.location.pathname.split('/');
+            if (parts.length >= 3 && parts[1] === 'r') {
+                return parts[2];
+            }
+            return null;
+        }
+
         async function login() {
             const u = document.getElementById('u').value;
             const p = document.getElementById('p').value;
+            const slug = getSlug();
             const formData = new FormData();
             formData.append('username', u);
             formData.append('password', p);
 
-            const res = await fetch('/auth/token', { method: 'POST', body: formData });
-            if (res.ok) {
-                const data = await res.json();
-                window.location.href = data.redirect;
-            } else {
-                document.getElementById('msg').innerText = "Invalid credentials";
+            let url = '/auth/token';
+            if (slug) {
+                url += '?slug=' + encodeURIComponent(slug);
+            }
+
+            try {
+                const res = await fetch(url, { method: 'POST', body: formData });
+                if (res.ok) {
+                    const data = await res.json();
+                    window.location.href = data.redirect;
+                } else {
+                    const err = await res.json().catch(() => ({ detail: 'Login failed' }));
+                    if (res.status === 403) {
+                        document.getElementById('login-box').style.display = 'none';
+                        document.getElementById('inactive-box').style.display = 'block';
+                    } else {
+                        document.getElementById('msg').innerText = err.detail || "Invalid credentials";
+                    }
+                }
+            } catch (error) {
+                document.getElementById('msg').innerText = "Network error. Please try again.";
             }
         }
+
+        document.getElementById('p').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
     </script>
 </body>
 </html>

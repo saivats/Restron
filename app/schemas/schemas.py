@@ -85,3 +85,50 @@ class SplitBillRequest(BaseModel):
     split_type: str = "equal"
     split_count: int = 1
     item_ids: Optional[List[int]] = None
+
+
+class StaffCreate(BaseModel):
+    username: str
+    password: str
+    role: str
+
+
+class RestaurantCreate(BaseModel):
+    restaurant_name: str
+    slug: str
+    owner_username: str
+    owner_password: str = ""
+    address: str = ""
+    phone: str = ""
+    table_count: int = 10
+    plan: str = "trial"
+    gst_rate: float = 5.0
+    owner_email: str = ""
+
+
+class RestaurantUpdate(BaseModel):
+    name: Optional[str] = None
+    slug: Optional[str] = None
+    is_active: Optional[bool] = None
+    plan: Optional[str] = None
+    plan_expires_at: Optional[str] = None
+    table_count: Optional[int] = None
+    gst_rate: Optional[float] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    owner_email: Optional[str] = None
+    menu_pdf_url: Optional[str] = None
+    currency_symbol: Optional[str] = None
+
+
+class RestaurantSettingsUpdate(BaseModel):
+    name: Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    logo_url: Optional[str] = None
+    table_count: Optional[int] = None
+    gst_rate: Optional[float] = None
+    menu_pdf_url: Optional[str] = None
+    currency_symbol: Optional[str] = None
+    gstin: Optional[str] = None
+    upi_id: Optional[str] = None

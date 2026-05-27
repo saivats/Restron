@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <style>
+        .subscription-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; }
+        .subscription-overlay .msg { background: #d32f2f; color: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 500px; font-size: 1.2em; line-height: 1.6; }
         body { font-family: monospace; background: #eee; padding: 10px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .search-box { width: 100%; padding: 12px; font-size: 16px; margin-bottom: 10px; border: 2px solid #333; }
@@ -15,6 +17,7 @@
     </style>
 </head>
 <body>
+    <div class="subscription-overlay" id="sub-overlay"><div class="msg"><h2>⚠️ Subscription Expired</h2><p>Your subscription has expired. Please contact Restron support.</p></div></div>
     <div class="header">
         <h2>🤵 Waiter Mode</h2>
         <button onclick="logout()">Exit</button>
@@ -102,6 +105,21 @@
         }
 
         function logout() { fetch('/logout', {method:'POST'}).then(() => window.location.href='/'); }
+
+        async function checkSubscription() {
+            try {
+                const res = await fetch('/restaurant/status/');
+                if (res.ok) {
+                    const data = await res.json();
+                    let expired = false;
+                    if (data.is_active === false) expired = true;
+                    if (data.plan_expires_at && new Date(data.plan_expires_at) < new Date()) expired = true;
+                    if (expired) document.getElementById('sub-overlay').style.display = 'flex';
+                }
+            } catch (e) { }
+        }
+
+        checkSubscription();
         init();
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/service-worker.js').catch(console.warn);

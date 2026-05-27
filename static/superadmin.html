@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restron Super Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0f0f1a; color: #e0e0e0; padding: 20px; }
+        h1 { color: #a29bfe; margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .header-actions { display: flex; gap: 10px; }
+
+        .card { background: #1a1a2e; padding: 20px; border-radius: 10px; border: 1px solid #2a2a3e; margin-bottom: 20px; }
+        .card h2 { color: #a29bfe; font-size: 1.1em; margin-bottom: 15px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #2a2a3e; font-size: 0.9em; }
+        th { color: #888; font-weight: 600; }
+
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
+        .badge-trial { background: #2d3436; color: #fdcb6e; }
+        .badge-paid { background: #00b894; color: white; }
+        .badge-free { background: #636e72; color: white; }
+        .badge-active { background: #00b894; color: white; }
+        .badge-inactive { background: #d63031; color: white; }
+
+        button { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9em; }
+        .btn-primary { background: #6c5ce7; color: white; }
+        .btn-primary:hover { background: #5a4bd1; }
+        .btn-danger { background: #d63031; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-small { padding: 5px 10px; font-size: 0.8em; }
+        .btn-outline { background: transparent; border: 1px solid #6c5ce7; color: #6c5ce7; }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); overflow-y: auto; }
+        .modal-content { background: #1a1a2e; margin: 5% auto; padding: 30px; border-radius: 12px; max-width: 500px; border: 1px solid #2a2a3e; position: relative; }
+        .modal-close { position: absolute; right: 15px; top: 10px; font-size: 28px; cursor: pointer; color: #888; }
+        .modal-close:hover { color: white; }
+
+        input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #2a2a3e; border-radius: 6px; background: #222; color: white; font-size: 0.95em; }
+        label { display: block; color: #888; font-size: 0.85em; margin-bottom: 4px; font-weight: 600; }
+
+        .stats-panel { background: #16213e; padding: 20px; border-radius: 10px; border: 1px solid #2a2a3e; margin-top: 10px; }
+        .stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #2a2a3e; }
+        .stat-label { color: #888; }
+        .stat-value { font-weight: bold; color: #a29bfe; }
+
+        .credentials-box { background: #1e3d2f; border: 1px solid #00b894; padding: 15px; border-radius: 8px; margin-top: 15px; }
+        .credentials-box h4 { color: #00b894; margin-bottom: 10px; }
+        .credentials-box code { background: #222; padding: 3px 8px; border-radius: 4px; font-size: 0.95em; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏢 Restron Platform Admin</h1>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openCreateModal()">+ New Restaurant</button>
+            <button class="btn-outline" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📋 Restaurants</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th>Plan</th>
+                    <th>Status</th>
+                    <th>Orders (30d)</th>
+                    <th>Tables</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="restaurant-table">
+                <tr><td colspan="8" style="color:#666;">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="stats-container" class="card" style="display:none;">
+        <h2 id="stats-title">📊 Restaurant Stats</h2>
+        <div class="stats-panel" id="stats-panel"></div>
+    </div>
+
+    <div id="create-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeCreateModal()">&times;</span>
+            <h2 style="color:#a29bfe; margin-bottom:20px;">Create Restaurant</h2>
+            <label>Restaurant Name *</label>
+            <input id="cr-name" placeholder="e.g. Desi Zaika">
+            <label>Slug * (URL-safe, lowercase)</label>
+            <input id="cr-slug" placeholder="e.g. desi-zaika">
+            <label>Owner Username *</label>
+            <input id="cr-owner" placeholder="e.g. owner_desi">
+            <label>Owner Password (leave blank to auto-generate)</label>
+            <input id="cr-password" type="password" placeholder="Auto-generated if empty">
+            <label>Address</label>
+            <input id="cr-address" placeholder="Full address">
+            <label>Phone</label>
+            <input id="cr-phone" placeholder="Phone number">
+            <label>Table Count</label>
+            <input id="cr-tables" type="number" value="10">
+            <label>Plan</label>
+            <select id="cr-plan">
+                <option value="trial">Trial</option>
+                <option value="basic">Basic</option>
+                <option value="premium">Premium</option>
+            </select>
+            <button class="btn-primary" onclick="createRestaurant()" style="width:100%; margin-top:10px;">Create Restaurant</button>
+            <div id="create-result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        async function loadRestaurants() {
+            const res = await fetch('/superadmin/restaurants/');
+            if (res.status === 401) {
+                window.location.href = '/superadmin/login';
+                return;
+            }
+            const data = await res.json();
+            const tbody = document.getElementById('restaurant-table');
+
+            if (!data.length) {
+                tbody.innerHTML = '<tr><td colspan="8" style="color:#666;">No restaurants yet. Create one!</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach(r => {
+                const planBadge = r.plan === 'trial' ? 'badge-trial' : r.plan === 'free' ? 'badge-free' : 'badge-paid';
+                const statusBadge = r.is_active ? 'badge-active' : 'badge-inactive';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.id}</td>
+                        <td><strong>${r.name}</strong></td>
+                        <td><code>${r.slug || '-'}</code></td>
+                        <td><span class="badge ${planBadge}">${r.plan || 'free'}</span></td>
+                        <td><span class="badge ${statusBadge}">${r.is_active ? 'Active' : 'Inactive'}</span></td>
+                        <td>${r.order_count_30d}</td>
+                        <td>${r.table_count || '-'}</td>
+                        <td>
+                            <button class="btn-small btn-outline" onclick="viewStats(${r.id})">Stats</button>
+                            ${r.is_active
+                                ? `<button class="btn-small btn-danger" onclick="toggleActive(${r.id}, false)">Deactivate</button>`
+                                : `<button class="btn-small btn-primary" onclick="toggleActive(${r.id}, true)">Activate</button>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openCreateModal() {
+            document.getElementById('create-modal').style.display = 'block';
+            document.getElementById('create-result').style.display = 'none';
+        }
+
+        function closeCreateModal() {
+            document.getElementById('create-modal').style.display = 'none';
+        }
+
+        async function createRestaurant() {
+            const payload = {
+                restaurant_name: document.getElementById('cr-name').value,
+                slug: document.getElementById('cr-slug').value.toLowerCase().replace(/\s+/g, '-'),
+                owner_username: document.getElementById('cr-owner').value,
+                owner_password: document.getElementById('cr-password').value || '',
+                address: document.getElementById('cr-address').value,
+                phone: document.getElementById('cr-phone').value,
+                table_count: parseInt(document.getElementById('cr-tables').value) || 10,
+                plan: document.getElementById('cr-plan').value,
+            };
+
+            if (!payload.restaurant_name || !payload.slug || !payload.owner_username) {
+                alert('Restaurant name, slug, and owner username are required!');
+                return;
+            }
+
+            const res = await fetch('/superadmin/restaurants/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                const resultDiv = document.getElementById('create-result');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <div class="credentials-box">
+                        <h4>✅ Restaurant Created!</h4>
+                        <p>Login URL: <code>/r/${data.restaurant.slug}/login</code></p>
+                        <p>Owner Username: <code>${data.owner.username}</code></p>
+                        <p>Owner Password: <code>${data.owner.password}</code></p>
+                        <p style="color:#fdcb6e; font-size:0.85em; margin-top:10px;">⚠️ Save these credentials — the password cannot be recovered.</p>
+                    </div>
+                `;
+                loadRestaurants();
+            } else {
+                alert(data.detail || 'Failed to create restaurant');
+            }
+        }
+
+        async function toggleActive(restaurantId, activate) {
+            const action = activate ? 'activate' : 'deactivate';
+            if (!confirm(`Are you sure you want to ${action} this restaurant?`)) return;
+
+            const res = await fetch(`/superadmin/restaurants/${restaurantId}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ is_active: activate })
+            });
+            if (res.ok) loadRestaurants();
+            else alert('Failed to update restaurant');
+        }
+
+        async function viewStats(restaurantId) {
+            const res = await fetch(`/superadmin/restaurants/${restaurantId}/stats`);
+            const data = await res.json();
+            const container = document.getElementById('stats-container');
+            container.style.display = 'block';
+            document.getElementById('stats-title').innerText = `📊 ${data.name} — Stats`;
+            document.getElementById('stats-panel').innerHTML = `
+                <div class="stat-row"><span class="stat-label">Total Orders</span><span class="stat-value">${data.order_count}</span></div>
+                <div class="stat-row"><span class="stat-label">Total Revenue</span><span class="stat-value">₹${data.revenue_total}</span></div>
+                <div class="stat-row"><span class="stat-label">Last Activity</span><span class="stat-value">${data.last_activity ? new Date(data.last_activity).toLocaleString() : 'No activity'}</span></div>
+            `;
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function logout() {
+            await fetch('/superadmin/logout', { method: 'POST' });
+            window.location.href = '/superadmin/login';
+        }
+
+        loadRestaurants();
+    </script>
+</body>
+</html>
