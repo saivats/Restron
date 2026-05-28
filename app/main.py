@@ -131,8 +131,13 @@ async def slug_admin(slug: str, user: models.User | None = Depends(get_current_u
     return static_file("admin.html")
 
 
-@app.get("/r/{slug}/receipt/{order_id}")
-async def slug_receipt(slug: str, order_id: int, user: models.User | None = Depends(get_current_user)):
+@app.get("/r/{slug}/receipt/{order_id}", response_class=HTMLResponse)
+async def slug_receipt_page(slug: str, order_id: int):
+    return static_file("receipt.html")
+
+
+@app.get("/r/{slug}/receipt/{order_id}/data")
+async def slug_receipt_data(slug: str, order_id: int, user: models.User | None = Depends(get_current_user)):
     from app.api.deps import user_restaurant_id
     from app.services.receipt_service import generate_receipt_logic
     db = SessionLocal()

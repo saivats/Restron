@@ -1,30 +1,245 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Restron Login</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body { background: #222; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #333; padding: 30px; border-radius: 10px; width: 300px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: none; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #ff5722; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        h2 { color: #ff9800; margin-top: 0; }
-        .inactive-banner { background: #d32f2f; color: white; padding: 20px; border-radius: 8px; text-align: center; font-size: 1.1em; line-height: 1.5; }
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Restron POS | Premium Login</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "success": "#2E7D32",
+                    "on-secondary": "#670024",
+                    "inverse-surface": "#f1dfd3",
+                    "on-surface": "#f1dfd3",
+                    "secondary-container": "#891838",
+                    "on-tertiary-container": "#003854",
+                    "surface-container": "#271e16",
+                    "error": "#ffb4ab",
+                    "outline": "#a38c7c",
+                    "text-primary": "#F5EBE1",
+                    "on-background": "#f1dfd3",
+                    "inverse-primary": "#8f4e00",
+                    "tertiary-container": "#00a7ee",
+                    "primary-fixed-dim": "#ffb77b",
+                    "surface": "#1a120b",
+                    "secondary-fixed-dim": "#ffb2bd",
+                    "tertiary-fixed-dim": "#8aceff",
+                    "primary-container": "#e8851a",
+                    "on-tertiary-fixed": "#001e2f",
+                    "on-secondary-fixed-variant": "#891838",
+                    "primary-fixed": "#ffdcc2",
+                    "on-primary-container": "#532b00",
+                    "on-primary": "#4c2700",
+                    "background-surface": "#1A1510",
+                    "surface-bright": "#42372f",
+                    "on-secondary-container": "#ff97a8",
+                    "on-primary-fixed": "#2e1500",
+                    "secondary-fixed": "#ffd9dd",
+                    "inverse-on-surface": "#392e26",
+                    "surface-container-high": "#322820",
+                    "background": "#1a120b",
+                    "outline-variant": "#554336",
+                    "on-tertiary": "#00344e",
+                    "surface-variant": "#3d332b",
+                    "on-error": "#690005",
+                    "surface-dim": "#1a120b",
+                    "surface-container-highest": "#3d332b",
+                    "secondary": "#ffb2bd",
+                    "on-error-container": "#ffdad6",
+                    "tertiary-fixed": "#c9e6ff",
+                    "tertiary": "#8aceff",
+                    "primary": "#ffb77b",
+                    "on-primary-fixed-variant": "#6d3a00",
+                    "on-tertiary-fixed-variant": "#004b6e",
+                    "on-secondary-fixed": "#400013",
+                    "surface-tint": "#ffb77b",
+                    "error-container": "#93000a",
+                    "on-surface-variant": "#dbc2b0",
+                    "surface-container-low": "#231a13",
+                    "surface-container-lowest": "#140d06",
+                    "text-secondary": "#A89F95",
+                    "background-base": "#0D0A06"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "1rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "container-max": "1280px",
+                    "margin-desktop": "40px",
+                    "unit": "8px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Playfair Display"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "body-lg": ["DM Sans"],
+                    "body-md": ["DM Sans"],
+                    "display-lg": ["Playfair Display"],
+                    "label-md": ["DM Sans"],
+                    "headline-sm": ["Playfair Display"],
+                    "label-sm": ["DM Sans"]
+            },
+            "fontSize": {
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        body {
+            background-color: #0D0A06;
+            overflow: hidden;
+        }
+
+        .bg-ambient {
+            background: radial-gradient(circle at 20% 30%, rgba(232, 133, 26, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(26, 18, 11, 0.8) 0%, transparent 50%),
+                        linear-gradient(135deg, #0D0A06 0%, #1A120B 100%);
+        }
+
+        .glass-card {
+            background: rgba(26, 21, 16, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(232, 133, 26, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(232, 133, 26, 0.1);
+        }
+
+        .spring-btn {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .spring-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .spring-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Float Animation for Atmosphere */
+        .float-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.4;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(10%, 15%); }
+        }
+
+        .inactive-banner {
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
-</head>
-<body>
-    <div class="box" id="login-box">
-        <h2>🔒 Staff Login</h2>
-        <input id="u" placeholder="Username">
-        <input id="p" type="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <p id="msg" style="color:red; margin-top:10px; font-size:0.9em;"></p>
-    </div>
-    <div class="box inactive-banner" id="inactive-box" style="display:none;">
-        <h2>⚠️ Account Inactive</h2>
-        <p>This account is inactive. Please contact Restron support to renew.</p>
-    </div>
-    <script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-ambient h-screen w-full flex items-center justify-center relative font-body-md text-text-primary">
+<!-- Atmospheric Background Elements -->
+<div class="float-blob w-96 h-96 bg-[#E8851A] -top-20 -left-20"></div>
+<div class="float-blob w-[500px] h-[500px] bg-[#1A120B] -bottom-40 -right-20" style="animation-delay: -5s;"></div>
+<main class="relative z-10 w-full max-w-md px-margin-mobile md:px-0">
+<!-- Main Login Box -->
+<div class="glass-card rounded-2xl p-8 md:p-12" id="login-box">
+<header class="text-center mb-10">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-container/10 mb-4 border border-primary/20">
+<span class="material-symbols-outlined text-primary text-3xl">restaurant_menu</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Restron POS</h1>
+<p class="font-label-md text-label-md text-text-secondary mt-2">Precision Craftsmanship for your Business</p>
+</header>
+<!-- Error Message Placeholder -->
+<div class="mb-6 text-center font-label-md text-error" id="msg"></div>
+<!-- Inactive Banner (Initially Hidden) -->
+<div class="inactive-banner mb-6 p-3 rounded-lg bg-error/10 border border-error/20 text-error text-center font-label-sm" id="inactive-box">
+                Account Inactive
+            </div>
+<form class="space-y-6" onsubmit="return false;">
+<!-- Username -->
+<div class="space-y-2">
+<label class="block font-label-sm text-label-sm text-text-secondary uppercase" for="u">Username</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-lg">person</span>
+<input class="w-full bg-background-base/50 border border-outline-variant rounded-xl py-3.5 pl-12 pr-4 text-text-primary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-text-secondary/40 font-body-md" id="u" placeholder="Enter your username" type="text"/>
+</div>
+</div>
+<!-- Password -->
+<div class="space-y-2">
+<label class="block font-label-sm text-label-sm text-text-secondary uppercase" for="p">Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-lg">lock</span>
+<input class="w-full bg-background-base/50 border border-outline-variant rounded-xl py-3.5 pl-12 pr-4 text-text-primary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-text-secondary/40 font-body-md" id="p" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<div class="flex items-center justify-between py-2">
+<label class="flex items-center space-x-2 cursor-pointer group">
+<input class="rounded border-outline-variant bg-transparent text-primary focus:ring-primary/50" type="checkbox"/>
+<span class="font-label-sm text-text-secondary group-hover:text-text-primary transition-colors">Remember me</span>
+</label>
+<a class="font-label-sm text-primary hover:opacity-80 transition-opacity" href="#">Forgot access?</a>
+</div>
+<!-- Login Button -->
+<button class="spring-btn w-full bg-primary-container text-on-primary-container font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary-container/20 group" onclick="login()">
+<span class="font-label-md text-label-md uppercase tracking-widest">Sign In</span>
+<span class="material-symbols-outlined text-xl transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+</form>
+<footer class="mt-12 pt-8 border-t border-white/5 flex flex-col items-center gap-4">
+<p class="font-label-sm text-text-secondary">© 2024 Restron POS. Precision Craftsmanship.</p>
+<div class="flex gap-6">
+<a class="font-label-sm text-text-secondary hover:text-primary transition-colors" href="#">Support</a>
+<a class="font-label-sm text-text-secondary hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="font-label-sm text-text-secondary hover:text-primary transition-colors" href="#">Legal</a>
+</div>
+</footer>
+</div>
+</main>
+<!-- Overlay Image Background (Very subtle texture) -->
+<div class="fixed inset-0 pointer-events-none opacity-20 mix-blend-overlay">
+<img class="w-full h-full object-cover" data-alt="A macro photograph of aged dark mahogany wood texture with subtle golden resin veins flowing through the grain. The lighting is moody and dramatic, accentuating the deep reddish-brown tones and creating a luxurious atmosphere. This organic pattern provides a sophisticated, tactile backdrop for a high-end digital interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDApljnCRr3DSrZuy4tS32-SkZY9IVgrd3WHoFcIbyeabrhXdA__90yaFMBLlZ3nEYVLEhlScO4hY02ToPG6hCtY8UK3QQ_9EAIwrQ0VFnsMia9CEYMp3LVJsL3sfJg0yPjt_e-pSD_3wgaLevyzpmUQUjBtHlyF8HcOcfU8-kDYPMT_wtt5uNDKEcgIPXAAJfkEBvurzXtup1T1Js19fL6Sg_R2Ct-xsvb5Alba1uKvTt7Il0KltE2SOfiiFVTcXKOoaWbwkLV7LM"/>
+</div>
+<script>
         function getSlug() {
             const parts = window.location.pathname.split('/');
             if (parts.length >= 3 && parts[1] === 'r') {
@@ -68,6 +283,15 @@
         document.getElementById('p').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') login();
         });
+
+        // Atmospheric mouse movement effect
+        document.addEventListener('mousemove', (e) => {
+            const box = document.getElementById('login-box');
+            if (box) {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 50;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 50;
+                box.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            }
+        });
     </script>
-</body>
-</html>
+</body></html>

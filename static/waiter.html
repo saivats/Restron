@@ -1,37 +1,270 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Waiter Mode</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
-    <style>
-        .subscription-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; }
-        .subscription-overlay .msg { background: #d32f2f; color: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 500px; font-size: 1.2em; line-height: 1.6; }
-        body { font-family: monospace; background: #eee; padding: 10px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .search-box { width: 100%; padding: 12px; font-size: 16px; margin-bottom: 10px; border: 2px solid #333; }
-        .item-row { background: white; padding: 10px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .qty-btn { width: 35px; height: 35px; border: none; background: #ddd; font-weight: bold; font-size: 1.2em; }
-        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #333; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .place-btn { background: #28a745; color: white; border: none; padding: 10px 20px; font-weight: bold; font-size: 1.1em; }
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Restron | Waiter Mode</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#891838",
+                        "text-secondary": "#A89F95",
+                        "secondary-fixed": "#ffd9dd",
+                        "surface-bright": "#42372f",
+                        "primary-container": "#e8851a",
+                        "primary": "#ffb77b",
+                        "secondary-fixed-dim": "#ffb2bd",
+                        "on-primary-fixed": "#2e1500",
+                        "tertiary-fixed-dim": "#8aceff",
+                        "success": "#2E7D32",
+                        "tertiary": "#8aceff",
+                        "surface-container-low": "#231a13",
+                        "on-tertiary": "#00344e",
+                        "on-primary-container": "#532b00",
+                        "inverse-on-surface": "#392e26",
+                        "primary-fixed": "#ffdcc2",
+                        "surface-container-highest": "#3d332b",
+                        "surface-container-lowest": "#140d06",
+                        "background": "#1a120b",
+                        "error": "#ffb4ab",
+                        "primary-fixed-dim": "#ffb77b",
+                        "surface-container-high": "#322820",
+                        "on-secondary-container": "#ff97a8",
+                        "on-secondary-fixed": "#400013",
+                        "on-error-container": "#ffdad6",
+                        "surface": "#1a120b",
+                        "secondary": "#ffb2bd",
+                        "on-error": "#690005",
+                        "tertiary-fixed": "#c9e6ff",
+                        "on-tertiary-container": "#003854",
+                        "outline": "#a38c7c",
+                        "outline-variant": "#554336",
+                        "on-background": "#f1dfd3",
+                        "on-secondary-fixed-variant": "#891838",
+                        "on-tertiary-fixed-variant": "#004b6e",
+                        "on-surface": "#f1dfd3",
+                        "surface-variant": "#3d332b",
+                        "surface-container": "#271e16",
+                        "tertiary-container": "#00a7ee",
+                        "surface-tint": "#ffb77b",
+                        "on-secondary": "#670024",
+                        "background-surface": "#1A1510",
+                        "text-primary": "#F5EBE1",
+                        "inverse-surface": "#f1dfd3",
+                        "on-tertiary-fixed": "#001e2f",
+                        "inverse-primary": "#8f4e00",
+                        "error-container": "#93000a",
+                        "surface-dim": "#1a120b",
+                        "on-primary": "#4c2700",
+                        "on-primary-fixed-variant": "#6d3a00",
+                        "background-base": "#0D0A06",
+                        "on-surface-variant": "#dbc2b0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "margin-mobile": "16px",
+                        "unit": "8px",
+                        "margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["DM Sans"],
+                        "label-md": ["DM Sans"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "label-sm": ["DM Sans"],
+                        "headline-sm": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "body-md": ["DM Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "display-lg-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0D0A06;
+            color: #F5EBE1;
+            font-family: 'DM Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-card {
+            background: rgba(26, 21, 16, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .search-shadow {
+            box-shadow: 0 4px 20px rgba(232, 133, 26, 0.05);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E8851A;
+            border-radius: 10px;
+        }
     </style>
-</head>
-<body>
-    <div class="subscription-overlay" id="sub-overlay"><div class="msg"><h2>⚠️ Subscription Expired</h2><p>Your subscription has expired. Please contact Restron support.</p></div></div>
-    <div class="header">
-        <h2>🤵 Waiter Mode</h2>
-        <button onclick="logout()">Exit</button>
-    </div>
-
-    <input class="search-box" id="search" placeholder="Search item (Fuzzy)..." oninput="doSearch()">
-
-    <div id="list">Loading...</div>
-    <div style="height: 80px;"></div> <div class="cart-bar">
-        <span id="summary">0 items | ₹0</span>
-        <button class="place-btn" onclick="placeOrder()">SEND TO KITCHEN</button>
-    </div>
-
-    <script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background-surface/80 backdrop-blur-md border-b border-white/10 shadow-[0_4px_20px_rgba(232,133,26,0.15)] h-16 flex justify-between items-center px-margin-mobile">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[28px]">account_circle</span>
+</div>
+<h1 class="font-headline-sm text-headline-sm-mobile text-primary">Waiter Mode</h1>
+<button class="flex items-center gap-1 bg-white/10 hover:bg-white/5 border border-white/10 backdrop-blur rounded-lg px-3 py-1.5 active:scale-95 transition-all duration-200" onclick="logout()">
+<span class="font-label-sm text-label-sm text-on-surface">Logout</span>
+<span class="material-symbols-outlined text-sm">exit_to_app</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 mt-16 pb-28 px-margin-mobile w-full max-w-container-max mx-auto overflow-x-hidden">
+<!-- Search Section -->
+<section class="mt-6 sticky top-[72px] z-40 py-2">
+<div class="relative group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary material-symbols-outlined pointer-events-none">search</span>
+<input class="w-full h-14 pl-12 pr-4 bg-surface-container-low/80 border border-white/5 rounded-xl text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent transition-all backdrop-blur-sm placeholder:text-text-secondary/50 search-shadow" id="search" oninput="doSearch()" placeholder="Search item (Fuzzy)..." type="text"/>
+</div>
+</section>
+<!-- Category Quick Chips (Extra UI refinement) -->
+<div class="flex gap-3 overflow-x-auto py-4 no-scrollbar">
+<button class="bg-primary-container text-on-primary-container px-4 py-2 rounded-full font-label-sm text-label-sm whitespace-nowrap shadow-lg">All Items</button>
+<button class="bg-surface-container border border-white/5 text-text-secondary px-4 py-2 rounded-full font-label-sm text-label-sm whitespace-nowrap">Starters</button>
+<button class="bg-surface-container border border-white/5 text-text-secondary px-4 py-2 rounded-full font-label-sm text-label-sm whitespace-nowrap">Main Course</button>
+<button class="bg-surface-container border border-white/5 text-text-secondary px-4 py-2 rounded-full font-label-sm text-label-sm whitespace-nowrap">Beverages</button>
+</div>
+<!-- List Container -->
+<div class="mt-2 flex flex-col gap-3" id="list">
+<!-- Example Menu Item Card -->
+<div class="glass-card rounded-2xl p-4 flex items-center justify-between group active:scale-[0.98] transition-transform duration-200">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-xl overflow-hidden bg-surface-container-highest flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A close-up shot of grilled Paneer Tikka cubes, charred at the edges, served on a sleek dark ceramic plate. The lighting is warm and dramatic, highlighting the rich orange spices and fresh green garnish. The background is a sophisticated dark mahogany wood texture typical of a premium Restron dining environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNC3OJXM7opvp_Jw08hE4vfHt7jGTfgAiT6hRX5xz-CWF25HlTPXuwC-Nc3yOUTq2pmvw4Bync3RNEE0rAOedRpRQ-_EJJrIsiPrzzJ7tdJed0kYDrojp_DWoGEjmulEdGYSRaiJLezlY8m60ZWF0mjtYwyhG6XFXSrTX_e4UHegUREQm-wlKO-dTvgAsYIP__JaeLWouOjM8TsvCDCO_Q4pvygYPvOqn9NipSXfTPYgWNniK_57x-9y9Z5m3XeISVBwS-KVcVD2E"/>
+</div>
+<div>
+<h3 class="font-bold text-text-primary text-body-lg">Paneer Tikka</h3>
+<p class="text-primary font-bold">₹320</p>
+</div>
+</div>
+<div class="flex items-center bg-surface-container-lowest/50 rounded-xl p-1 border border-white/5">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/5 text-primary active:scale-90 transition-all" onclick="mod(1, -1)">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<span class="w-8 text-center font-bold text-text-primary text-body-md" id="qty-1">1</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary-container text-on-primary-container shadow-md active:scale-90 transition-all" onclick="mod(1, 1)">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- More Items for Visual Context -->
+<div class="glass-card rounded-2xl p-4 flex items-center justify-between group active:scale-[0.98] transition-transform duration-200 opacity-80">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-xl overflow-hidden bg-surface-container-highest flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Authentic Dal Makhani in a traditional copper serving bowl, topped with a swirl of fresh cream and a sprig of cilantro. The setting is dimly lit with warm amber accents reflecting off the metallic surfaces, creating a luxurious and appetizing mood in a dark-themed restaurant." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpMueMypPmMUNasnjGea6FW2D_F0qTblHH9AyhHGcypAy6vwYdJ8KfluPUksP6G0wuB79gHEYLAHFx5l0MTZ-4DiVRgoEodeNlrhUP2ioQX6rvqWdKd7vJno4I4W4tZrsj49rqRTFYKMuwEXsb_cdi2FjS0mSXUhE6E8rfWz4UVm3o9Ghkp3bHX0bR9_LKjzXVU6-JkDypFB9BNfzNpNdkR2A8w8Jk7PHImwHDtQK18yNPlGitqmiIwAyN2z1sAmpfk-ZMC3FauJI"/>
+</div>
+<div>
+<h3 class="font-bold text-text-primary text-body-lg">Dal Makhani</h3>
+<p class="text-primary font-bold">₹280</p>
+</div>
+</div>
+<div class="flex items-center bg-surface-container-lowest/50 rounded-xl p-1 border border-white/5">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/5 text-primary active:scale-90 transition-all" onclick="mod(2, -1)">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<span class="w-8 text-center font-bold text-text-primary text-body-md" id="qty-2">0</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary-container text-on-primary-container shadow-md active:scale-90 transition-all" onclick="mod(2, 1)">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<div class="glass-card rounded-2xl p-4 flex items-center justify-between group active:scale-[0.98] transition-transform duration-200 opacity-80">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-xl overflow-hidden bg-surface-container-highest flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Spicy Schezwan Noodles in a dark bowl, glistening with oil and colorful vegetables. High-end food photography with dramatic lighting and steam rising softly, conveying heat and freshness against a deep black and amber restaurant backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk1h45W-y7S6K2Tv9Y_YVU9N8YGzLl57VZ9x-gnC4qc8HsAD_-s6SMjdnIv_tK39WA5HEzeYRRjG1Xq1ASImbNBuIA3ql9trdfVHl4LXbRrQDyFwsn_EgJxkm4x6dy5pMdjqtxsYMDXEKTFWjIs2UytUD2cytjkzS6OuzGBJtLm0cMBRMzRSQMhT3Xtue7N3fkLJEqnYBeRG3VMqjklc4ssclpmQVPn_4jPr8epUAmYo7OeslEvwX-VX3dMd_bhfaONmcygPtPZcs"/>
+</div>
+<div>
+<h3 class="font-bold text-text-primary text-body-lg">Schezwan Noodles</h3>
+<p class="text-primary font-bold">₹240</p>
+</div>
+</div>
+<div class="flex items-center bg-surface-container-lowest/50 rounded-xl p-1 border border-white/5">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/5 text-primary active:scale-90 transition-all" onclick="mod(3, -1)">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<span class="w-8 text-center font-bold text-text-primary text-body-md" id="qty-3">1</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary-container text-on-primary-container shadow-md active:scale-90 transition-all" onclick="mod(3, 1)">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Sticky Bottom Cart Bar -->
+<div class="cart-bar fixed bottom-0 left-0 w-full z-50 bg-surface-container/90 backdrop-blur-lg border-t border-white/10 px-margin-mobile h-20 flex items-center justify-between shadow-[0_-4px_30px_rgba(232,133,26,0.2)]">
+<div class="flex flex-col">
+<span class="text-label-sm font-label-sm text-text-secondary uppercase tracking-widest">Order Summary</span>
+<span class="text-body-lg font-bold text-text-primary" id="summary">2 items | ₹640</span>
+</div>
+<button class="place-btn h-12 px-6 bg-primary-container text-on-primary-container font-bold rounded-xl shadow-[0_4px_15px_rgba(232,133,26,0.3)] hover:brightness-110 active:scale-95 transition-all duration-200 flex items-center gap-2" onclick="placeOrder()">
+<span class="material-symbols-outlined">kitchen</span>
+            SEND TO KITCHEN
+        </button>
+</div>
+<!-- Subscription Overlay -->
+<div class="fixed inset-0 z-[100] bg-background-base/80 backdrop-blur-xl flex items-center justify-center p-6" id="sub-overlay" style="display:none">
+<div class="glass-card max-w-md w-full rounded-3xl p-8 text-center border-2 border-secondary-container shadow-2xl animate-in fade-in zoom-in duration-300">
+<div class="w-20 h-20 bg-secondary-container/20 rounded-full flex items-center justify-center mx-auto mb-6">
+<span class="material-symbols-outlined text-secondary-container text-5xl">warning</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-secondary-container mb-4">Subscription Expired</h2>
+<p class="text-text-secondary font-body-md mb-8">Access to Waiter Mode is restricted. Please contact your restaurant manager to renew the Restron subscription.</p>
+<button class="w-full h-14 bg-on-secondary-fixed-variant text-white rounded-xl font-bold active:scale-95 transition-all" onclick="document.getElementById('sub-overlay').style.display='none'">
+                Close
+            </button>
+</div>
+</div>
+<!-- Bottom Nav (Shared Component Logic) -->
+<nav class="fixed bottom-0 w-full hidden md:flex items-center justify-around h-20 px-4 pb-safe bg-surface-container/90 backdrop-blur-lg border-t border-white/10 z-[60]">
+<!-- Top level navigation items if viewed on desktop shell -->
+</nav>
+<script>
         let menu = [], cart = {}, fuse;
 
         async function init() {
@@ -48,14 +281,26 @@
                 if(!i.is_available) return;
                 const qty = cart[i.id] || 0;
                 div.innerHTML += `
-                    <div class="item-row">
-                        <div><b>${i.name}</b><br><small>₹${i.price}</small></div>
-                        <div style="display:flex; gap:5px; align-items:center;">
-                            ${qty > 0 ? `<button class="qty-btn" onclick="mod(${i.id}, -1)">-</button>` : ''}
-                            <span>${qty > 0 ? qty : ''}</span>
-                            <button class="qty-btn" style="background:#ff9800; color:white;" onclick="mod(${i.id}, 1)">+</button>
-                        </div>
-                    </div>`;
+<div class="glass-card rounded-2xl p-4 flex items-center justify-between group active:scale-[0.98] transition-transform duration-200 mb-2">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-xl overflow-hidden bg-surface-container-highest flex-shrink-0">
+<img class="w-full h-full object-cover" src="${i.image_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuBNC3OJXM7opvp_Jw08hE4vfHt7jGTfgAiT6hRX5xz-CWF25HlTPXuwC-Nc3yOUTq2pmvw4Bync3RNEE0rAOedRpRQ-_EJJrIsiPrzzJ7tdJed0kYDrojp_DWoGEjmulEdGYSRaiJLezlY8m60ZWF0mjtYwyhG6XFXSrTX_e4UHegUREQm-wlKO-dTvgAsYIP__JaeLWouOjM8TsvCDCO_Q4pvygYPvOqn9NipSXfTPYgWNniK_57x-9y9Z5m3XeISVBwS-KVcVD2E'}"/>
+</div>
+<div>
+<h3 class="font-bold text-text-primary text-body-lg">${i.name}</h3>
+<p class="text-primary font-bold">₹${i.price}</p>
+</div>
+</div>
+<div class="flex items-center bg-surface-container-lowest/50 rounded-xl p-1 border border-white/5">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/5 text-primary active:scale-90 transition-all ${qty > 0 ? '' : 'invisible'}" onclick="mod(${i.id}, -1)">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<span class="w-8 text-center font-bold text-text-primary text-body-md" id="qty-${i.id}">${qty > 0 ? qty : '0'}</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary-container text-on-primary-container shadow-md active:scale-90 transition-all" onclick="mod(${i.id}, 1)">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>`;
             });
         }
 
@@ -125,5 +370,4 @@
             navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
         }
     </script>
-</body>
-</html>
+</body></html>

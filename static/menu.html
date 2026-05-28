@@ -1,119 +1,225 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Restron Menu</title>
 
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
-
-    <script>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Restron POS | Mobile Ordering</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;family=Playfair+Display:wght@600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@100..900&amp;family=Playfair+Display:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
-                    colors: {
-                        "primary": "#db421f",
-                        "primary-dark": "#b93518",
-                        "background-light": "#FDFBF7",
-                        "text-main": "#3E2723",
-                        "text-sub": "#5D4037",
-                        "accent": "#CBA135"
+                    "colors": {
+                        "text-secondary": "#A89F95",
+                        "text-primary": "#F5EBE1",
+                        "on-tertiary-container": "#003854",
+                        "outline": "#a38c7c",
+                        "error": "#ffb4ab",
+                        "background-base": "#0D0A06",
+                        "surface-tint": "#ffb77b",
+                        "background-surface": "#1A1510",
+                        "primary-container": "#e8851a",
+                        "on-secondary-container": "#ff97a8",
+                        "on-secondary": "#670024",
+                        "surface-container-lowest": "#140d06",
+                        "secondary": "#ffb2bd",
+                        "outline-variant": "#554336",
+                        "background": "#1a120b",
+                        "surface-dim": "#1a120b",
+                        "on-surface-variant": "#dbc2b0",
+                        "on-surface": "#f1dfd3",
+                        "on-primary-fixed-variant": "#6d3a00",
+                        "error-container": "#93000a",
+                        "surface-container": "#271e16",
+                        "surface-container-highest": "#3d332b",
+                        "on-secondary-fixed-variant": "#891838",
+                        "success": "#2E7D32",
+                        "tertiary-fixed": "#c9e6ff",
+                        "on-background": "#f1dfd3",
+                        "on-tertiary-fixed": "#001e2f",
+                        "on-error": "#690005",
+                        "surface-variant": "#3d332b",
+                        "surface-container-high": "#322820",
+                        "surface-bright": "#42372f",
+                        "inverse-on-surface": "#392e26",
+                        "surface-container-low": "#231a13",
+                        "tertiary-container": "#00a7ee",
+                        "inverse-surface": "#f1dfd3",
+                        "inverse-primary": "#8f4e00",
+                        "on-tertiary": "#00344e",
+                        "secondary-container": "#891838",
+                        "surface": "#1a120b",
+                        "on-primary-container": "#532b00",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#8aceff",
+                        "tertiary": "#8aceff",
+                        "primary-fixed": "#ffdcc2",
+                        "primary": "#ffb77b",
+                        "primary-fixed-dim": "#ffb77b",
+                        "secondary-fixed-dim": "#ffb2bd",
+                        "on-primary": "#4c2700",
+                        "on-tertiary-fixed-variant": "#004b6e",
+                        "on-secondary-fixed": "#400013",
+                        "on-primary-fixed": "#2e1500",
+                        "secondary-fixed": "#ffd9dd"
                     },
-                    fontFamily: { "display": ["Epilogue", "sans-serif"] },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["DM Sans"],
+                        "headline-sm": ["Playfair Display"],
+                        "body-lg": ["DM Sans"],
+                        "headline-md": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["DM Sans"],
+                        "label-md": ["DM Sans"],
+                        "display-lg-mobile": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "headline-sm-mobile": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "display-lg-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}]
+                    }
                 },
             },
         }
     </script>
-    <style>
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .ornate-divider { display: flex; align-items: center; text-align: center; margin-bottom: 1rem; }
-        .ornate-divider::before, .ornate-divider::after { content: ''; flex: 1; border-bottom: 2px double #db421f; opacity: 0.3; }
-        .glass-effect { background: rgba(253, 251, 247, 0.95); backdrop-filter: blur(8px); }
-
-        #search-input {
-            width: 100%; padding: 12px 20px; border-radius: 30px;
-            border: 1px solid #e0e0e0; background: #fff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-size: 16px; outline: none; transition: all 0.3s;
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        #search-input:focus { border-color: #db421f; box-shadow: 0 4px 12px rgba(219, 66, 31, 0.15); }
-
-        #order-modal { backdrop-filter: blur(4px); background-color: rgba(0, 0, 0, 0.5); }
-        .modal-content { animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        body {
+            background-color: #0D0A06;
+            color: #F5EBE1;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
-</head>
-<body class="bg-background-light text-text-main font-display antialiased pb-32">
-
-    <header class="fixed top-0 inset-x-0 z-50 border-b border-[#db421f]/20 glass-effect transition-all duration-300">
-        <div class="flex flex-col items-center w-full px-4 pt-2">
-            <h1 class="text-xl font-bold tracking-tight text-primary uppercase" style="letter-spacing: 0.1em;">Restron POS</h1>
-            <span class="text-[10px] uppercase tracking-widest opacity-60 font-medium">Fresh, fast, accurate</span>
-        </div>
-        <div class="overflow-x-auto hide-scrollbar border-t border-[#db421f]/5 py-2 px-4">
-            <div class="flex gap-3 min-w-max" id="category-nav"></div>
-        </div>
-    </header>
-
-    <main class="relative w-full max-w-lg mx-auto pt-36 px-4 min-h-screen">
-        <div class="mb-6 relative">
-            <input type="text" id="search-input" placeholder="Search menu..." oninput="filterMenu()">
-        </div>
-
-        <div id="menu-container">
-            <p class="text-center mt-10 text-gray-500">Loading Menu...</p>
-        </div>
-    </main>
-
-    <div class="fixed bottom-0 inset-x-0 z-40 p-4 max-w-lg mx-auto pointer-events-none">
-        <div class="bg-text-main text-white rounded-xl shadow-2xl p-4 flex items-center justify-between pointer-events-auto ring-1 ring-white/10 relative overflow-hidden">
-            <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/black-linen.png')]"></div>
-            <div class="flex flex-col z-10">
-                <span class="text-xs uppercase tracking-wider text-white/60 font-medium">Your Order</span>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-lg font-bold" id="total-items">0 Items</span>
-                    <span class="text-white/40">|</span>
-                    <span class="text-lg font-bold" id="total-price">₹0</span>
-                </div>
-            </div>
-            <button onclick="openModal()" id="view-cart-btn" disabled class="z-10 bg-primary hover:bg-primary-dark disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 shadow-lg pointer-events-auto transition-colors">
-                <span>Place Order</span>
-                <span class="material-symbols-outlined !text-[20px]">arrow_forward</span>
-            </button>
-        </div>
-    </div>
-
-    <div id="order-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="modal-content bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden border-2 border-primary/20">
-            <div class="bg-primary p-4 text-center">
-                <h3 class="text-white font-bold text-lg uppercase tracking-wide">Finalize Order</h3>
-                <p class="text-white/80 text-xs">Enter details to confirm</p>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-text-sub uppercase mb-1">Table Number</label>
-                    <input type="text" id="modal-table" placeholder="Enter No. or 'D' for Delivery" class="w-full border-gray-300 rounded-lg focus:border-primary p-3">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-text-sub uppercase mb-1">Phone <span class="text-gray-400 font-normal">(Optional)</span></label>
-                    <input type="tel" id="modal-phone" placeholder="For Loyalty Discounts" class="w-full border-gray-300 rounded-lg focus:border-primary p-3">
-                </div>
-            </div>
-            <div class="p-4 bg-gray-50 flex gap-3">
-                <button onclick="closeModal()" class="flex-1 py-3 text-sm font-bold text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-100">Cancel</button>
-                <button onclick="confirmOrder()" class="flex-1 py-3 text-sm font-bold text-white bg-primary rounded-xl hover:bg-primary-dark shadow-md">Confirm</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md selection:bg-primary/30">
+<!-- Top AppBar -->
+<header class="fixed top-0 w-full z-50 bg-background-surface/80 backdrop-blur-lg border-b border-white/10 shadow-[0_4px_20px_rgba(232,133,26,0.15)] flex justify-between items-center px-margin-mobile h-16">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="restaurant_menu">restaurant_menu</span>
+<h1 class="font-headline-md text-headline-md text-primary">Restron POS</h1>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-white/5 p-2 rounded-full active:scale-95 transition-transform duration-200" data-icon="search">search</button>
+</header>
+<main class="pt-20 pb-32 px-margin-mobile max-w-container-max mx-auto">
+<!-- Search & Hero -->
+<section class="mb-8">
+<div class="relative group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-text-secondary group-focus-within:text-primary transition-colors" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-2xl py-4 pl-12 pr-4 text-text-primary transition-all duration-300 placeholder:text-text-secondary/50" id="search-input" oninput="filterMenu()" placeholder="Search menu..." type="text"/>
+</div>
+</section>
+<!-- Category Navigation -->
+<nav class="flex gap-3 overflow-x-auto hide-scrollbar mb-8 py-2 sticky top-16 z-40 bg-background-base/50 backdrop-blur-sm -mx-margin-mobile px-margin-mobile" id="category-nav">
+<button class="whitespace-nowrap bg-primary text-on-primary font-label-md text-label-md px-6 py-2 rounded-full shadow-[0_0_15px_rgba(232,133,26,0.3)]">All Items</button>
+<button class="whitespace-nowrap bg-surface-container border border-white/5 text-text-secondary font-label-md text-label-md px-6 py-2 rounded-full hover:border-primary/50 transition-colors">Starters</button>
+<button class="whitespace-nowrap bg-surface-container border border-white/5 text-text-secondary font-label-md text-label-md px-6 py-2 rounded-full hover:border-primary/50 transition-colors">Main Course</button>
+<button class="whitespace-nowrap bg-surface-container border border-white/5 text-text-secondary font-label-md text-label-md px-6 py-2 rounded-full hover:border-primary/50 transition-colors">Tandoor</button>
+<button class="whitespace-nowrap bg-surface-container border border-white/5 text-text-secondary font-label-md text-label-md px-6 py-2 rounded-full hover:border-primary/50 transition-colors">Desserts</button>
+</nav>
+<!-- Menu Container -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter" id="menu-container">
+<!-- Classic Paneer Tikka Card -->
+<div class="group relative bg-background-surface rounded-2xl overflow-hidden border border-white/5 shadow-xl transition-all duration-300 hover:shadow-[0_8px_30px_rgba(232,133,26,0.15)] hover:-translate-y-1">
+<div class="h-48 overflow-hidden">
+<img alt="Classic Paneer Tikka" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A gourmet presentation of Paneer Tikka with charred edges, served on a black stone platter. The lighting is warm and cinematic, highlighting the vibrant orange saffron marinade and fresh green mint chutney drizzles. The setting is a high-end restaurant with a dark mahogany table and soft bokeh of amber lights in the background, creating a premium and appetizing aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWa5Sq-qMHaYzJqCBtRDTcf7qGKs702-akJbo-Bv0tCIU33YSZc1dPWzYhndJ850emBPEFcRx88ECCEFLD5vZATkRC4fdSje5rs4INEiwGNKOsWalSpxIssSICdupDcmiffYWGyL9szjxjDOid2Vj5tsuLtQO08T6bclgikzFJ9A3VLeFPjsXzomNEC69p9Kq6rJPVGVV2BTzUnCyEg1sLiwVhKlCbOhYAraW3lFxzeNzDJSXzDD6IktWp6UWoO-qNMLmMK0uzYU8"/>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-sm text-headline-sm text-text-primary">Classic Paneer Tikka</h3>
+<span class="flex items-center gap-1 text-success bg-success/10 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+<span class="w-2 h-2 rounded-full bg-success"></span> Veg
+                        </span>
+</div>
+<p class="text-text-secondary text-sm mb-6 line-clamp-2">Cubes of fresh malai paneer marinated in a traditional blend of yogurt and hand-ground saffron spices, grilled to smoky perfection.</p>
+<div class="flex items-center justify-between">
+<span class="font-display-lg-mobile text-primary text-headline-sm">₹320</span>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md text-label-md flex items-center gap-2 active:scale-90 transition-all duration-300 shadow-[0_4px_12px_rgba(232,133,26,0.4)]" onclick="updateQty(1, 1)">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span> ADD
+                        </button>
+</div>
+</div>
+<div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+</div>
+<!-- Dynamic items would be injected here -->
+</div>
+</main>
+<!-- Bottom Cart Summary Bar -->
+<div class="fixed bottom-0 w-full z-50 bg-background-surface/80 backdrop-blur-xl border-t border-white/10 rounded-t-2xl shadow-[0_-4px_30px_rgba(232,133,26,0.15)] transform translate-y-full transition-transform duration-500 ease-out" id="cart-summary">
+<div class="max-w-container-max mx-auto px-margin-mobile h-24 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-text-secondary font-label-sm text-label-sm uppercase tracking-widest" id="total-items">0 Items</span>
+<span class="text-primary font-headline-sm text-headline-sm" id="total-price">₹0</span>
+</div>
+<button class="bg-primary text-on-primary px-8 h-14 rounded-2xl font-bold flex items-center gap-3 active:scale-95 transition-all duration-300 shadow-[0_8px_20px_rgba(232,133,26,0.3)]" id="view-cart-btn" onclick="openModal()">
+                PLACE ORDER
+                <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Order Modal -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center p-4" id="order-modal" style="display:none">
+<div class="absolute inset-0 bg-background-base/80 backdrop-blur-md" onclick="closeModal()"></div>
+<div class="relative w-full max-w-md bg-surface-container-high border border-white/10 rounded-2xl shadow-2xl overflow-hidden p-8 animate-[scaleIn_0.3s_ease-out]">
+<h2 class="font-headline-md text-headline-md text-primary mb-6">Confirm Order</h2>
+<div class="space-y-6 mb-8">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-text-secondary uppercase" for="modal-table">Table Number</label>
+<input class="w-full bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl py-3 px-4 text-text-primary transition-all" id="modal-table" placeholder="e.g. 12" type="number"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-text-secondary uppercase" for="modal-phone">Phone Number</label>
+<input class="w-full bg-surface-container-low border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl py-3 px-4 text-text-primary transition-all" id="modal-phone" placeholder="Your contact number" type="tel"/>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="flex-1 py-4 rounded-xl border border-white/10 text-text-secondary font-label-md text-label-md hover:bg-white/5 active:scale-95 transition-all" onclick="closeModal()">
+                    CANCEL
+                </button>
+<button class="flex-1 py-4 rounded-xl bg-primary text-on-primary font-bold active:scale-95 transition-all shadow-[0_8px_20px_rgba(232,133,26,0.3)]" onclick="confirmOrder()">
+                    CONFIRM
+                </button>
+</div>
+</div>
+</div>
+<script>
         let userInRange = false;
         let geofenceConfig = { latitude: null, longitude: null, radius_meters: 50 };
 
@@ -214,36 +320,39 @@
 
             for (const [catName, items] of Object.entries(categories)) {
                 const navLink = document.createElement('a');
-                navLink.className = "px-4 py-2 rounded-full bg-[#f3eae8] text-text-main text-xs font-medium border border-[#db421f]/10 hover:border-primary/50 transition-colors whitespace-nowrap";
+                navLink.className = "whitespace-nowrap bg-surface-container border border-white/5 text-text-secondary font-label-md text-label-md px-6 py-2 rounded-full hover:border-primary/50 transition-colors";
                 navLink.href = `#${catName.replace(/\s+/g, '-').toLowerCase()}`;
                 navLink.innerText = catName;
                 navContainer.appendChild(navLink);
 
                 const sectionId = catName.replace(/\s+/g, '-').toLowerCase();
-                let sectionHTML = `<div class="mb-8 scroll-mt-40" id="${sectionId}"><div class="ornate-divider"><span class="text-lg font-bold text-primary mx-4 uppercase tracking-wide">${catName}</span></div>`;
+                let sectionHTML = `<div class="mb-8 scroll-mt-40" id="${sectionId}"><div class="flex items-center text-center mb-4"><span class="text-lg font-bold text-primary mx-4 uppercase tracking-wide">${catName}</span><div class="flex-1 border-b border-primary/20"></div></div>`;
 
                 items.forEach(item => {
                     const qty = cart[item.id] || 0;
-                    const dotColor = item.is_veg ? "green-600" : "red-600";
+                    const dotColor = item.is_veg ? "success" : "error";
                     let buttonHTML = qty === 0
-                        ? `<button onclick="updateQty(${item.id}, 1)" class="text-primary text-xs font-bold border border-primary/30 bg-primary/5 px-4 py-2 rounded-lg uppercase hover:bg-primary hover:text-white transition-all">Add</button>`
-                        : `<div class="flex items-center bg-primary/10 rounded-lg h-8 border border-primary/20"><button onclick="updateQty(${item.id}, -1)" class="w-8 h-full text-primary hover:bg-primary/20">-</button><span class="text-sm font-bold text-primary w-6 text-center">${qty}</span><button onclick="updateQty(${item.id}, 1)" class="w-8 h-full text-primary hover:bg-primary/20">+</button></div>`;
+                        ? `<button onclick="updateQty(${item.id}, 1)" class="bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md text-label-md flex items-center gap-2 active:scale-90 transition-all duration-300 shadow-[0_4px_12px_rgba(232,133,26,0.4)]"><span class="material-symbols-outlined text-sm" data-icon="add">add</span> ADD</button>`
+                        : `<div class="flex items-center gap-3 bg-surface-container-highest rounded-full px-3 py-2"><button onclick="updateQty(${item.id}, -1)" class="text-primary material-symbols-outlined text-[18px]">remove</button><span class="font-label-sm w-4 text-center">${qty}</span><button onclick="updateQty(${item.id}, 1)" class="text-primary material-symbols-outlined text-[18px]">add</button></div>`;
 
                     sectionHTML += `
-                        <div class="bg-white p-4 rounded-xl shadow-sm border border-[#db421f]/10 mb-3 relative flex flex-col">
-                            <div class="flex justify-between items-start mb-2">
-                                <div class="flex-1 pr-2">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <div class="flex justify-center size-3 border border-${dotColor} rounded-sm p-[1px] shrink-0"><div class="size-1.5 bg-${dotColor} rounded-full"></div></div>
-                                        <h3 class="text-text-main text-lg font-bold leading-tight">${item.name}</h3>
-                                    </div>
+                        <div class="group relative bg-background-surface rounded-2xl overflow-hidden border border-white/5 shadow-xl transition-all duration-300 hover:shadow-[0_8px_30px_rgba(232,133,26,0.15)] hover:-translate-y-1 mb-4">
+                            <div class="h-48 overflow-hidden">
+                                <img alt="${item.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="${item.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500'}"/>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-headline-sm text-headline-sm text-text-primary">${item.name}</h3>
+                                    <span class="flex items-center gap-1 text-${dotColor} bg-${dotColor}/10 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                                        <span class="w-2 h-2 rounded-full bg-${dotColor}"></span> ${item.is_veg ? 'Veg' : 'Non-Veg'}
+                                    </span>
                                 </div>
-                                <div class="flex flex-col items-end gap-1 shrink-0">
-                                    <span class="text-text-main font-bold text-base">₹${item.price}</span>
+                                <p class="text-text-secondary text-sm mb-6 line-clamp-2">${item.description || ''}</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="font-display-lg-mobile text-primary text-headline-sm">₹${item.price}</span>
+                                    ${buttonHTML}
                                 </div>
                             </div>
-                            <p class="text-text-sub/80 text-sm italic mb-3 leading-relaxed border-l-2 border-primary/20 pl-3">${item.description || ''}</p>
-                            <div class="self-end">${buttonHTML}</div>
                         </div>`;
                 });
                 sectionHTML += `</div>`;
@@ -333,5 +442,4 @@
             navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
         }
     </script>
-</body>
-</html>
+</body></html>

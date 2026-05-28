@@ -1,28 +1,215 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Restron Super Admin Login</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body { background: #111; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #1a1a2e; padding: 40px; border-radius: 12px; width: 340px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.5); border: 1px solid #333; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #333; border-radius: 6px; box-sizing: border-box; background: #222; color: white; font-size: 1em; }
-        button { width: 100%; padding: 12px; background: #6c5ce7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1em; margin-top: 10px; }
-        button:hover { background: #5a4bd1; }
-        h2 { color: #a29bfe; margin-top: 0; font-size: 1.4em; }
-        .subtitle { color: #666; font-size: 0.85em; margin-bottom: 20px; }
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Restron Super Admin Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&amp;family=Playfair+Display:wght@600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@100..900&amp;family=Playfair+Display:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#6d3a00",
+                    "tertiary-fixed-dim": "#8aceff",
+                    "on-secondary-fixed": "#400013",
+                    "secondary-container": "#891838",
+                    "text-primary": "#F5EBE1",
+                    "tertiary": "#8aceff",
+                    "inverse-surface": "#f1dfd3",
+                    "secondary-fixed": "#ffd9dd",
+                    "primary-fixed-dim": "#ffb77b",
+                    "surface-tint": "#ffb77b",
+                    "surface-bright": "#42372f",
+                    "surface": "#1a120b",
+                    "on-secondary": "#670024",
+                    "surface-container-low": "#231a13",
+                    "on-error": "#690005",
+                    "surface-dim": "#1a120b",
+                    "inverse-on-surface": "#392e26",
+                    "surface-container": "#271e16",
+                    "surface-variant": "#3d332b",
+                    "on-surface": "#f1dfd3",
+                    "on-tertiary-fixed": "#001e2f",
+                    "background-surface": "#1A1510",
+                    "background-base": "#0D0A06",
+                    "secondary-fixed-dim": "#ffb2bd",
+                    "inverse-primary": "#8f4e00",
+                    "on-background": "#f1dfd3",
+                    "background": "#1a120b",
+                    "text-secondary": "#A89F95",
+                    "surface-container-high": "#322820",
+                    "success": "#2E7D32",
+                    "outline": "#a38c7c",
+                    "error-container": "#93000a",
+                    "primary": "#ffb77b",
+                    "on-tertiary": "#00344e",
+                    "on-primary-fixed": "#2e1500",
+                    "surface-container-highest": "#3d332b",
+                    "error": "#ffb4ab",
+                    "on-primary-container": "#532b00",
+                    "tertiary-container": "#00a7ee",
+                    "primary-fixed": "#ffdcc2",
+                    "on-tertiary-fixed-variant": "#004b6e",
+                    "on-surface-variant": "#dbc2b0",
+                    "surface-container-lowest": "#140d06",
+                    "on-tertiary-container": "#003854",
+                    "primary-container": "#e8851a",
+                    "on-secondary-container": "#ff97a8",
+                    "on-primary": "#4c2700",
+                    "tertiary-fixed": "#c9e6ff",
+                    "on-secondary-fixed-variant": "#891838",
+                    "on-error-container": "#ffdad6",
+                    "secondary": "#ffb2bd",
+                    "outline-variant": "#554336"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "margin-desktop": "40px",
+                    "unit": "8px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "body-md": ["DM Sans"],
+                    "label-md": ["DM Sans"],
+                    "headline-md": ["Playfair Display"],
+                    "label-sm": ["DM Sans"],
+                    "headline-sm": ["Playfair Display"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "display-lg": ["Playfair Display"],
+                    "body-lg": ["DM Sans"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        body {
+            background: radial-gradient(circle at 20% 30%, rgba(232, 133, 26, 0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(232, 133, 26, 0.05) 0%, transparent 40%),
+                        #0D0A06;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(26, 21, 16, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ambient-glow {
+            filter: blur(120px);
+            background: linear-gradient(135deg, #E8851A 0%, #4C2700 100%);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .animate-float {
+            animation: float 10s ease-in-out infinite;
+        }
     </style>
-</head>
-<body>
-    <div class="box">
-        <h2>🔑 Super Admin</h2>
-        <p class="subtitle">Restron Platform Management</p>
-        <input id="u" placeholder="Username">
-        <input id="p" type="password" placeholder="Password">
-        <button onclick="login()">Access Dashboard</button>
-        <p id="msg" style="color:#e74c3c; margin-top:10px; font-size:0.9em;"></p>
-    </div>
-    <script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-text-primary selection:bg-primary-container selection:text-on-primary-container flex items-center justify-center p-margin-mobile md:p-margin-desktop">
+<!-- Atmospheric Background Elements -->
+<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] ambient-glow opacity-20 rounded-full animate-float"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] ambient-glow opacity-10 rounded-full animate-float" style="animation-delay: -5s;"></div>
+<main class="relative z-10 w-full max-w-md">
+<!-- TopAppBar Content & Identity -->
+<div class="flex flex-col items-center mb-10 space-y-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Restron</h1>
+</div>
+<p class="font-label-sm text-label-sm text-text-secondary uppercase tracking-[0.2em]">Super Admin Portal</p>
+</div>
+<!-- Central Login Card -->
+<div class="glass-card rounded-2xl p-8 md:p-10 shadow-[0_20px_50px_rgba(13,10,6,0.5)] relative overflow-hidden group">
+<!-- Subtle Inner Glow -->
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+<div class="relative">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-2">Welcome Back</h2>
+<p class="font-body-md text-text-secondary mb-8">Secure access to administrative controls</p>
+<!-- Message Container -->
+<div class="mb-6 empty:hidden font-label-md text-label-md px-4 py-3 rounded-lg border bg-error-container/20 border-error/20 text-error transition-all duration-300" id="msg"></div>
+<form class="space-y-6" onsubmit="event.preventDefault(); login();">
+<!-- Username Input -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface-variant" for="u">Username</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-lg">person</span>
+<input class="w-full bg-surface-container-lowest/50 border border-outline-variant rounded-xl py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent transition-all duration-300 font-body-md" id="u" name="username" placeholder="Enter admin ID" required="" type="text"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="block font-label-md text-label-md text-on-surface-variant" for="p">Password</label>
+<a class="text-primary font-label-sm hover:underline transition-all" href="#">Forgot Password?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-lg">lock</span>
+<input class="w-full bg-surface-container-lowest/50 border border-outline-variant rounded-xl py-3.5 pl-12 pr-12 text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent transition-all duration-300 font-body-md" id="p" name="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-on-surface transition-colors" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined text-lg" id="eye-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-primary-container text-on-primary font-label-md text-label-md py-4 rounded-xl shadow-[0_8px_20px_rgba(232,133,26,0.3)] hover:shadow-[0_12px_24px_rgba(232,133,26,0.4)] hover:bg-primary transition-all duration-300 transform active:scale-[0.96] flex items-center justify-center gap-2 group" onclick="login()" type="submit">
+                        Access Dashboard
+                        <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</form>
+</div>
+</div>
+<!-- Footer Information -->
+<footer class="mt-12 text-center space-y-4">
+<div class="flex justify-center gap-6">
+<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-colors" href="#">Security Policy</a>
+<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-colors" href="#">System Status</a>
+<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-colors" href="#">Privacy</a>
+</div>
+<p class="font-label-sm text-label-sm text-text-secondary opacity-60">
+                © 2024 Restron Platform. All rights reserved.
+            </p>
+</footer>
+</main>
+<script>
         async function login() {
             const u = document.getElementById('u').value;
             const p = document.getElementById('p').value;
@@ -36,16 +223,31 @@
                     window.location.href = '/superadmin/dashboard';
                 } else {
                     const err = await res.json().catch(() => ({ detail: 'Login failed' }));
-                    document.getElementById('msg').innerText = err.detail || "Invalid credentials";
+                    const msg = document.getElementById('msg');
+                    msg.innerText = err.detail || "Invalid credentials";
+                    msg.classList.remove('hidden');
                 }
             } catch (error) {
-                document.getElementById('msg').innerText = "Network error. Please try again.";
+                const msg = document.getElementById('msg');
+                msg.innerText = "Network error. Please try again.";
+                msg.classList.remove('hidden');
             }
         }
 
         document.getElementById('p').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') login();
         });
+
+        function togglePassword() {
+            const pInput = document.getElementById('p');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (pInput.type === 'password') {
+                pInput.type = 'text';
+                eyeIcon.textContent = 'visibility_off';
+            } else {
+                pInput.type = 'password';
+                eyeIcon.textContent = 'visibility';
+            }
+        }
     </script>
-</body>
-</html>
+</body></html>
