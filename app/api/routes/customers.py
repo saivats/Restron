@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
@@ -13,6 +15,8 @@ from app.api.deps import (
 from app.models import models
 from app.schemas.schemas import CustomerCreate
 from app.services.audit_service import write_audit_log
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -41,46 +45,53 @@ def create_customer(
     user: models.User = Depends(require_permission(CAN_MANAGE_CUSTOMERS)),
 ):
     restaurant_id = user_restaurant_id(user)
-    existing = db.query(models.Customer).filter(
-        models.Customer.restaurant_id == restaurant_id,
-        models.Customer.phone == c.phone,
-    ).first()
-    if existing:
-        before = {
-            "name": existing.name,
-            "relation": existing.relation,
-            "discount_percent": existing.discount_percent,
-        }
-        existing.name = c.name
-        existing.relation = c.relation
-        existing.discount_percent = c.discount_percent
+    try:
+        existing = db.query(models.Customer).filter(
+            models.Customer.restaurant_id == restaurant_id,
+            models.Customer.phone == c.phone,
+        ).first()
+        if existing:
+            before = {
+                "name": existing.name,
+                "relation": existing.relation,
+                "discount_percent": existing.discount_percent,
+            }
+            existing.name = c.name
+            existing.relation = c.relation
+            existing.discount_percent = c.discount_percent
+            write_audit_log(
+                db,
+                action="customer.updated",
+                entity_type="customer",
+                entity_id=existing.id,
+                restaurant_id=restaurant_id,
+                user=user,
+                before_state=before,
+                after_state=c.model_dump(),
+            )
+            db.commit()
+            return {"status": "Updated", "id": existing.id, "name": existing.name}
+
+        new_cust = models.Customer(restaurant_id=restaurant_id, **c.model_dump())
+        db.add(new_cust)
+        db.flush()
         write_audit_log(
             db,
-            action="customer.updated",
+            action="customer.created",
             entity_type="customer",
-            entity_id=existing.id,
+            entity_id=new_cust.id,
             restaurant_id=restaurant_id,
             user=user,
-            before_state=before,
             after_state=c.model_dump(),
         )
         db.commit()
-        return {"status": "Updated", "id": existing.id, "name": existing.name}
-
-    new_cust = models.Customer(restaurant_id=restaurant_id, **c.model_dump())
-    db.add(new_cust)
-    db.flush()
-    write_audit_log(
-        db,
-        action="customer.created",
-        entity_type="customer",
-        entity_id=new_cust.id,
-        restaurant_id=restaurant_id,
-        user=user,
-        after_state=c.model_dump(),
-    )
-    db.commit()
-    return {"status": "Created", "id": new_cust.id, "name": new_cust.name}
+        return {"status": "Created", "id": new_cust.id, "name": new_cust.name}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        db.rollback()
+        logger.exception("Customer create/update failed phone=%s restaurant_id=%s: %s", c.phone, restaurant_id, exc)
+        raise HTTPException(status_code=500, detail=f"Customer save error: {exc}") from exc
 
 
 @router.get("/lookup/{phone}")

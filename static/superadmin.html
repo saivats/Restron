@@ -211,6 +211,31 @@
         </div>
     </div>
 
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeEditModal()">&times;</span>
+            <h2 style="color:#a29bfe; margin-bottom:20px;">Edit Restaurant</h2>
+            <input type="hidden" id="edit-id">
+            <label>Status</label>
+            <select id="edit-active">
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+            </select>
+            <label>Plan</label>
+            <select id="edit-plan">
+                <option value="trial">Trial</option>
+                <option value="basic">Basic</option>
+                <option value="premium">Premium</option>
+                <option value="free">Free</option>
+            </select>
+            <label>Plan Expires At (ISO date, leave blank for no expiry)</label>
+            <input id="edit-expires" type="date" placeholder="YYYY-MM-DD">
+            <label>Table Count</label>
+            <input id="edit-tables" type="number" min="1">
+            <button class="btn-primary" onclick="saveEdit()" style="width:100%; margin-top:10px;">Save Changes</button>
+        </div>
+    </div>
+
     <script>
         async function loadRestaurants() {
             const res = await fetch('/superadmin/restaurants/');
@@ -241,6 +266,7 @@
                         <td>${r.table_count || '-'}</td>
                         <td>
                             <button class="btn-small btn-outline" onclick="viewStats(${r.id})">Stats</button>
+                            <button class="btn-small btn-outline" onclick="editRestaurant(${r.id}, ${r.is_active}, '${r.plan || 'free'}', '${r.plan_expires_at || ''}', ${r.table_count || 10})">Edit</button>
                             ${r.is_active
                                 ? `<button class="btn-small btn-danger" onclick="toggleActive(${r.id}, false)">Deactivate</button>`
                                 : `<button class="btn-small btn-primary" onclick="toggleActive(${r.id}, true)">Activate</button>`
@@ -315,17 +341,65 @@
         }
 
         async function viewStats(restaurantId) {
-            const res = await fetch(`/superadmin/restaurants/${restaurantId}/stats`);
-            const data = await res.json();
-            const container = document.getElementById('stats-container');
-            container.style.display = 'block';
-            document.getElementById('stats-title').innerText = `📊 ${data.name} — Stats`;
-            document.getElementById('stats-panel').innerHTML = `
-                <div class="stat-row"><span class="stat-label">Total Orders</span><span class="stat-value">${data.order_count}</span></div>
-                <div class="stat-row"><span class="stat-label">Total Revenue</span><span class="stat-value">₹${data.revenue_total}</span></div>
-                <div class="stat-row"><span class="stat-label">Last Activity</span><span class="stat-value">${data.last_activity ? new Date(data.last_activity).toLocaleString() : 'No activity'}</span></div>
-            `;
-            container.scrollIntoView({ behavior: 'smooth' });
+            try {
+                const res = await fetch(`/superadmin/restaurants/${restaurantId}/stats`, { credentials: 'include' });
+                if (!res.ok) { alert('Failed to load stats: ' + res.status); return; }
+                const data = await res.json();
+                const container = document.getElementById('stats-container');
+                container.style.display = 'block';
+                document.getElementById('stats-title').innerText = `📊 ${data.name} — Stats`;
+                document.getElementById('stats-panel').innerHTML = `
+                    <div class="stat-row"><span class="stat-label">Total Orders</span><span class="stat-value">${data.order_count}</span></div>
+                    <div class="stat-row"><span class="stat-label">Total Revenue</span><span class="stat-value">₹${data.revenue_total}</span></div>
+                    <div class="stat-row"><span class="stat-label">Last Activity</span><span class="stat-value">${data.last_activity ? new Date(data.last_activity).toLocaleString() : 'No activity'}</span></div>
+                `;
+                container.scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                alert('Network error loading stats: ' + err.message);
+            }
+        }
+
+        function editRestaurant(id, isActive, plan, expiresAt, tableCount) {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-active').value = String(isActive);
+            document.getElementById('edit-plan').value = plan;
+            document.getElementById('edit-expires').value = expiresAt ? expiresAt.split('T')[0] : '';
+            document.getElementById('edit-tables').value = tableCount;
+            document.getElementById('edit-modal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+
+        async function saveEdit() {
+            const id = document.getElementById('edit-id').value;
+            const payload = {
+                is_active: document.getElementById('edit-active').value === 'true',
+                plan: document.getElementById('edit-plan').value,
+                table_count: parseInt(document.getElementById('edit-tables').value) || 10,
+            };
+            const expiresVal = document.getElementById('edit-expires').value;
+            if (expiresVal) {
+                payload.plan_expires_at = expiresVal + 'T23:59:59';
+            } else {
+                payload.plan_expires_at = null;
+            }
+
+            const res = await fetch(`/superadmin/restaurants/${id}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'include',
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                alert('Restaurant updated successfully!');
+                closeEditModal();
+                loadRestaurants();
+            } else {
+                const err = await res.json().catch(() => ({ detail: 'Unknown error' }));
+                alert('Failed: ' + (err.detail || 'Unknown error'));
+            }
         }
 
         async function logout() {

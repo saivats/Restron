@@ -276,7 +276,7 @@
 
         async function loadMenu() {
             try {
-                const response = await fetch('/menu/');
+                const response = await fetch('/menu/?slug=' + encodeURIComponent(extractSlugFromUrl()));
                 menuItems = await response.json();
                 fuse = new Fuse(menuItems, { keys: ['name', 'category'], threshold: 0.3 });
                 renderMenu(menuItems);
@@ -408,7 +408,7 @@
             else { tableNum = parseInt(tableInput) || 0; }
 
             try {
-                const response = await fetch('/order/', {
+                const response = await fetch('/order/?slug=' + encodeURIComponent(extractSlugFromUrl()), {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ "table_number": tableNum, "items": orderItems, "order_type": type, "customer_phone": phoneInput || null })
                 });

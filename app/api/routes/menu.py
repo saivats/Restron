@@ -10,8 +10,16 @@ router = APIRouter()
 
 
 @router.get("/")
-def read_menu(db: Session = Depends(get_db), user: models.User | None = Depends(get_current_user)):
+def read_menu(
+    slug: str | None = None,
+    db: Session = Depends(get_db),
+    user: models.User | None = Depends(get_current_user),
+):
     restaurant_id = user_restaurant_id(user)
+    if not user and slug:
+        restaurant = db.query(models.Restaurant).filter(models.Restaurant.slug == slug).first()
+        if restaurant:
+            restaurant_id = restaurant.id
     return (
         db.query(models.MenuItem)
         .filter(models.MenuItem.restaurant_id == restaurant_id)

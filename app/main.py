@@ -46,7 +46,7 @@ class TokenRefreshMiddleware(BaseHTTPMiddleware):
             if exp:
                 expire_time = datetime.fromtimestamp(exp, tz=timezone.utc)
                 remaining = expire_time - datetime.now(timezone.utc)
-                if timedelta(0) < remaining < timedelta(minutes=60):
+                if timedelta(0) < remaining < timedelta(minutes=120):
                     new_token = create_access_token(
                         data={k: v for k, v in payload.items() if k != "exp"},
                     )

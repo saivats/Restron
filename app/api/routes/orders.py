@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
+from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from app.api.deps import (
@@ -11,7 +12,7 @@ from app.api.deps import (
     require_permission,
     user_restaurant_id,
 )
-from app.core.config import DEFAULT_RESTAURANT_ID
+from app.core.config import ALGORITHM, DEFAULT_RESTAURANT_ID, SECRET_KEY
 from app.models import models
 from app.schemas.schemas import OrderCreate, OrderStatusUpdate
 from app.services.order_service import (
@@ -33,10 +34,15 @@ router = APIRouter()
 @router.post("/")
 async def place_order(
     order_data: OrderCreate,
+    slug: str | None = Query(None),
     db: Session = Depends(get_db),
     user: models.User | None = Depends(get_current_user),
 ):
     restaurant_id = user_restaurant_id(user)
+    if not user and slug:
+        restaurant = db.query(models.Restaurant).filter(models.Restaurant.slug == slug).first()
+        if restaurant:
+            restaurant_id = restaurant.id
     result = place_order_logic(order_data, db, restaurant_id=restaurant_id, user=user)
     await kitchen_ws_manager.broadcast(restaurant_id, {"event": "order.changed", "order": result["order"]})
     return result
@@ -116,6 +122,13 @@ async def cancel_order(
 @router.websocket("/ws/kitchen")
 async def kitchen_ws(websocket: WebSocket):
     restaurant_id = DEFAULT_RESTAURANT_ID
+    token = websocket.cookies.get("access_token")
+    if token:
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            restaurant_id = int(payload.get("restaurant_id", DEFAULT_RESTAURANT_ID))
+        except (JWTError, Exception):
+            pass
     await kitchen_ws_manager.connect(restaurant_id, websocket)
     try:
         while True:

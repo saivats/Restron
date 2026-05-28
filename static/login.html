@@ -182,10 +182,10 @@
             }
 
             try {
-                const res = await fetch(url, { method: 'POST', body: formData });
+                const res = await fetch(url, { method: 'POST', body: formData, credentials: 'include' });
                 if (res.ok) {
                     const data = await res.json();
-                    window.location.href = data.redirect;
+                    window.location.href = data.redirect || '/';
                 } else {
                     const err = await res.json().catch(() => ({ detail: 'Login failed' }));
                     if (res.status === 403) {

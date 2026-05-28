@@ -1,10 +1,14 @@
-from fastapi import APIRouter, Depends
+import logging
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.deps import CAN_CHECKOUT, get_db, require_permission, user_restaurant_id
 from app.models import models
 from app.schemas.schemas import CheckoutSchema, SplitBillRequest
 from app.services.checkout_service import checkout_order_logic
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -15,7 +19,13 @@ def checkout_order(
     db: Session = Depends(get_db),
     user: models.User = Depends(require_permission(CAN_CHECKOUT)),
 ):
-    return checkout_order_logic(data, db, restaurant_id=user_restaurant_id(user), user=user)
+    try:
+        return checkout_order_logic(data, db, restaurant_id=user_restaurant_id(user), user=user)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Checkout failed for order_id=%s restaurant_id=%s: %s", data.order_id, user_restaurant_id(user), exc)
+        raise HTTPException(status_code=500, detail=f"Checkout error: {exc}") from exc
 
 
 @router.post("/split")
