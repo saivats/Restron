@@ -33,6 +33,9 @@ class Restaurant(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     upi_id = Column(String, default="")
     menu_pdf_url = Column(String, default="")
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+    geofence_radius_meters = Column(Integer, default=50)
     created_at = Column(DateTime, default=utc_now, nullable=False)
 
 

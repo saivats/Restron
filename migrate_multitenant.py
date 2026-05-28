@@ -44,6 +44,9 @@ def step_2_add_restaurant_columns():
         "plan": "VARCHAR DEFAULT 'trial'",
         "plan_expires_at": _col_type("DATETIME", "TIMESTAMP"),
         "menu_pdf_url": "VARCHAR DEFAULT ''",
+        "latitude": "FLOAT",
+        "longitude": "FLOAT",
+        "geofence_radius_meters": "INTEGER DEFAULT 50",
     }
     with engine.begin() as conn:
         inspector = inspect(conn)

@@ -195,6 +195,14 @@
                 <input id="set-currency" style="width:100%;">
                 <label>Menu PDF URL</label>
                 <input id="set-menu-pdf" style="width:100%;">
+                <label style="margin-top:20px; border-top:2px solid #ff5722; padding-top:12px; display:block;">📍 Geofencing (for mobile ordering)</label>
+                <label>Latitude</label>
+                <input id="set-latitude" type="number" step="any" placeholder="e.g. 28.6543" style="width:100%;">
+                <label>Longitude</label>
+                <input id="set-longitude" type="number" step="any" placeholder="e.g. 77.5061" style="width:100%;">
+                <label>Geofence Radius (meters)</label>
+                <input id="set-geofence-radius" type="number" min="10" placeholder="50" style="width:100%;">
+                <p style="color:#999; font-size:0.8em; margin-top:4px;">Leave lat/lng empty to allow orders from anywhere. Right-click your restaurant on Google Maps to copy coordinates.</p>
                 <button onclick="saveSettings()" class="green" style="margin-top:15px;">Save Settings</button>
                 <p id="settings-msg" style="color:#28a745; margin-top:5px; height:20px;"></p>
             </div>
@@ -399,6 +407,9 @@
             document.getElementById('set-gst').value = data.gst_rate || 5.0;
             document.getElementById('set-currency').value = data.currency_symbol || '₹';
             document.getElementById('set-menu-pdf').value = data.menu_pdf_url || '';
+            document.getElementById('set-latitude').value = data.latitude != null ? data.latitude : '';
+            document.getElementById('set-longitude').value = data.longitude != null ? data.longitude : '';
+            document.getElementById('set-geofence-radius').value = data.geofence_radius_meters || 50;
         }
 
         async function saveSettings() {
@@ -413,6 +424,9 @@
                 gst_rate: parseFloat(document.getElementById('set-gst').value) || undefined,
                 currency_symbol: document.getElementById('set-currency').value || undefined,
                 menu_pdf_url: document.getElementById('set-menu-pdf').value || undefined,
+                latitude: document.getElementById('set-latitude').value ? parseFloat(document.getElementById('set-latitude').value) : null,
+                longitude: document.getElementById('set-longitude').value ? parseFloat(document.getElementById('set-longitude').value) : null,
+                geofence_radius_meters: parseInt(document.getElementById('set-geofence-radius').value) || undefined,
             };
             Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
 

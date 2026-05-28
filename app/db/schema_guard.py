@@ -75,6 +75,9 @@ def _ensure_columns() -> None:
             "plan": "VARCHAR DEFAULT 'trial'",
             "plan_expires_at": datetime_type,
             "menu_pdf_url": "VARCHAR DEFAULT ''",
+            "latitude": "FLOAT",
+            "longitude": "FLOAT",
+            "geofence_radius_meters": "INTEGER DEFAULT 50",
         }
 
         for name, ddl in user_columns.items():

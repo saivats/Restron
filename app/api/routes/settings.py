@@ -33,6 +33,9 @@ def get_restaurant_settings(
         "upi_id": restaurant.upi_id,
         "plan": restaurant.plan,
         "is_active": restaurant.is_active,
+        "latitude": restaurant.latitude,
+        "longitude": restaurant.longitude,
+        "geofence_radius_meters": restaurant.geofence_radius_meters,
     }
 
 
@@ -87,4 +90,20 @@ def get_restaurant_status(
         "plan": restaurant.plan,
         "plan_expires_at": restaurant.plan_expires_at.isoformat() if restaurant.plan_expires_at else None,
         "name": restaurant.name,
+    }
+
+
+@router.get("/geofence/{slug}")
+def get_restaurant_geofence(
+    slug: str,
+    db: Session = Depends(get_db),
+):
+    restaurant = db.query(models.Restaurant).filter(models.Restaurant.slug == slug).first()
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+
+    return {
+        "latitude": restaurant.latitude,
+        "longitude": restaurant.longitude,
+        "geofence_radius_meters": restaurant.geofence_radius_meters,
     }

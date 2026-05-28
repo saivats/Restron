@@ -114,32 +114,56 @@
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        // UPDATE THESE WITH YOUR RESTAURANT'S EXACT LOCATION
-        const RESTAURANT_LAT = 28.654258822179788;
-        const RESTAURANT_LNG = 77.50614514922746;
-        const ALLOWED_RADIUS_KM = 0.05; // 50 METERS
         let userInRange = false;
+        let geofenceConfig = { latitude: null, longitude: null, radius_meters: 50 };
 
         let cart = {};
         let menuItems = [];
         let fuse;
 
-        // --- GEO CHECK ---
+        function extractSlugFromUrl() {
+            const match = window.location.pathname.match(/^\/r\/([^/]+)/);
+            return match ? match[1] : 'default';
+        }
+
+        async function loadGeofenceConfig() {
+            const slug = extractSlugFromUrl();
+            try {
+                const res = await fetch(`/restaurant/geofence/${slug}`);
+                if (res.ok) {
+                    geofenceConfig = await res.json();
+                }
+            } catch (e) { }
+
+            if (geofenceConfig.latitude == null || geofenceConfig.longitude == null) {
+                userInRange = true;
+                return;
+            }
+
+            checkLocation();
+        }
+
         function checkLocation() {
             if (!navigator.geolocation) return;
             navigator.geolocation.getCurrentPosition((pos) => {
-                const dist = getDistanceFromLatLonInKm(pos.coords.latitude, pos.coords.longitude, RESTAURANT_LAT, RESTAURANT_LNG);
-                if (dist > ALLOWED_RADIUS_KM) {
+                const radiusKm = (geofenceConfig.geofence_radius_meters || 50) / 1000;
+                const dist = getDistanceFromLatLonInKm(
+                    pos.coords.latitude, pos.coords.longitude,
+                    geofenceConfig.latitude, geofenceConfig.longitude
+                );
+                if (dist > radiusKm) {
                     userInRange = false;
                     const btn = document.getElementById('view-cart-btn');
                     btn.disabled = true;
                     btn.innerText = "❌ Out of Range";
                     btn.classList.add("bg-gray-500");
-                    alert(`You are ${dist.toFixed(2)}km away. Orders restricted to 50m.`);
+                    const radiusLabel = geofenceConfig.geofence_radius_meters >= 1000
+                        ? `${(geofenceConfig.geofence_radius_meters / 1000).toFixed(1)}km`
+                        : `${geofenceConfig.geofence_radius_meters}m`;
+                    alert(`You are ${(dist * 1000).toFixed(0)}m away. Orders restricted to ${radiusLabel}.`);
                 } else {
                     userInRange = true;
-                    updateCartFooter(); // Re-enable button if cart has items
+                    updateCartFooter();
                 }
             }, (err) => console.log("Loc access denied"));
         }
@@ -157,12 +181,9 @@
             try {
                 const response = await fetch('/menu/');
                 menuItems = await response.json();
-
-                // Init Fuzzy Search
                 fuse = new Fuse(menuItems, { keys: ['name', 'category'], threshold: 0.3 });
-
                 renderMenu(menuItems);
-                checkLocation();
+                await loadGeofenceConfig();
             } catch (error) { console.error(error); }
         }
 
@@ -258,16 +279,18 @@
         function closeModal() { document.getElementById('order-modal').classList.add('hidden'); }
 
         async function confirmOrder() {
-            // 1. Check strict 10-minute re-verification rule
+            const geofenceActive = geofenceConfig.latitude != null && geofenceConfig.longitude != null;
             const lastOrderTime = localStorage.getItem('lastOrderTime');
-            if (lastOrderTime) {
+            if (geofenceActive && lastOrderTime) {
                 const diffMinutes = (Date.now() - parseInt(lastOrderTime)) / 1000 / 60;
                 if (diffMinutes > 10) {
-                    alert("🕒 Session expired (10 mins limit). Verifying location again...");
-                    // Force re-check
+                    alert("\ud83d\udd52 Session expired (10 mins limit). Verifying location again...");
                     checkLocation();
                     if (!userInRange) {
-                        alert("❌ You must be within 50m to place a new order.");
+                        const radiusLabel = geofenceConfig.geofence_radius_meters >= 1000
+                            ? `${(geofenceConfig.geofence_radius_meters / 1000).toFixed(1)}km`
+                            : `${geofenceConfig.geofence_radius_meters}m`;
+                        alert(`\u274c You must be within ${radiusLabel} to place a new order.`);
                         return;
                     }
                 }

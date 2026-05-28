@@ -119,6 +119,9 @@ class RestaurantUpdate(BaseModel):
     owner_email: Optional[str] = None
     menu_pdf_url: Optional[str] = None
     currency_symbol: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    geofence_radius_meters: Optional[int] = None
 
 
 class RestaurantSettingsUpdate(BaseModel):
@@ -132,3 +135,6 @@ class RestaurantSettingsUpdate(BaseModel):
     currency_symbol: Optional[str] = None
     gstin: Optional[str] = None
     upi_id: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    geofence_radius_meters: Optional[int] = None
