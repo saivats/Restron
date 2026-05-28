@@ -1,215 +1,162 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Restron Super Admin Login</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&amp;family=Playfair+Display:wght@600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@100..900&amp;family=Playfair+Display:wght@100..900&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<html>
+<head>
+    <title>Restron Super Admin Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
       tailwind.config = {
         darkMode: "class",
         theme: {
           extend: {
-            "colors": {
-                    "on-primary-fixed-variant": "#6d3a00",
-                    "tertiary-fixed-dim": "#8aceff",
-                    "on-secondary-fixed": "#400013",
-                    "secondary-container": "#891838",
-                    "text-primary": "#F5EBE1",
-                    "tertiary": "#8aceff",
-                    "inverse-surface": "#f1dfd3",
-                    "secondary-fixed": "#ffd9dd",
-                    "primary-fixed-dim": "#ffb77b",
-                    "surface-tint": "#ffb77b",
-                    "surface-bright": "#42372f",
-                    "surface": "#1a120b",
-                    "on-secondary": "#670024",
-                    "surface-container-low": "#231a13",
-                    "on-error": "#690005",
-                    "surface-dim": "#1a120b",
-                    "inverse-on-surface": "#392e26",
-                    "surface-container": "#271e16",
-                    "surface-variant": "#3d332b",
-                    "on-surface": "#f1dfd3",
-                    "on-tertiary-fixed": "#001e2f",
-                    "background-surface": "#1A1510",
-                    "background-base": "#0D0A06",
-                    "secondary-fixed-dim": "#ffb2bd",
-                    "inverse-primary": "#8f4e00",
-                    "on-background": "#f1dfd3",
-                    "background": "#1a120b",
-                    "text-secondary": "#A89F95",
-                    "surface-container-high": "#322820",
-                    "success": "#2E7D32",
-                    "outline": "#a38c7c",
-                    "error-container": "#93000a",
-                    "primary": "#ffb77b",
-                    "on-tertiary": "#00344e",
-                    "on-primary-fixed": "#2e1500",
-                    "surface-container-highest": "#3d332b",
-                    "error": "#ffb4ab",
-                    "on-primary-container": "#532b00",
-                    "tertiary-container": "#00a7ee",
-                    "primary-fixed": "#ffdcc2",
-                    "on-tertiary-fixed-variant": "#004b6e",
-                    "on-surface-variant": "#dbc2b0",
-                    "surface-container-lowest": "#140d06",
-                    "on-tertiary-container": "#003854",
-                    "primary-container": "#e8851a",
-                    "on-secondary-container": "#ff97a8",
-                    "on-primary": "#4c2700",
-                    "tertiary-fixed": "#c9e6ff",
-                    "on-secondary-fixed-variant": "#891838",
-                    "on-error-container": "#ffdad6",
-                    "secondary": "#ffb2bd",
-                    "outline-variant": "#554336"
+            colors: {
+              background: "#0D0A06",
+              surface: "#1A1510",
+              primary: "#E8851A",
+              secondary: "#8B1A3A",
+              success: "#2E7D32",
+              error: "#93000a",
+              "text-primary": "#F5EBE1",
+              "text-secondary": "#A89F95"
             },
-            "borderRadius": {
-                    "DEFAULT": "0.25rem",
-                    "lg": "0.5rem",
-                    "xl": "0.75rem",
-                    "full": "9999px"
-            },
-            "spacing": {
-                    "container-max": "1280px",
-                    "margin-desktop": "40px",
-                    "unit": "8px",
-                    "gutter": "24px",
-                    "margin-mobile": "16px"
-            },
-            "fontFamily": {
-                    "body-md": ["DM Sans"],
-                    "label-md": ["DM Sans"],
-                    "headline-md": ["Playfair Display"],
-                    "label-sm": ["DM Sans"],
-                    "headline-sm": ["Playfair Display"],
-                    "display-lg-mobile": ["Playfair Display"],
-                    "display-lg": ["Playfair Display"],
-                    "body-lg": ["DM Sans"]
-            },
-            "fontSize": {
-                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
-                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
-                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
-                    "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
-                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
-                    "display-lg-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}],
-                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            fontFamily: {
+              sans: ["DM Sans", "sans-serif"],
+              serif: ["Playfair Display", "serif"]
             }
-          },
-        },
+          }
+        }
       }
     </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-background text-text-primary font-sans min-h-screen p-4 md:p-8;
+                background-image: radial-gradient(circle at 50% -20%, rgba(232, 133, 26, 0.15) 0%, transparent 60%);
+            }
+            h1, h2, h3, h4, h5, h6 {
+                @apply font-serif text-primary mb-4;
+            }
+            h1 { @apply text-3xl font-bold; }
+            h2 { @apply text-2xl font-semibold; }
+            h3 { @apply text-xl font-medium; }
+            p { @apply text-text-secondary mb-4; }
+            
+            input, select, textarea {
+                @apply w-full bg-surface border border-white/10 rounded-xl px-4 py-3 text-base focus:ring-primary focus:border-primary transition-all text-text-primary mb-4;
+            }
+            label {
+                @apply block text-text-secondary text-sm font-semibold uppercase tracking-wider mb-1;
+            }
+            table { @apply w-full text-left border-collapse mb-6; }
+            th { @apply px-4 py-3 bg-white/5 text-xs text-white/50 uppercase tracking-wider border-b border-white/10; }
+            td { @apply px-4 py-3 border-b border-white/5 text-sm; }
+            tr:hover { @apply bg-white/5 transition-colors; }
+            
+            /* Login page forms */
+            .login-container, .form-container {
+                @apply bg-surface/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 max-w-md mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden;
+            }
+            .form-group { @apply mb-4; }
         }
         
-        body {
-            background: radial-gradient(circle at 20% 30%, rgba(232, 133, 26, 0.08) 0%, transparent 40%),
-                        radial-gradient(circle at 80% 70%, rgba(232, 133, 26, 0.05) 0%, transparent 40%),
-                        #0D0A06;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .glass-card {
-            background: rgba(26, 21, 16, 0.6);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .ambient-glow {
-            filter: blur(120px);
-            background: linear-gradient(135deg, #E8851A 0%, #4C2700 100%);
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-
-        .animate-float {
-            animation: float 10s ease-in-out infinite;
+        @layer components {
+            .header { @apply flex flex-col md:flex-row justify-between items-center mb-8 gap-4; }
+            .header-actions { @apply flex gap-2 flex-wrap justify-center; }
+            
+            .card, .menu-item, .order-card {
+                @apply bg-surface/80 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-[0_4px_30px_rgba(232,133,26,0.05)] mb-6 relative overflow-hidden transition-all duration-300;
+            }
+            .card:hover, .menu-item:hover, .order-card:hover {
+                @apply shadow-[0_8px_40px_rgba(232,133,26,0.15)] border-primary/20 transform -translate-y-1;
+            }
+            
+            button, .btn {
+                @apply font-semibold transition-all duration-300 ease-out active:scale-95 px-6 py-2 rounded-xl inline-flex items-center justify-center gap-2 cursor-pointer;
+            }
+            .btn-primary, button[type="submit"], button[onclick*="login"], button[onclick*="generate"] {
+                @apply bg-primary text-[#4c2700] hover:bg-[#ffb77b] shadow-lg shadow-primary/20 border-0;
+            }
+            .btn-danger {
+                @apply bg-error text-[#ffdad6] hover:bg-[#ffb4ab] hover:text-[#690005] border-0;
+            }
+            .btn-outline, .btn-secondary {
+                @apply bg-transparent border border-primary text-primary hover:bg-primary/10;
+            }
+            .btn-small {
+                @apply px-3 py-1.5 text-xs rounded-lg;
+            }
+            .btn-success {
+                @apply bg-success text-white hover:bg-green-600 border-0;
+            }
+            
+            .modal {
+                @apply fixed inset-0 z-[100] hidden items-center justify-center bg-background/80 backdrop-blur-sm p-4;
+            }
+            .modal-content {
+                @apply bg-surface/95 backdrop-blur-md w-full max-w-2xl rounded-2xl p-8 border border-white/10 shadow-2xl relative max-h-[90vh] overflow-y-auto m-auto mt-10;
+            }
+            .modal-close {
+                @apply absolute right-4 top-4 text-white/50 hover:text-white cursor-pointer text-2xl;
+            }
+            
+            .badge {
+                @apply px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border inline-block;
+            }
+            .badge-active { @apply bg-success/20 text-green-400 border-success/30; }
+            .badge-inactive { @apply bg-error/20 text-red-400 border-error/30; }
+            .badge-paid, .badge-premium, .status-paid, .status-ready { @apply bg-primary/20 text-primary border-primary/30; }
+            .badge-trial, .status-pending, .status-preparing { @apply bg-yellow-900/30 text-yellow-400 border-yellow-500/30; }
+            .badge-free { @apply bg-white/5 text-text-secondary border-white/10; }
+            .status-delivered { @apply bg-success/20 text-green-400 border-success/30; }
+            
+            .stats-panel, .credentials-box, .order-details, .items-list {
+                @apply bg-black/30 p-4 rounded-xl border border-white/5 mt-4;
+            }
+            .stat-row {
+                @apply flex justify-between py-2 border-b border-white/5 last:border-0;
+            }
+            .stat-label { @apply text-text-secondary text-sm uppercase tracking-wider; }
+            .stat-value { @apply font-bold text-primary text-lg; }
+            
+            /* Tabs */
+            .tabs, .tab-bar { @apply flex overflow-x-auto border-b border-white/10 mb-6 pb-2 gap-4 hide-scrollbar; }
+            .tab { @apply px-4 py-2 cursor-pointer text-text-secondary hover:text-white border-b-2 border-transparent transition-colors whitespace-nowrap; }
+            .tab.active { @apply text-primary border-primary; }
+            .tab-content { @apply hidden; }
+            .tab-content.active { @apply block; }
+            
+            /* Grid layouts */
+            #orders-container, #menu-container, #staff-list, .grid-cards {
+                @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+            }
+            
+            /* Modifiers & Items */
+            .item-row { @apply flex justify-between items-center py-2 border-b border-white/5 last:border-0; }
+            .modifier-group { @apply bg-black/20 p-3 rounded-lg border border-white/5 mb-3; }
+            
+            /* Kitchen/Waiter specific */
+            .order-card h3 { @apply flex justify-between items-center text-xl mb-4 border-b border-white/10 pb-2; }
+            .order-items { @apply space-y-2 mb-4; }
+            .order-item { @apply flex justify-between text-sm p-2 bg-white/5 rounded-lg; }
+            
+            /* Hide scrollbar for tabs */
+            .hide-scrollbar::-webkit-scrollbar { display: none; }
+            .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         }
     </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
-  </head>
-<body class="font-body-md text-text-primary selection:bg-primary-container selection:text-on-primary-container flex items-center justify-center p-margin-mobile md:p-margin-desktop">
-<!-- Atmospheric Background Elements -->
-<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] ambient-glow opacity-20 rounded-full animate-float"></div>
-<div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] ambient-glow opacity-10 rounded-full animate-float" style="animation-delay: -5s;"></div>
-<main class="relative z-10 w-full max-w-md">
-<!-- TopAppBar Content & Identity -->
-<div class="flex flex-col items-center mb-10 space-y-4">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">shield_person</span>
-<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Restron</h1>
-</div>
-<p class="font-label-sm text-label-sm text-text-secondary uppercase tracking-[0.2em]">Super Admin Portal</p>
-</div>
-<!-- Central Login Card -->
-<div class="glass-card rounded-2xl p-8 md:p-10 shadow-[0_20px_50px_rgba(13,10,6,0.5)] relative overflow-hidden group">
-<!-- Subtle Inner Glow -->
-<div class="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-<div class="relative">
-<h2 class="font-headline-sm text-headline-sm text-on-surface mb-2">Welcome Back</h2>
-<p class="font-body-md text-text-secondary mb-8">Secure access to administrative controls</p>
-<!-- Message Container -->
-<div class="mb-6 empty:hidden font-label-md text-label-md px-4 py-3 rounded-lg border bg-error-container/20 border-error/20 text-error transition-all duration-300" id="msg"></div>
-<form class="space-y-6" onsubmit="event.preventDefault(); login();">
-<!-- Username Input -->
-<div class="space-y-2">
-<label class="block font-label-md text-label-md text-on-surface-variant" for="u">Username</label>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-lg">person</span>
-<input class="w-full bg-surface-container-lowest/50 border border-outline-variant rounded-xl py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent transition-all duration-300 font-body-md" id="u" name="username" placeholder="Enter admin ID" required="" type="text"/>
-</div>
-</div>
-<!-- Password Input -->
-<div class="space-y-2">
-<div class="flex justify-between items-center">
-<label class="block font-label-md text-label-md text-on-surface-variant" for="p">Password</label>
-<a class="text-primary font-label-sm hover:underline transition-all" href="#">Forgot Password?</a>
-</div>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary text-lg">lock</span>
-<input class="w-full bg-surface-container-lowest/50 border border-outline-variant rounded-xl py-3.5 pl-12 pr-12 text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-transparent transition-all duration-300 font-body-md" id="p" name="password" placeholder="••••••••" required="" type="password"/>
-<button class="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-on-surface transition-colors" onclick="togglePassword()" type="button">
-<span class="material-symbols-outlined text-lg" id="eye-icon">visibility</span>
-</button>
-</div>
-</div>
-<!-- Submit Button -->
-<button class="w-full bg-primary-container text-on-primary font-label-md text-label-md py-4 rounded-xl shadow-[0_8px_20px_rgba(232,133,26,0.3)] hover:shadow-[0_12px_24px_rgba(232,133,26,0.4)] hover:bg-primary transition-all duration-300 transform active:scale-[0.96] flex items-center justify-center gap-2 group" onclick="login()" type="submit">
-                        Access Dashboard
-                        <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
-</button>
-</form>
-</div>
-</div>
-<!-- Footer Information -->
-<footer class="mt-12 text-center space-y-4">
-<div class="flex justify-center gap-6">
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-colors" href="#">Security Policy</a>
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-colors" href="#">System Status</a>
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-colors" href="#">Privacy</a>
-</div>
-<p class="font-label-sm text-label-sm text-text-secondary opacity-60">
-                © 2024 Restron Platform. All rights reserved.
-            </p>
-</footer>
-</main>
-<script>
+</head>
+<body>
+    <div class="box">
+        <h2>🔑 Super Admin</h2>
+        <p class="subtitle">Restron Platform Management</p>
+        <input id="u" placeholder="Username">
+        <input id="p" type="password" placeholder="Password">
+        <button onclick="login()">Access Dashboard</button>
+        <p id="msg" style="color:#e74c3c; margin-top:10px; font-size:0.9em;"></p>
+    </div>
+    <script>
         async function login() {
             const u = document.getElementById('u').value;
             const p = document.getElementById('p').value;
@@ -223,31 +170,16 @@
                     window.location.href = '/superadmin/dashboard';
                 } else {
                     const err = await res.json().catch(() => ({ detail: 'Login failed' }));
-                    const msg = document.getElementById('msg');
-                    msg.innerText = err.detail || "Invalid credentials";
-                    msg.classList.remove('hidden');
+                    document.getElementById('msg').innerText = err.detail || "Invalid credentials";
                 }
             } catch (error) {
-                const msg = document.getElementById('msg');
-                msg.innerText = "Network error. Please try again.";
-                msg.classList.remove('hidden');
+                document.getElementById('msg').innerText = "Network error. Please try again.";
             }
         }
 
         document.getElementById('p').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') login();
         });
-
-        function togglePassword() {
-            const pInput = document.getElementById('p');
-            const eyeIcon = document.getElementById('eye-icon');
-            if (pInput.type === 'password') {
-                pInput.type = 'text';
-                eyeIcon.textContent = 'visibility_off';
-            } else {
-                pInput.type = 'password';
-                eyeIcon.textContent = 'visibility';
-            }
-        }
     </script>
-</body></html>
+</body>
+</html>

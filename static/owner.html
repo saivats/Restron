@@ -1,528 +1,353 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Restron Owner Dashboard</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "primary-fixed": "#ffdcc2",
-                        "on-secondary-fixed": "#400013",
-                        "on-secondary-container": "#ff97a8",
-                        "on-secondary-fixed-variant": "#891838",
-                        "on-primary-fixed": "#2e1500",
-                        "surface-container-high": "#322820",
-                        "on-primary-container": "#532b00",
-                        "surface-container-lowest": "#140d06",
-                        "surface-tint": "#ffb77b",
-                        "tertiary-container": "#00a7ee",
-                        "primary-fixed-dim": "#ffb77b",
-                        "tertiary": "#8aceff",
-                        "background-surface": "#1A1510",
-                        "secondary-fixed-dim": "#ffb2bd",
-                        "on-surface-variant": "#dbc2b0",
-                        "outline": "#a38c7c",
-                        "tertiary-fixed-dim": "#8aceff",
-                        "secondary-fixed": "#ffd9dd",
-                        "inverse-on-surface": "#392e26",
-                        "primary-container": "#e8851a",
-                        "primary": "#ffb77b",
-                        "on-tertiary-fixed": "#001e2f",
-                        "background-base": "#0D0A06",
-                        "success": "#2E7D32",
-                        "secondary-container": "#891838",
-                        "error": "#ffb4ab",
-                        "on-tertiary-container": "#003854",
-                        "on-tertiary-fixed-variant": "#004b6e",
-                        "on-error": "#690005",
-                        "on-tertiary": "#00344e",
-                        "text-primary": "#F5EBE1",
-                        "background": "#1a120b",
-                        "inverse-primary": "#8f4e00",
-                        "surface-container-low": "#231a13",
-                        "on-surface": "#f1dfd3",
-                        "surface-variant": "#3d332b",
-                        "on-error-container": "#ffdad6",
-                        "on-primary": "#4c2700",
-                        "surface-container": "#271e16",
-                        "secondary": "#ffb2bd",
-                        "on-background": "#f1dfd3",
-                        "outline-variant": "#554336",
-                        "tertiary-fixed": "#c9e6ff",
-                        "inverse-surface": "#f1dfd3",
-                        "error-container": "#93000a",
-                        "surface-container-highest": "#3d332b",
-                        "text-secondary": "#A89F95",
-                        "on-primary-fixed-variant": "#6d3a00",
-                        "on-secondary": "#670024",
-                        "surface": "#1a120b",
-                        "surface-dim": "#1a120b",
-                        "surface-bright": "#42372f"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "2xl": "1.25rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "unit": "8px",
-                        "margin-mobile": "16px",
-                        "container-max": "1280px",
-                        "gutter": "24px",
-                        "margin-desktop": "40px"
-                    },
-                    "fontFamily": {
-                        "display-lg": ["Playfair Display"],
-                        "headline-md": ["Playfair Display"],
-                        "headline-sm": ["Playfair Display"],
-                        "label-md": ["DM Sans"],
-                        "body-lg": ["DM Sans"],
-                        "body-md": ["DM Sans"],
-                        "label-sm": ["DM Sans"]
-                    }
-                }
+<html>
+<head>
+    <title>Restron Owner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              background: "#0D0A06",
+              surface: "#1A1510",
+              primary: "#E8851A",
+              secondary: "#8B1A3A",
+              success: "#2E7D32",
+              error: "#93000a",
+              "text-primary": "#F5EBE1",
+              "text-secondary": "#A89F95"
+            },
+            fontFamily: {
+              sans: ["DM Sans", "sans-serif"],
+              serif: ["Playfair Display", "serif"]
             }
+          }
         }
+      }
     </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-background text-text-primary font-sans min-h-screen p-4 md:p-8;
+                background-image: radial-gradient(circle at 50% -20%, rgba(232, 133, 26, 0.15) 0%, transparent 60%);
+            }
+            h1, h2, h3, h4, h5, h6 {
+                @apply font-serif text-primary mb-4;
+            }
+            h1 { @apply text-3xl font-bold; }
+            h2 { @apply text-2xl font-semibold; }
+            h3 { @apply text-xl font-medium; }
+            p { @apply text-text-secondary mb-4; }
+            
+            input, select, textarea {
+                @apply w-full bg-surface border border-white/10 rounded-xl px-4 py-3 text-base focus:ring-primary focus:border-primary transition-all text-text-primary mb-4;
+            }
+            label {
+                @apply block text-text-secondary text-sm font-semibold uppercase tracking-wider mb-1;
+            }
+            table { @apply w-full text-left border-collapse mb-6; }
+            th { @apply px-4 py-3 bg-white/5 text-xs text-white/50 uppercase tracking-wider border-b border-white/10; }
+            td { @apply px-4 py-3 border-b border-white/5 text-sm; }
+            tr:hover { @apply bg-white/5 transition-colors; }
+            
+            /* Login page forms */
+            .login-container, .form-container {
+                @apply bg-surface/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 max-w-md mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden;
+            }
+            .form-group { @apply mb-4; }
         }
-        .glass-panel {
-            background: rgba(26, 21, 16, 0.2);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .active-tab {
-            color: #e8851a;
-            border-bottom: 2px solid #e8851a;
-        }
-        body {
-            background-color: #0D0A06;
-            color: #F5EBE1;
-        }
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0D0A06;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #3d332b;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #e8851a;
+        
+        @layer components {
+            .header { @apply flex flex-col md:flex-row justify-between items-center mb-8 gap-4; }
+            .header-actions { @apply flex gap-2 flex-wrap justify-center; }
+            
+            .card, .menu-item, .order-card {
+                @apply bg-surface/80 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-[0_4px_30px_rgba(232,133,26,0.05)] mb-6 relative overflow-hidden transition-all duration-300;
+            }
+            .card:hover, .menu-item:hover, .order-card:hover {
+                @apply shadow-[0_8px_40px_rgba(232,133,26,0.15)] border-primary/20 transform -translate-y-1;
+            }
+            
+            button, .btn {
+                @apply font-semibold transition-all duration-300 ease-out active:scale-95 px-6 py-2 rounded-xl inline-flex items-center justify-center gap-2 cursor-pointer;
+            }
+            .btn-primary, button[type="submit"], button[onclick*="login"], button[onclick*="generate"] {
+                @apply bg-primary text-[#4c2700] hover:bg-[#ffb77b] shadow-lg shadow-primary/20 border-0;
+            }
+            .btn-danger {
+                @apply bg-error text-[#ffdad6] hover:bg-[#ffb4ab] hover:text-[#690005] border-0;
+            }
+            .btn-outline, .btn-secondary {
+                @apply bg-transparent border border-primary text-primary hover:bg-primary/10;
+            }
+            .btn-small {
+                @apply px-3 py-1.5 text-xs rounded-lg;
+            }
+            .btn-success {
+                @apply bg-success text-white hover:bg-green-600 border-0;
+            }
+            
+            .modal {
+                @apply fixed inset-0 z-[100] hidden items-center justify-center bg-background/80 backdrop-blur-sm p-4;
+            }
+            .modal-content {
+                @apply bg-surface/95 backdrop-blur-md w-full max-w-2xl rounded-2xl p-8 border border-white/10 shadow-2xl relative max-h-[90vh] overflow-y-auto m-auto mt-10;
+            }
+            .modal-close {
+                @apply absolute right-4 top-4 text-white/50 hover:text-white cursor-pointer text-2xl;
+            }
+            
+            .badge {
+                @apply px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border inline-block;
+            }
+            .badge-active { @apply bg-success/20 text-green-400 border-success/30; }
+            .badge-inactive { @apply bg-error/20 text-red-400 border-error/30; }
+            .badge-paid, .badge-premium, .status-paid, .status-ready { @apply bg-primary/20 text-primary border-primary/30; }
+            .badge-trial, .status-pending, .status-preparing { @apply bg-yellow-900/30 text-yellow-400 border-yellow-500/30; }
+            .badge-free { @apply bg-white/5 text-text-secondary border-white/10; }
+            .status-delivered { @apply bg-success/20 text-green-400 border-success/30; }
+            
+            .stats-panel, .credentials-box, .order-details, .items-list {
+                @apply bg-black/30 p-4 rounded-xl border border-white/5 mt-4;
+            }
+            .stat-row {
+                @apply flex justify-between py-2 border-b border-white/5 last:border-0;
+            }
+            .stat-label { @apply text-text-secondary text-sm uppercase tracking-wider; }
+            .stat-value { @apply font-bold text-primary text-lg; }
+            
+            /* Tabs */
+            .tabs, .tab-bar { @apply flex overflow-x-auto border-b border-white/10 mb-6 pb-2 gap-4 hide-scrollbar; }
+            .tab { @apply px-4 py-2 cursor-pointer text-text-secondary hover:text-white border-b-2 border-transparent transition-colors whitespace-nowrap; }
+            .tab.active { @apply text-primary border-primary; }
+            .tab-content { @apply hidden; }
+            .tab-content.active { @apply block; }
+            
+            /* Grid layouts */
+            #orders-container, #menu-container, #staff-list, .grid-cards {
+                @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+            }
+            
+            /* Modifiers & Items */
+            .item-row { @apply flex justify-between items-center py-2 border-b border-white/5 last:border-0; }
+            .modifier-group { @apply bg-black/20 p-3 rounded-lg border border-white/5 mb-3; }
+            
+            /* Kitchen/Waiter specific */
+            .order-card h3 { @apply flex justify-between items-center text-xl mb-4 border-b border-white/10 pb-2; }
+            .order-items { @apply space-y-2 mb-4; }
+            .order-item { @apply flex justify-between text-sm p-2 bg-white/5 rounded-lg; }
+            
+            /* Hide scrollbar for tabs */
+            .hide-scrollbar::-webkit-scrollbar { display: none; }
+            .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         }
     </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
-  </head>
-<body class="font-body-md text-body-md min-h-screen">
-<!-- Top Navigation Bar -->
-<header class="fixed top-0 w-full z-50 flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16 bg-surface/20 backdrop-blur-md dark:bg-surface-dim/20 border-b border-white/10 shadow-[0_4px_30px_rgba(232,133,26,0.1)]">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">shield_person</span>
-<h1 class="font-headline-sm text-headline-sm-mobile md:text-headline-sm text-primary tracking-tight">👑 Owner Dashboard</h1>
-</div>
-<nav class="hidden md:flex gap-8">
-<button class="tab-btn font-label-md transition-colors active-tab" id="btn-dashboard" onclick="switchTab('dashboard')">Dashboard</button>
-<button class="tab-btn font-label-md text-on-surface-variant hover:text-primary transition-colors" id="btn-staff" onclick="switchTab('staff')">Staff</button>
-<button class="tab-btn font-label-md text-on-surface-variant hover:text-primary transition-colors" id="btn-qrcodes" onclick="switchTab('qrcodes')">QR Codes</button>
-<button class="tab-btn font-label-md text-on-surface-variant hover:text-primary transition-colors" id="btn-settings" onclick="switchTab('settings')">Settings</button>
-</nav>
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center font-bold text-on-primary-container">AD</div>
-</div>
-</header>
-<!-- Subscription Overlay -->
-<div class="hidden fixed inset-0 z-[100] bg-background-base/90 backdrop-blur-xl flex items-center justify-center p-6" id="sub-overlay">
-<div class="glass-panel max-w-md w-full p-8 rounded-2xl text-center space-y-6">
-<span class="material-symbols-outlined text-primary text-6xl">workspace_premium</span>
-<h2 class="font-headline-md text-text-primary">Subscription Expired</h2>
-<p class="text-text-secondary">Your premium access to the Restron platform has ended. Renew now to continue managing your business seamlessly.</p>
-<button class="w-full py-4 bg-primary-container text-on-primary-container font-bold rounded-xl active:scale-95 transition-transform">Renew Plan</button>
-</div>
-</div>
-<main class="pt-24 pb-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
-<!-- Tab: Dashboard -->
-<section class="space-y-8" id="tab-dashboard">
-<!-- Hero Metrics -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-<div class="glass-panel p-6 rounded-2xl flex flex-col justify-between min-h-[160px] shadow-lg group hover:bg-white/5 transition-all">
-<div class="flex justify-between items-start">
-<span class="text-on-surface-variant font-label-sm uppercase tracking-widest">Revenue Today</span>
-<span class="material-symbols-outlined text-primary">calendar_today</span>
-</div>
-<div>
-<h3 class="font-headline-md text-primary" id="rev-today">₹ 42,500</h3>
-<p class="text-success text-label-sm flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-sm">trending_up</span> +12% from yesterday</p>
-</div>
-</div>
-<div class="glass-panel p-6 rounded-2xl flex flex-col justify-between min-h-[160px] shadow-lg group hover:bg-white/5 transition-all">
-<div class="flex justify-between items-start">
-<span class="text-on-surface-variant font-label-sm uppercase tracking-widest">Revenue This Week</span>
-<span class="material-symbols-outlined text-primary">view_week</span>
-</div>
-<div>
-<h3 class="font-headline-md text-primary" id="rev-week">₹ 2,84,000</h3>
-<p class="text-success text-label-sm flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-sm">trending_up</span> +5.2% from last week</p>
-</div>
-</div>
-<div class="glass-panel p-6 rounded-2xl flex flex-col justify-between min-h-[160px] shadow-lg group hover:bg-white/5 transition-all">
-<div class="flex justify-between items-start">
-<span class="text-on-surface-variant font-label-sm uppercase tracking-widest">Revenue This Month</span>
-<span class="material-symbols-outlined text-primary">calendar_month</span>
-</div>
-<div>
-<h3 class="font-headline-md text-primary" id="rev-month">₹ 12,45,000</h3>
-<p class="text-on-surface-variant text-label-sm mt-1">Projection: ₹ 14.8L</p>
-</div>
-</div>
-</div>
-<!-- Performance Bento Grid -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-<div class="md:col-span-1 glass-panel p-6 rounded-2xl space-y-4">
-<h4 class="font-label-sm text-on-surface-variant tracking-widest uppercase">Key Stats</h4>
-<div class="space-y-6">
-<div>
-<p class="text-label-sm text-on-surface-variant">Total Revenue</p>
-<p class="font-headline-sm text-text-primary" id="metric-total">₹ 4.2 Cr</p>
-</div>
-<div>
-<p class="text-label-sm text-on-surface-variant">Average Order Value</p>
-<p class="font-headline-sm text-text-primary" id="metric-aov">₹ 840</p>
-</div>
-<div>
-<p class="text-label-sm text-on-surface-variant">Peak Hour</p>
-<p class="font-headline-sm text-text-primary" id="metric-peak">8:00 PM - 9:30 PM</p>
-</div>
-</div>
-</div>
-<!-- Best Sellers -->
-<div class="md:col-span-3 glass-panel p-6 rounded-2xl">
-<div class="flex justify-between items-center mb-6">
-<h4 class="font-headline-sm text-text-primary">Best Sellers This Month</h4>
-<span class="material-symbols-outlined text-primary">restaurant</span>
-</div>
-<div class="space-y-4" id="best-sellers-month">
-<div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container">
-<img class="w-full h-full object-cover" data-alt="Close-up photograph of a spicy butter chicken dish with vibrant orange gravy, garnished with fresh cilantro and cream, presented in a traditional copper bowl on a dark mahogany table under warm dramatic lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvUrlgGQMncjoH7DeRBc9ZqD1dl37tPUJrJ1IYNBcmiZstHOeJObEjWBYL0XUcnYm0izDp2_EytXttf8TekYEPFLfkjeXUrD75J-xj3rQj3Q7vvUfTtaUXCa-h8z-vwyXCOhbi3DWOuqX6IEQBYPH0Td4iua_V2ky5b2uE-m0XBsV0wPnIFWiqvm4BeVJ1KSkYorXzMjBX_mwmjrHukGX9LO8XcoUxNhYRAAveoa8c6-mojEJa0E7uC6miono0D0WQdfLdrqk9-zU"/>
-</div>
-<div>
-<p class="font-bold">Paneer Tikka Butter Masala</p>
-<p class="text-label-sm text-on-surface-variant">Vegetarian • 482 Orders</p>
-</div>
-</div>
-<p class="font-bold text-primary">₹ 1,83,160</p>
-</div>
-<div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container">
-<img class="w-full h-full object-cover" data-alt="A gourmet salad bowl with fresh greens, grilled vegetables, and vibrant toppings, beautifully arranged in a dark ceramic bowl, captured in a sleek modern aesthetic with soft shadows and warm highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCG2ui1Gd3uYDyHh64ZvV2APFpXwrlbHsQgV1MziyOR4WIp0bHrqkYHoYLKVYcfGBoqaxBAhY7Y2TWIrsDtMCnybdgWpMZF7Axr-ZkDD-8AzXnJk1XKVDMPzxkAamFm1Do78L4oAF7OjyqsljAEiBpJekTLVc-ZRnY3IBQ4REn-jjsaNUfQ78gkSoALsth7cSjmNcQ_sdsLe0I-uTnwzKSfC7UjpzrQx6YQPt2j-qZU48Y0mTJlo6kzP25Xi8Q2xbSi3T7JK0p9H4"/>
-</div>
-<div>
-<p class="font-bold">Hyderabadi Chicken Biryani</p>
-<p class="text-label-sm text-on-surface-variant">Non-Veg • 312 Orders</p>
-</div>
-</div>
-<p class="font-bold text-primary">₹ 1,24,800</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Master History Report -->
-<div class="glass-panel p-8 rounded-2xl space-y-6">
-<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-<h4 class="font-headline-sm text-text-primary">Master History Report</h4>
-<div class="flex flex-wrap gap-4">
-<select class="bg-surface-container-high border-white/10 rounded-xl px-4 py-2 text-on-surface focus:ring-primary focus:border-primary" id="search-type" onchange="toggleInput()">
-<option value="date">Search by Date</option>
-<option value="month">Search by Month</option>
-</select>
-<input class="bg-surface-container-high border-white/10 rounded-xl px-4 py-2 text-on-surface" id="hist-date" type="date"/>
-<input class="hidden bg-surface-container-high border-white/10 rounded-xl px-4 py-2 text-on-surface" id="hist-month" type="month"/>
-<button class="px-6 py-2 bg-primary-container text-on-primary-container font-bold rounded-xl hover:scale-105 active:scale-95 transition-all" onclick="getHistory()">Get History</button>
-</div>
-</div>
-<div class="hidden animate-in fade-in slide-in-from-bottom-4 duration-500" id="hist-result">
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-<div class="bg-white/5 p-6 rounded-xl border border-white/5">
-<p class="text-label-sm text-on-surface-variant uppercase">Total Period Revenue</p>
-<p class="text-headline-sm text-primary" id="h-rev">₹ 0</p>
-</div>
-<div class="bg-white/5 p-6 rounded-xl border border-white/5">
-<p class="text-label-sm text-on-surface-variant uppercase">Veg Contribution</p>
-<p class="text-headline-sm text-green-400" id="h-veg">₹ 0</p>
-</div>
-<div class="bg-white/5 p-6 rounded-xl border border-white/5">
-<p class="text-label-sm text-on-surface-variant uppercase">Non-Veg Contribution</p>
-<p class="text-headline-sm text-red-400" id="h-non">₹ 0</p>
-</div>
-</div>
-<div class="overflow-x-auto rounded-xl border border-white/10" id="log-container">
-<table class="w-full text-left" id="log-table">
-<thead class="bg-surface-container text-label-sm text-on-surface-variant uppercase">
-<tr>
-<th class="px-6 py-4">Transaction ID</th>
-<th class="px-6 py-4">Items</th>
-<th class="px-6 py-4">Mode</th>
-<th class="px-6 py-4">Amount</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-white/5">
-<!-- Data injected here -->
-</tbody>
-</table>
-</div>
-<div class="mt-8">
-<h5 class="font-bold mb-4">Summary Summary</h5>
-<table class="w-full text-left" id="h-table">
-<!-- Summary data -->
-</table>
-</div>
-</div>
-</div>
-<!-- Inventory & Quick Add -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-<div class="glass-panel p-8 rounded-2xl flex flex-col">
-<div class="flex justify-between items-center mb-6">
-<h4 class="font-headline-sm">Shopping List</h4>
-<button class="text-label-sm text-error hover:underline" onclick="clearList()">Clear All</button>
-</div>
-<div class="space-y-3 flex-1 min-h-[200px]" id="inv-list">
-<p class="text-on-surface-variant text-center py-10 opacity-50">List is empty</p>
-</div>
-</div>
-<div class="glass-panel p-8 rounded-2xl">
-<h4 class="font-headline-sm mb-6">Add New Dish</h4>
-<div class="space-y-4">
-<div>
-<label class="block text-label-sm text-on-surface-variant mb-1">Dish Name</label>
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3 focus:border-primary focus:ring-primary" id="name" placeholder="e.g. Masala Dosa" type="text"/>
-</div>
-<div class="grid grid-cols-2 gap-4">
-<div>
-<label class="block text-label-sm text-on-surface-variant mb-1">Price (₹)</label>
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3 focus:border-primary focus:ring-primary" id="price" placeholder="250" type="number"/>
-</div>
-<div>
-<label class="block text-label-sm text-on-surface-variant mb-1">Category</label>
-<select class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3 focus:border-primary focus:ring-primary" id="cat">
-<option value="Veg">Vegetarian</option>
-<option value="Non-Veg">Non-Vegetarian</option>
-<option value="Drinks">Drinks</option>
-</select>
-</div>
-</div>
-<button class="w-full py-4 bg-primary text-on-primary font-bold rounded-xl hover:shadow-[0_0_20px_rgba(232,133,26,0.3)] transition-all active:scale-95" onclick="addItem()">Add to Menu</button>
-</div>
-</div>
-</div>
-</section>
-<!-- Tab: Staff -->
-<section class="hidden space-y-8" id="tab-staff">
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-<div class="md:col-span-2 glass-panel p-8 rounded-2xl">
-<h4 class="font-headline-sm mb-6">Active Staff Members</h4>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="staff-list">
-<!-- Staff cards will be added here -->
-<div class="p-4 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary">badge</span>
-<div>
-<p class="font-bold">admin_rahul</p>
-<p class="text-label-sm text-on-surface-variant">Manager</p>
-</div>
-</div>
-<span class="w-2 h-2 rounded-full bg-success"></span>
-</div>
-</div>
-</div>
-<div class="glass-panel p-8 rounded-2xl h-fit">
-<h4 class="font-headline-sm mb-6">Register Staff</h4>
-<div class="space-y-4">
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3 focus:border-primary focus:ring-primary" id="staff-username" placeholder="Username" type="text"/>
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3 focus:border-primary focus:ring-primary" id="staff-password" placeholder="Password" type="password"/>
-<select class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3 focus:border-primary focus:ring-primary" id="staff-role">
-<option value="waiter">Waiter</option>
-<option value="chef">Chef</option>
-<option value="manager">Manager</option>
-</select>
-<button class="w-full py-4 bg-primary text-on-primary font-bold rounded-xl hover:scale-105 transition-all" onclick="addStaff()">Add Staff Member</button>
-<p class="text-center text-label-sm h-4" id="staff-msg"></p>
-</div>
-</div>
-</div>
-</section>
-<!-- Tab: QR Codes -->
-<section class="hidden space-y-8" id="tab-qrcodes">
-<div class="flex justify-between items-center">
-<h2 class="font-headline-md">Manage Tables &amp; QR Codes</h2>
-<div class="bg-primary/10 text-primary px-4 py-2 rounded-full font-label-sm border border-primary/20">
-                    Total Tables: 12
+</head>
+<body>
+    <div class="subscription-overlay" id="sub-overlay">
+        <div class="msg">
+            <h2>⚠️ Subscription Expired</h2>
+            <p>Your subscription has expired. Please contact Restron support to renew.</p>
+        </div>
+    </div>
+
+    <h1>👑 Owner Dashboard</h1>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+        <button class="tab-btn" onclick="switchTab('staff')">👥 Staff</button>
+        <button class="tab-btn" onclick="switchTab('qrcodes')">📱 QR Codes</button>
+        <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
+    </div>
+
+    <div id="tab-dashboard" class="tab-content active">
+        <div class="grid">
+            <div class="card">
+                <span class="number" id="rev-today">₹0</span>
+                <span class="label">Today</span>
+            </div>
+            <div class="card">
+                <span class="number" id="rev-week">₹0</span>
+                <span class="label">Week</span>
+            </div>
+            <div class="card">
+                <span class="number" id="rev-month">₹0</span>
+                <span class="label">Month</span>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>📊 Performance</h2>
+                <div class="list-row"><span>Lifetime Revenue</span> <b id="metric-total" style="color:#28a745;">₹0</b></div>
+                <div class="list-row"><span>Avg Order (AOV)</span> <b id="metric-aov">₹0</b></div>
+                <div class="list-row"><span>Peak Hour</span> <b id="metric-peak">--</b></div>
+            </div>
+            <div class="card">
+                <h2>🔥 Best Sellers (Month)</h2>
+                <div id="best-sellers-month">Loading...</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card" style="flex: 2;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2>📅 Master History Report</h2>
+                    <div>
+                        <select id="search-type" onchange="toggleInput()">
+                            <option value="date">By Date (Detailed)</option>
+                            <option value="month">By Month (Summary)</option>
+                        </select>
+                        <input type="date" id="hist-date">
+                        <input type="month" id="hist-month" style="display:none;">
+                        <button onclick="getHistory()">Get Report</button>
+                    </div>
                 </div>
-</div>
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6" id="qr-grid">
-<!-- QR Cards loop -->
-<script>
-                    for(let i=1; i<=12; i++) {
-                        document.write(`
-                            <div onclick="openQrModal(${i})" class="glass-panel p-6 rounded-2xl text-center group hover:border-primary/50 transition-all cursor-pointer">
-                                <span class="material-symbols-outlined text-4xl text-on-surface-variant group-hover:text-primary transition-colors mb-2">qr_code_2</span>
-                                <p class="font-bold">Table ${i}</p>
-                                <p class="text-xs text-on-surface-variant">Click to view</p>
-                            </div>
-                        `);
-                    }
-                </script>
-</div>
-<!-- Modal -->
-<div class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4" id="qr-modal-overlay">
-<div class="glass-panel max-w-sm w-full p-8 rounded-3xl relative">
-<button class="absolute top-4 right-4 text-on-surface-variant hover:text-primary" onclick="closeQrModal()">
-<span class="material-symbols-outlined">close</span>
-</button>
-<div class="text-center space-y-6">
-<h3 class="font-headline-sm" id="qr-modal-title">Table 01</h3>
-<div class="bg-white p-4 rounded-2xl mx-auto w-48 h-48 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.1)]">
-<img class="w-full h-full" data-alt="A clean, high-contrast QR code generated for a luxury restaurant table, framed within a minimalist white border, reflecting the sophisticated branding of the Restron platform with sharp geometric clarity." id="qr-modal-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmLogLuIh8BAVGtvC3TK9C41XZnT3YLoZmurKoE5AzW-YuXIpZZy1zC4_y--4tEvWYkG5hN0EMqCs0dwLKdOvxNXucK5sRfQ3cD061I0AXSDUoOnRsdgijn4bs2i7Qp9sW700EJu2vyNAzSvbHTrWDlYYCWtuS2xABvzPO1oQbiyyUcSNKdX_NoZl0TDPJIyUtx5k7akGdohwN8M0ci2AArt261TOpyqZB6dufWd4ffdW3CIKy4foh7SielLVWkJTFc4QmC0x4aME"/>
-</div>
-<p class="text-label-sm text-on-surface-variant break-all" id="qr-modal-url">restron.app/t/01</p>
-<button class="w-full py-3 bg-primary-container text-on-primary-container font-bold rounded-xl flex items-center justify-center gap-2" id="qr-download-btn" onclick="downloadQr()">
-<span class="material-symbols-outlined">download</span> Download QR
-                        </button>
-<a id="qr-download-link" style="display:none;"></a>
-</div>
-</div>
-</div>
-</section>
-<!-- Tab: Settings -->
-<section class="hidden" id="tab-settings">
-<div class="max-w-3xl mx-auto glass-panel p-8 md:p-12 rounded-3xl">
-<div class="flex items-center gap-4 mb-10">
-<div class="w-16 h-16 rounded-2xl bg-primary-container flex items-center justify-center text-3xl">⚙️</div>
-<div>
-<h2 class="font-headline-sm">Restaurant Settings</h2>
-<p class="text-on-surface-variant">Update your business profile and preferences</p>
-</div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-<div class="space-y-4">
-<h5 class="text-primary font-bold uppercase tracking-widest text-xs">General Info</h5>
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-name" placeholder="Restaurant Name" type="text"/>
-<textarea class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3 min-h-[100px]" id="set-address" placeholder="Physical Address"></textarea>
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-phone" placeholder="Phone Number" type="tel"/>
-</div>
-<div class="space-y-4">
-<h5 class="text-primary font-bold uppercase tracking-widest text-xs">Compliance &amp; Billing</h5>
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-gstin" placeholder="GSTIN Number" type="text"/>
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-upi" placeholder="UPI ID for Payments" type="text"/>
-<div class="grid grid-cols-2 gap-4">
-<input class="bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-gst" placeholder="GST %" type="number"/>
-<input class="bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-currency" placeholder="Currency (₹)" type="text"/>
-</div>
-</div>
-<div class="space-y-4">
-<h5 class="text-primary font-bold uppercase tracking-widest text-xs">Digital Presence</h5>
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-logo" placeholder="Logo URL" type="url"/>
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-menu-pdf" placeholder="Menu PDF Link" type="url"/>
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-tables" placeholder="Number of Tables" type="number"/>
-</div>
-<div class="space-y-4">
-<h5 class="text-primary font-bold uppercase tracking-widest text-xs">Location &amp; Geofencing</h5>
-<div class="grid grid-cols-2 gap-4">
-<input class="bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-latitude" placeholder="Latitude" type="text"/>
-<input class="bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-longitude" placeholder="Longitude" type="text"/>
-</div>
-<input class="w-full bg-surface-container border-white/10 rounded-xl px-4 py-3" id="set-geofence-radius" placeholder="Radius (meters)" type="number"/>
-</div>
-</div>
-<div class="mt-12 flex flex-col items-center gap-4">
-<button class="w-full md:w-64 py-4 bg-primary text-on-primary font-bold rounded-xl hover:shadow-[0_0_30px_rgba(232,133,26,0.4)] transition-all active:scale-95" onclick="saveSettings()">Save All Changes</button>
-<p class="text-success text-label-sm h-4 font-bold" id="settings-msg"></p>
-</div>
-</div>
-</section>
-</main>
-<!-- Footer Content -->
-<footer class="w-full py-8 flex flex-col md:flex-row items-center justify-center gap-4 text-center border-t border-white/5 mt-auto">
-<p class="font-label-sm text-label-sm text-secondary">© 2024 Restron Platform. All rights reserved.</p>
-<div class="flex gap-6">
-<a class="text-text-secondary hover:text-primary transition-colors text-label-sm font-label-sm" href="#">Security Policy</a>
-<a class="text-text-secondary hover:text-primary transition-colors text-label-sm font-label-sm" href="#">System Status</a>
-<a class="text-text-secondary hover:text-primary transition-colors text-label-sm font-label-sm" href="#">Privacy</a>
-</div>
-</footer>
-<!-- Bottom Navigation (Mobile Only) -->
-<div class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container/80 backdrop-blur-xl flex justify-around items-center h-16 border-t border-white/5 px-4 z-50">
-<button class="flex flex-col items-center text-primary" onclick="switchTab('dashboard')">
-<span class="material-symbols-outlined">dashboard</span>
-<span class="text-[10px] font-bold">Dashboard</span>
-</button>
-<button class="flex flex-col items-center text-on-surface-variant" onclick="switchTab('staff')">
-<span class="material-symbols-outlined">group</span>
-<span class="text-[10px] font-bold">Staff</span>
-</button>
-<button class="flex flex-col items-center text-on-surface-variant" onclick="switchTab('qrcodes')">
-<span class="material-symbols-outlined">qr_code</span>
-<span class="text-[10px] font-bold">QRs</span>
-</button>
-<button class="flex flex-col items-center text-on-surface-variant" onclick="switchTab('settings')">
-<span class="material-symbols-outlined">settings</span>
-<span class="text-[10px] font-bold">Settings</span>
-</button>
-</div>
-<script>
-        function switchTab(tabId) {
-            const tabs = ['dashboard', 'staff', 'qrcodes', 'settings'];
-            tabs.forEach(t => {
-                const tabEl = document.getElementById(`tab-${t}`);
-                if (tabEl) tabEl.classList.add('hidden');
-                const btn = document.getElementById(`btn-${t}`);
-                if (btn) {
-                    btn.classList.remove('active-tab');
-                    btn.classList.add('text-on-surface-variant');
-                }
-            });
-            const activeTab = document.getElementById(`tab-${tabId}`);
-            if (activeTab) activeTab.classList.remove('hidden');
-            const activeBtn = document.getElementById(`btn-${tabId}`);
-            if (activeBtn) {
-                activeBtn.classList.add('active-tab');
-                activeBtn.classList.remove('text-on-surface-variant');
-            }
-            if (tabId === 'staff') loadStaff();
-            if (tabId === 'qrcodes') loadQrCodes();
-            if (tabId === 'settings') loadSettings();
+
+                <div id="hist-result" style="display:none; margin-top:20px;">
+                    <div style="display:flex; gap:20px; padding:15px; background:#f1f1f1; border-radius:5px; font-weight:bold; margin-bottom:20px;">
+                        <span>💰 Revenue: <span id="h-rev" style="color:#28a745;">0</span></span>
+                        <span>🥬 Veg Sold: <span id="h-veg">0</span></span>
+                        <span>🍗 Non-Veg Sold: <span id="h-non">0</span></span>
+                    </div>
+
+                    <div id="log-container" style="display:none;">
+                        <h3>📝 Full Order Log (A-Z)</h3>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <table id="log-table">
+                                <thead><tr><th>ID</th><th>Time</th><th>Type</th><th>Table</th><th>Items Ordered</th><th>Bill</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top:20px;">📦 Item Summary</h3>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        <table id="h-table">
+                            <thead><tr><th>Item Name</th><th>Qty Sold</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>🛒 Shopping List</h2>
+                <div id="inv-list">Loading...</div>
+                <button onclick="clearList()" class="red" style="margin-top:10px;">Clear List</button>
+            </div>
+            <div class="card">
+                <h2>➕ Add Dish</h2>
+                <input id="name" placeholder="Name" style="width:100%;">
+                <input id="price" placeholder="Price" style="width:100%;">
+                <input id="cat" placeholder="Category" style="width:100%;">
+                <button onclick="addItem()" class="green" style="margin-top:5px;">Add to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-staff" class="tab-content">
+        <div class="grid">
+            <div class="card" style="flex:2;">
+                <h2>👥 Staff Members</h2>
+                <div id="staff-list">Loading...</div>
+            </div>
+            <div class="card">
+                <h2>➕ Add Staff</h2>
+                <input id="staff-username" placeholder="Username" style="width:100%;">
+                <input id="staff-password" type="password" placeholder="Password" style="width:100%;">
+                <select id="staff-role" style="width:100%;">
+                    <option value="waiter">Waiter</option>
+                    <option value="manager">Manager</option>
+                    <option value="chef">Chef</option>
+                    <option value="cashier">Cashier</option>
+                </select>
+                <button onclick="addStaff()" class="green" style="margin-top:5px;">Add Staff Member</button>
+                <p id="staff-msg" style="color:#28a745; margin-top:5px; height:20px;"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-settings" class="tab-content">
+        <div class="grid">
+            <div class="card settings-form" style="flex:2; max-width:600px;">
+                <h2>⚙️ Restaurant Settings</h2>
+                <label>Restaurant Name</label>
+                <input id="set-name" style="width:100%;">
+                <label>Address</label>
+                <input id="set-address" style="width:100%;">
+                <label>Phone</label>
+                <input id="set-phone" style="width:100%;">
+                <label>GSTIN</label>
+                <input id="set-gstin" style="width:100%;">
+                <label>UPI ID</label>
+                <input id="set-upi" style="width:100%;">
+                <label>Logo URL</label>
+                <input id="set-logo" style="width:100%;">
+                <label>Table Count</label>
+                <input id="set-tables" type="number" style="width:100%;">
+                <label>GST Rate (%)</label>
+                <input id="set-gst" type="number" step="0.1" style="width:100%;">
+                <label>Currency Symbol</label>
+                <input id="set-currency" style="width:100%;">
+                <label>Menu PDF URL</label>
+                <input id="set-menu-pdf" style="width:100%;">
+                <label style="margin-top:20px; border-top:2px solid #ff5722; padding-top:12px; display:block;">📍 Geofencing (for mobile ordering)</label>
+                <label>Latitude</label>
+                <input id="set-latitude" type="number" step="any" placeholder="e.g. 28.6543" style="width:100%;">
+                <label>Longitude</label>
+                <input id="set-longitude" type="number" step="any" placeholder="e.g. 77.5061" style="width:100%;">
+                <label>Geofence Radius (meters)</label>
+                <input id="set-geofence-radius" type="number" min="10" placeholder="50" style="width:100%;">
+                <p style="color:#999; font-size:0.8em; margin-top:4px;">Leave lat/lng empty to allow orders from anywhere. Right-click your restaurant on Google Maps to copy coordinates.</p>
+                <button onclick="saveSettings()" class="green" style="margin-top:15px;">Save Settings</button>
+                <p id="settings-msg" style="color:#28a745; margin-top:5px; height:20px;"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-qrcodes" class="tab-content">
+        <div class="card" style="margin-bottom:20px;">
+            <h2>📱 QR Codes for Tables</h2>
+            <p style="color:#777; font-size:0.9em; margin-top:4px;">Each QR code links to your restaurant's mobile ordering page for that table. Download and print them to place on your tables.</p>
+        </div>
+        <div class="qr-grid" id="qr-grid">Loading...</div>
+    </div>
+
+    <div class="qr-modal-overlay" id="qr-modal-overlay" onclick="closeQrModal(event)">
+        <div class="qr-modal" onclick="event.stopPropagation()">
+            <h3 id="qr-modal-title">Table QR Code</h3>
+            <img id="qr-modal-img" src="" alt="QR Code">
+            <div class="qr-url" id="qr-modal-url"></div>
+            <div class="qr-actions">
+                <button class="btn-download" id="qr-download-btn" onclick="downloadQr()">⬇ Download</button>
+                <button class="btn-close" onclick="closeQrModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    <a id="qr-download-link" style="display:none;"></a>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            event.target.classList.add('active');
+            if (tab === 'staff') loadStaff();
+            if (tab === 'qrcodes') loadQrCodes();
+            if (tab === 'settings') loadSettings();
         }
 
         function toggleInput() {
             const type = document.getElementById('search-type').value;
-            const dateInput = document.getElementById('hist-date');
-            const monthInput = document.getElementById('hist-month');
-            if (type === 'date') {
-                dateInput.classList.remove('hidden');
-                monthInput.classList.add('hidden');
-            } else {
-                dateInput.classList.add('hidden');
-                monthInput.classList.remove('hidden');
-            }
+            document.getElementById('hist-date').style.display = (type === 'date') ? 'inline-block' : 'none';
+            document.getElementById('hist-month').style.display = (type === 'month') ? 'inline-block' : 'none';
         }
 
         async function checkSubscription() {
@@ -538,7 +363,7 @@
                     }
                     if (expired) {
                         const overlay = document.getElementById('sub-overlay');
-                        overlay.classList.remove('hidden');
+                        overlay.style.display = 'flex';
                     }
                 }
             } catch (e) { }
@@ -564,30 +389,14 @@
             const bsDiv = document.getElementById('best-sellers-month');
             bsDiv.innerHTML = '';
             data.best_sellers_month.forEach((item, i) => {
-                bsDiv.innerHTML += `
-                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl mb-2">
-                        <div class="flex items-center gap-4">
-                            <div>
-                                <p class="font-bold">#${i+1} ${item.name}</p>
-                                <p class="text-label-sm text-on-surface-variant">${item.qty} Orders</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                bsDiv.innerHTML += `<div class="list-row"><span>#${i+1} ${item.name}</span><b>${item.qty}</b></div>`;
             });
 
             const invRes = await fetch('/inventory/');
             const inv = await invRes.json();
             const invList = document.getElementById('inv-list');
             invList.innerHTML = inv.length ? '' : '<p style="color:#aaa;">No requests.</p>';
-            inv.forEach(i => invList.innerHTML += `
-                <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg mb-2">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-primary text-sm">check_circle</span>
-                        <span>${i.item_name}</span>
-                    </div>
-                </div>
-            `);
+            inv.forEach(i => invList.innerHTML += `<div class="list-row"><span>${i.item_name}</span></div>`);
         }
 
         async function getHistory() {
@@ -598,19 +407,19 @@
             const res = await fetch(`/owner/history/?${type}=${val}`);
             const data = await res.json();
 
-            document.getElementById('hist-result').classList.remove('hidden');
+            document.getElementById('hist-result').style.display = 'block';
             document.getElementById('h-rev').innerText = "₹" + data.revenue;
             document.getElementById('h-veg').innerText = data.veg_sold;
             document.getElementById('h-non').innerText = data.non_veg_sold;
 
             const sumBody = document.querySelector('#h-table tbody');
             sumBody.innerHTML = '';
-            if(data.items.length === 0) sumBody.innerHTML = "<tr><td colspan='2' class='py-2 text-on-surface-variant'>No sales.</td></tr>";
-            else data.items.forEach(i => sumBody.innerHTML += `<tr><td class='py-2 border-b border-white/5'>${i.name}</td><td class='py-2 border-b border-white/5'>${i.qty}</td></tr>`);
+            if(data.items.length === 0) sumBody.innerHTML = "<tr><td colspan='2'>No sales.</td></tr>";
+            else data.items.forEach(i => sumBody.innerHTML += `<tr><td>${i.name}</td><td>${i.qty}</td></tr>`);
 
             const logContainer = document.getElementById('log-container');
             if (type === 'date' && data.detailed_logs) {
-                logContainer.classList.remove('hidden');
+                logContainer.style.display = 'block';
                 const logBody = document.querySelector('#log-table tbody');
                 logBody.innerHTML = '';
 
@@ -619,20 +428,22 @@
                 } else {
                     data.detailed_logs.forEach(order => {
                         const typeTag = order.type === 'Delivery'
-                            ? `<span class="px-2 py-1 bg-amber-500/10 text-amber-500 rounded text-xs">🛵 DELIVERY</span>`
-                            : `<span class="px-2 py-1 bg-green-500/10 text-green-500 rounded text-xs">🍽️ DINE-IN</span>`;
+                            ? `<span class="tag tag-del">🛵 DELIVERY</span>`
+                            : `<span class="tag tag-dine">🍽️ DINE-IN</span>`;
                         logBody.innerHTML += `
-                            <tr class="hover:bg-white/5 transition-colors">
-                                <td class="px-6 py-4 font-mono text-sm">#${order.id}<br><span class="text-xs text-text-secondary">${order.time}</span></td>
-                                <td class="px-6 py-4">${order.items}</td>
-                                <td class="px-6 py-4">${typeTag}</td>
-                                <td class="px-6 py-4 font-bold text-primary">₹ ${order.total}</td>
+                            <tr>
+                                <td>#${order.id}</td>
+                                <td>${order.time}</td>
+                                <td>${typeTag}</td>
+                                <td>${order.table}</td>
+                                <td style="color:#555; font-size:0.85em;">${order.items}</td>
+                                <td><b>₹${order.total}</b></td>
                             </tr>
                         `;
                     });
                 }
             } else {
-                logContainer.classList.add('hidden');
+                logContainer.style.display = 'none';
             }
         }
 
@@ -662,15 +473,12 @@
             list.innerHTML = '';
             staff.forEach(s => {
                 list.innerHTML += `
-                    <div class="p-4 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-primary">badge</span>
-                    <div>
-                    <p class="font-bold">${s.username}</p>
-                    <p class="text-label-sm text-on-surface-variant">${s.role.toUpperCase()}</p>
-                    </div>
-                    </div>
-                    ${s.role !== 'owner' ? `<button onclick="removeStaff(${s.id}, '${s.username}')" class="text-xs bg-error/20 text-error px-3 py-1 rounded-lg">Remove</button>` : '<span class="w-2 h-2 rounded-full bg-success"></span>'}
+                    <div class="staff-row">
+                        <div>
+                            <strong>${s.username}</strong>
+                            <span class="staff-role">${s.role.toUpperCase()}</span>
+                        </div>
+                        ${s.role !== 'owner' ? `<button onclick="removeStaff(${s.id}, '${s.username}')" style="background:#dc3545; padding:6px 12px; width:auto; font-size:0.85em;">Remove</button>` : ''}
                     </div>
                 `;
             });
@@ -776,12 +584,10 @@
             grid.innerHTML = '';
             for (let i = 1; i <= tableCount; i++) {
                 grid.innerHTML += `
-                    <div onclick="showQrModal(${i})" class="glass-panel p-6 rounded-2xl text-center group hover:border-primary/50 transition-all cursor-pointer">
-                        <span class="material-symbols-outlined text-4xl text-on-surface-variant group-hover:text-primary transition-colors mb-2">qr_code_2</span>
-                        <p class="font-bold">Table ${i}</p>
-                        <p class="text-xs text-on-surface-variant">Click to view</p>
-                    </div>
-                `;
+                    <div class="qr-card">
+                        <span class="table-label">🍽️ Table ${i}</span>
+                        <button onclick="showQrModal(${i})">View QR</button>
+                    </div>`;
             }
         }
 
@@ -809,7 +615,7 @@
             qrBlobUrl = URL.createObjectURL(blob);
             img.src = qrBlobUrl;
 
-            document.getElementById('qr-modal-overlay').classList.remove('hidden');
+            document.getElementById('qr-modal-overlay').style.display = 'flex';
         }
 
         function downloadQr() {
@@ -822,7 +628,7 @@
 
         function closeQrModal(e) {
             if (e && e.target !== document.getElementById('qr-modal-overlay')) return;
-            document.getElementById('qr-modal-overlay').classList.add('hidden');
+            document.getElementById('qr-modal-overlay').style.display = 'none';
         }
 
         checkSubscription();
@@ -831,4 +637,5 @@
             navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
         }
     </script>
-</body></html>
+</body>
+</html>

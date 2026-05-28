@@ -1,469 +1,285 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Restron | Manager Dashboard</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&amp;family=DM+Sans:wght@400;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@100..900&amp;family=Playfair+Display:wght@100..900&amp;display=swap" rel="stylesheet"/>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+<html>
+<head>
+    <title>Restron Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              background: "#0D0A06",
+              surface: "#1A1510",
+              primary: "#E8851A",
+              secondary: "#8B1A3A",
+              success: "#2E7D32",
+              error: "#93000a",
+              "text-primary": "#F5EBE1",
+              "text-secondary": "#A89F95"
+            },
+            fontFamily: {
+              sans: ["DM Sans", "sans-serif"],
+              serif: ["Playfair Display", "serif"]
+            }
+          }
         }
-        .glass-panel {
-            background: rgba(26, 21, 16, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(232, 133, 26, 0.1);
+      }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-background text-text-primary font-sans min-h-screen p-4 md:p-8;
+                background-image: radial-gradient(circle at 50% -20%, rgba(232, 133, 26, 0.15) 0%, transparent 60%);
+            }
+            h1, h2, h3, h4, h5, h6 {
+                @apply font-serif text-primary mb-4;
+            }
+            h1 { @apply text-3xl font-bold; }
+            h2 { @apply text-2xl font-semibold; }
+            h3 { @apply text-xl font-medium; }
+            p { @apply text-text-secondary mb-4; }
+            
+            input, select, textarea {
+                @apply w-full bg-surface border border-white/10 rounded-xl px-4 py-3 text-base focus:ring-primary focus:border-primary transition-all text-text-primary mb-4;
+            }
+            label {
+                @apply block text-text-secondary text-sm font-semibold uppercase tracking-wider mb-1;
+            }
+            table { @apply w-full text-left border-collapse mb-6; }
+            th { @apply px-4 py-3 bg-white/5 text-xs text-white/50 uppercase tracking-wider border-b border-white/10; }
+            td { @apply px-4 py-3 border-b border-white/5 text-sm; }
+            tr:hover { @apply bg-white/5 transition-colors; }
+            
+            /* Login page forms */
+            .login-container, .form-container {
+                @apply bg-surface/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 max-w-md mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden;
+            }
+            .form-group { @apply mb-4; }
         }
-        .active-scale:active {
-            transform: scale(0.96);
-        }
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0D0A06;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #3d332b;
-            border-radius: 10px;
+        
+        @layer components {
+            .header { @apply flex flex-col md:flex-row justify-between items-center mb-8 gap-4; }
+            .header-actions { @apply flex gap-2 flex-wrap justify-center; }
+            
+            .card, .menu-item, .order-card {
+                @apply bg-surface/80 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-[0_4px_30px_rgba(232,133,26,0.05)] mb-6 relative overflow-hidden transition-all duration-300;
+            }
+            .card:hover, .menu-item:hover, .order-card:hover {
+                @apply shadow-[0_8px_40px_rgba(232,133,26,0.15)] border-primary/20 transform -translate-y-1;
+            }
+            
+            button, .btn {
+                @apply font-semibold transition-all duration-300 ease-out active:scale-95 px-6 py-2 rounded-xl inline-flex items-center justify-center gap-2 cursor-pointer;
+            }
+            .btn-primary, button[type="submit"], button[onclick*="login"], button[onclick*="generate"] {
+                @apply bg-primary text-[#4c2700] hover:bg-[#ffb77b] shadow-lg shadow-primary/20 border-0;
+            }
+            .btn-danger {
+                @apply bg-error text-[#ffdad6] hover:bg-[#ffb4ab] hover:text-[#690005] border-0;
+            }
+            .btn-outline, .btn-secondary {
+                @apply bg-transparent border border-primary text-primary hover:bg-primary/10;
+            }
+            .btn-small {
+                @apply px-3 py-1.5 text-xs rounded-lg;
+            }
+            .btn-success {
+                @apply bg-success text-white hover:bg-green-600 border-0;
+            }
+            
+            .modal {
+                @apply fixed inset-0 z-[100] hidden items-center justify-center bg-background/80 backdrop-blur-sm p-4;
+            }
+            .modal-content {
+                @apply bg-surface/95 backdrop-blur-md w-full max-w-2xl rounded-2xl p-8 border border-white/10 shadow-2xl relative max-h-[90vh] overflow-y-auto m-auto mt-10;
+            }
+            .modal-close {
+                @apply absolute right-4 top-4 text-white/50 hover:text-white cursor-pointer text-2xl;
+            }
+            
+            .badge {
+                @apply px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border inline-block;
+            }
+            .badge-active { @apply bg-success/20 text-green-400 border-success/30; }
+            .badge-inactive { @apply bg-error/20 text-red-400 border-error/30; }
+            .badge-paid, .badge-premium, .status-paid, .status-ready { @apply bg-primary/20 text-primary border-primary/30; }
+            .badge-trial, .status-pending, .status-preparing { @apply bg-yellow-900/30 text-yellow-400 border-yellow-500/30; }
+            .badge-free { @apply bg-white/5 text-text-secondary border-white/10; }
+            .status-delivered { @apply bg-success/20 text-green-400 border-success/30; }
+            
+            .stats-panel, .credentials-box, .order-details, .items-list {
+                @apply bg-black/30 p-4 rounded-xl border border-white/5 mt-4;
+            }
+            .stat-row {
+                @apply flex justify-between py-2 border-b border-white/5 last:border-0;
+            }
+            .stat-label { @apply text-text-secondary text-sm uppercase tracking-wider; }
+            .stat-value { @apply font-bold text-primary text-lg; }
+            
+            /* Tabs */
+            .tabs, .tab-bar { @apply flex overflow-x-auto border-b border-white/10 mb-6 pb-2 gap-4 hide-scrollbar; }
+            .tab { @apply px-4 py-2 cursor-pointer text-text-secondary hover:text-white border-b-2 border-transparent transition-colors whitespace-nowrap; }
+            .tab.active { @apply text-primary border-primary; }
+            .tab-content { @apply hidden; }
+            .tab-content.active { @apply block; }
+            
+            /* Grid layouts */
+            #orders-container, #menu-container, #staff-list, .grid-cards {
+                @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+            }
+            
+            /* Modifiers & Items */
+            .item-row { @apply flex justify-between items-center py-2 border-b border-white/5 last:border-0; }
+            .modifier-group { @apply bg-black/20 p-3 rounded-lg border border-white/5 mb-3; }
+            
+            /* Kitchen/Waiter specific */
+            .order-card h3 { @apply flex justify-between items-center text-xl mb-4 border-b border-white/10 pb-2; }
+            .order-items { @apply space-y-2 mb-4; }
+            .order-item { @apply flex justify-between text-sm p-2 bg-white/5 rounded-lg; }
+            
+            /* Hide scrollbar for tabs */
+            .hide-scrollbar::-webkit-scrollbar { display: none; }
+            .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         }
     </style>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "on-secondary-container": "#ff97a8",
-                        "on-primary-container": "#532b00",
-                        "on-surface-variant": "#dbc2b0",
-                        "outline": "#a38c7c",
-                        "surface-dim": "#1a120b",
-                        "success": "#2E7D32",
-                        "background": "#1a120b",
-                        "primary-fixed-dim": "#ffb77b",
-                        "tertiary-container": "#00a7ee",
-                        "surface-container-high": "#322820",
-                        "on-secondary": "#670024",
-                        "on-primary": "#4c2700",
-                        "primary-fixed": "#ffdcc2",
-                        "on-tertiary-container": "#003854",
-                        "secondary-fixed-dim": "#ffb2bd",
-                        "on-primary-fixed": "#2e1500",
-                        "surface-container": "#271e16",
-                        "primary": "#ffb77b",
-                        "on-secondary-fixed": "#400013",
-                        "on-tertiary-fixed": "#001e2f",
-                        "background-surface": "#1A1510",
-                        "on-error": "#690005",
-                        "error-container": "#93000a",
-                        "primary-container": "#e8851a",
-                        "tertiary-fixed-dim": "#8aceff",
-                        "text-secondary": "#A89F95",
-                        "surface-variant": "#3d332b",
-                        "surface-tint": "#ffb77b",
-                        "surface-container-lowest": "#140d06",
-                        "text-primary": "#F5EBE1",
-                        "on-surface": "#f1dfd3",
-                        "surface-container-highest": "#3d332b",
-                        "on-tertiary-fixed-variant": "#004b6e",
-                        "inverse-on-surface": "#392e26",
-                        "tertiary": "#8aceff",
-                        "secondary-container": "#891838",
-                        "surface-container-low": "#231a13",
-                        "on-background": "#f1dfd3",
-                        "on-secondary-fixed-variant": "#891838",
-                        "inverse-primary": "#8f4e00",
-                        "background-base": "#0D0A06",
-                        "outline-variant": "#554336",
-                        "surface": "#1a120b",
-                        "secondary": "#ffb2bd",
-                        "secondary-fixed": "#ffd9dd",
-                        "surface-bright": "#42372f",
-                        "on-tertiary": "#00344e",
-                        "on-primary-fixed-variant": "#6d3a00",
-                        "inverse-surface": "#f1dfd3",
-                        "tertiary-fixed": "#c9e6ff",
-                        "on-error-container": "#ffdad6",
-                        "error": "#ffb4ab"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "container-max": "1280px",
-                        "margin-desktop": "40px",
-                        "margin-mobile": "16px",
-                        "unit": "8px",
-                        "gutter": "24px"
-                    },
-                    "fontFamily": {
-                        "headline-sm": ["Playfair Display"],
-                        "body-lg": ["DM Sans"],
-                        "headline-md": ["Playfair Display"],
-                        "body-md": ["DM Sans"],
-                        "display-lg": ["Playfair Display"],
-                        "label-sm": ["DM Sans"],
-                        "label-md": ["DM Sans"],
-                        "display-lg-mobile": ["Playfair Display"]
-                    },
-                    "fontSize": {
-                        "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
-                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
-                        "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
-                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
-                        "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                        "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
-                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
-                        "display-lg-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}]
-                    }
-                },
-            },
-        }
-    </script>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
-  </head>
-<body class="bg-background-base text-text-primary font-body-md selection:bg-primary-container selection:text-on-primary-container">
-<!-- Top AppBar -->
-<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-margin-mobile md:px-margin-desktop h-20 bg-background-base/80 backdrop-blur-md border-b border-white/10 shadow-[0_4px_20px_rgba(232,133,26,0.15)]">
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-primary cursor-pointer active-scale">menu</span>
-<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md text-primary tracking-tight">Restron</h1>
-</div>
-<div class="hidden md:flex items-center gap-8">
-<span class="font-headline-sm text-headline-sm text-primary-container tracking-tight">👨‍💼 Manager Dashboard</span>
-</div>
-<button class="bg-primary-container text-on-primary-container px-6 py-2 rounded-xl font-bold active-scale transition-all hover:shadow-[0_0_15px_rgba(232,133,26,0.4)] flex items-center gap-2" onclick="openPhoneOrderModal()">
-<span class="material-symbols-outlined">phone_forwarded</span>
-<span>New Phone Order</span>
-</button>
-</header>
-<!-- Side Navigation Drawer (Desktop Only) -->
-<aside class="fixed left-0 top-0 h-full z-[60] overflow-y-auto bg-surface-dim h-full w-80 border-r border-outline-variant shadow-2xl shadow-amber-900/20 hidden lg:block pt-24">
-<div class="px-6 mb-8 flex items-center gap-4">
-<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
-<span class="material-symbols-outlined">person</span>
-</div>
-<div>
-<p class="font-headline-sm text-primary">Restron Manager</p>
-<p class="text-label-sm text-text-secondary">Admin Access</p>
-</div>
-</div>
-<nav class="space-y-1">
-<a class="flex items-center gap-4 px-6 py-4 bg-primary-container/20 text-primary border-l-4 border-primary transition-transform duration-300" href="#">
-<span class="material-symbols-outlined">dashboard</span>
-<span class="font-body-md">Dashboard Overview</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:bg-surface-variant/50 hover:translate-x-2 transition-all" href="#">
-<span class="material-symbols-outlined">payments</span>
-<span class="font-body-md">Financial Reports</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:bg-surface-variant/50 hover:translate-x-2 transition-all" href="#">
-<span class="material-symbols-outlined">badge</span>
-<span class="font-body-md">Staff Management</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:bg-surface-variant/50 hover:translate-x-2 transition-all" href="#">
-<span class="material-symbols-outlined">restaurant_menu</span>
-<span class="font-body-md">Menu Editor</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:bg-surface-variant/50 hover:translate-x-2 transition-all" href="#">
-<span class="material-symbols-outlined">outdoor_grill</span>
-<span class="font-body-md">Kitchen Display</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:bg-surface-variant/50 hover:translate-x-2 transition-all" href="#">
-<span class="material-symbols-outlined">settings</span>
-<span class="font-body-md">Settings</span>
-</a>
-</nav>
-</aside>
-<!-- Main Content -->
-<main class="pt-24 pb-32 lg:pl-80 px-margin-mobile md:px-margin-desktop min-h-screen">
-<!-- Bento Grid Layout -->
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
-<!-- Tables Panel -->
-<section class="glass-panel rounded-2xl p-6 shadow-xl flex flex-col gap-4">
-<div class="flex justify-between items-center">
-<h2 class="font-headline-sm text-primary flex items-center gap-2">
-<span class="material-symbols-outlined">grid_view</span> Tables
-                    </h2>
-<span class="text-label-sm text-primary px-3 py-1 bg-primary/10 rounded-full">8 Available</span>
-</div>
-<div class="grid grid-cols-2 gap-4" id="tables-grid">
-<!-- Example Table Card -->
-<div class="table-card occupied glass-panel bg-primary/10 border-primary/30 rounded-xl p-4 cursor-pointer active-scale transition-all hover:bg-primary/20">
-<div class="flex justify-between items-start mb-2">
-<span class="font-bold text-lg">Table 3</span>
-<span class="bg-primary text-on-primary text-[10px] px-2 py-0.5 rounded-full uppercase">Occupied</span>
-</div>
-<p class="text-headline-sm text-primary">₹1200</p>
-<p class="text-label-sm text-text-secondary mt-1">45 mins active</p>
-</div>
-<div class="table-card glass-panel rounded-xl p-4 cursor-pointer active-scale transition-all hover:bg-white/5 flex flex-col justify-center items-center opacity-60">
-<span class="font-bold text-lg">Table 1</span>
-<p class="text-label-sm uppercase">Vacant</p>
-</div>
-</div>
-</section>
-<!-- CRM Panel -->
-<section class="glass-panel rounded-2xl p-6 shadow-xl flex flex-col gap-4">
-<h2 class="font-headline-sm text-primary flex items-center gap-2">
-<span class="material-symbols-outlined">group</span> Customer CRM
-                </h2>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-sm">search</span>
-<input class="w-full bg-background-base/50 border border-outline-variant rounded-xl pl-10 py-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" id="customer-search" oninput="loadCustomers()" placeholder="Search by name or phone..." type="text"/>
-</div>
-<div class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-2" id="customer-list">
-<div class="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/10">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-secondary-container/30 flex items-center justify-center text-secondary">A</div>
-<div>
-<p class="font-bold">Ananya Sharma</p>
-<p class="text-xs text-text-secondary">+91 98765 43210</p>
-</div>
-</div>
-<span class="text-xs bg-secondary-container text-on-secondary-container px-2 py-1 rounded-lg">VIP</span>
-</div>
-</div>
-</section>
-<!-- New Customer Panel -->
-<section class="glass-panel rounded-2xl p-6 shadow-xl flex flex-col gap-4">
-<h2 class="font-headline-sm text-primary flex items-center gap-2">
-<span class="material-symbols-outlined">person_add</span> New Customer
-                </h2>
-<div class="grid grid-cols-2 gap-3">
-<input class="bg-background-base/50 border border-outline-variant rounded-xl px-4 py-2 focus:border-primary outline-none text-sm" id="c-name" placeholder="Name" type="text"/>
-<input class="bg-background-base/50 border border-outline-variant rounded-xl px-4 py-2 focus:border-primary outline-none text-sm" id="c-phone" placeholder="Phone Number" type="tel"/>
-</div>
-<div class="grid grid-cols-2 gap-3">
-<select class="bg-background-base/50 border border-outline-variant rounded-xl px-4 py-2 focus:border-primary outline-none text-sm" id="c-rel">
-<option value="Regular">Regular</option>
-<option value="VIP">VIP</option>
-<option value="New">New</option>
-</select>
-<input class="bg-background-base/50 border border-outline-variant rounded-xl px-4 py-2 focus:border-primary outline-none text-sm" id="c-disc" placeholder="Disc %" type="number"/>
-</div>
-<button class="w-full bg-primary text-on-primary font-bold py-2 rounded-xl active-scale transition-all hover:brightness-110" onclick="saveCustomer()">Save Customer</button>
-<span class="text-xs text-center min-h-[1em]" id="crm-msg"></span>
-</section>
-<!-- Operations / Orders Panel -->
-<section class="glass-panel rounded-2xl p-6 shadow-xl flex flex-col gap-4 md:col-span-2">
-<div class="flex justify-between items-center">
-<h2 class="font-headline-sm text-primary flex items-center gap-2">
-<span class="material-symbols-outlined">receipt_long</span> Operations
-                    </h2>
-<button class="text-label-sm text-text-secondary hover:text-error transition-colors flex items-center gap-1 active-scale" onclick="resetTodayHistory()">
-<span class="material-symbols-outlined text-sm">archive</span> Archive Today
-                    </button>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-<div>
-<h3 class="text-label-md text-primary-container border-b border-primary-container/20 pb-2 mb-4">🔥 Running Orders</h3>
-<div class="space-y-3" id="active-orders">
-<div class="glass-panel rounded-xl p-4 border-l-4 border-primary">
-<div class="flex justify-between items-start mb-2">
-<p class="font-bold">Order #422 - Table 3</p>
-<span class="text-xs text-text-secondary">12:30 PM</span>
-</div>
-<div class="text-sm space-y-1 text-on-surface-variant">
-<p>2x Butter Chicken, 4x Butter Naan</p>
-<p>1x Dal Makhani</p>
-</div>
-<div class="mt-4 flex justify-end">
-<button class="bg-primary/20 text-primary text-xs px-4 py-2 rounded-lg border border-primary/30 active-scale">View Bill</button>
-</div>
-</div>
-</div>
-</div>
-<div>
-<h3 class="text-label-md text-text-secondary border-b border-outline-variant pb-2 mb-4">📜 Recent History</h3>
-<div class="space-y-2 max-h-48 overflow-y-auto pr-2" id="history-orders">
-<div class="flex items-center justify-between p-3 rounded-lg bg-white/5 opacity-70">
-<div>
-<p class="text-sm font-medium">#421 - Takeaway</p>
-<p class="text-xs text-text-secondary">Paid via UPI</p>
-</div>
-<p class="font-bold">₹840</p>
-</div>
-<div class="flex items-center justify-between p-3 rounded-lg bg-white/5 opacity-70">
-<div>
-<p class="text-sm font-medium">#420 - Table 5</p>
-<p class="text-xs text-text-secondary">Paid via Cash</p>
-</div>
-<p class="font-bold">₹2,150</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Stock & Inventory Row -->
-<section class="glass-panel rounded-2xl p-6 shadow-xl flex flex-col gap-6">
-<div>
-<h2 class="font-headline-sm text-primary flex items-center gap-2 mb-4">
-<span class="material-symbols-outlined">inventory_2</span> Kitchen Supplies
-                    </h2>
-<textarea class="w-full h-24 bg-background-base/50 border border-outline-variant rounded-xl p-4 focus:border-primary outline-none text-sm resize-none mb-3" id="inv-item" placeholder="Type items needed from store..."></textarea>
-<button class="w-full bg-secondary-container text-on-secondary-container font-bold py-2 rounded-xl active-scale flex items-center justify-center gap-2" onclick="sendRequest()">
-<span class="material-symbols-outlined text-sm">send</span> Send Request
-                    </button>
-</div>
-<hr class="border-outline-variant opacity-30"/>
-<div id="stock-section">
-<h2 class="font-headline-sm text-error flex items-center justify-between mb-4">
-<span class="flex items-center gap-2"><span class="material-symbols-outlined">warning</span> Stock Control (86)</span>
-<span class="text-label-sm bg-error/10 px-2 py-0.5 rounded">3 Critical</span>
-</h2>
-<div class="space-y-3" id="menu-list">
-<div class="flex items-center justify-between">
-<span class="text-sm">Paneer Tikka</span>
-<label class="relative inline-flex items-center cursor-pointer">
-<input checked="" class="sr-only peer" type="checkbox"/>
-<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-</label>
-</div>
-<div class="flex items-center justify-between">
-<span class="text-sm text-error">Cold Coffee</span>
-<label class="relative inline-flex items-center cursor-pointer">
-<input class="sr-only peer" type="checkbox"/>
-<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-</label>
-</div>
-</div>
-</div>
-</section>
-</div>
-</main>
-<!-- Bottom Navigation (Mobile Only) -->
-<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center py-2 px-4 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl border-t border-white/5 shadow-[0_-4px_20px_rgba(232,133,26,0.1)]">
-<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active-scale">
-<span class="material-symbols-outlined">grid_view</span>
-<span class="text-label-sm">Tables</span>
-</div>
-<div class="flex flex-col items-center justify-center text-text-secondary opacity-70 hover:text-primary transition-all active-scale">
-<span class="material-symbols-outlined">receipt_long</span>
-<span class="text-label-sm">Orders</span>
-</div>
-<div class="flex flex-col items-center justify-center text-text-secondary opacity-70 hover:text-primary transition-all active-scale">
-<span class="material-symbols-outlined">inventory_2</span>
-<span class="text-label-sm">Stock</span>
-</div>
-<div class="flex flex-col items-center justify-center text-text-secondary opacity-70 hover:text-primary transition-all active-scale">
-<span class="material-symbols-outlined">group</span>
-<span class="text-label-sm">CRM</span>
-</div>
-</nav>
-<!-- Subscription Overlay -->
-<div class="hidden fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl flex flex-center items-center justify-center p-8" id="sub-overlay">
-<div class="glass-panel max-w-md w-full p-8 rounded-3xl text-center border-primary/50 shadow-[0_0_50px_rgba(232,133,26,0.2)]">
-<span class="material-symbols-outlined text-primary text-6xl mb-4">workspace_premium</span>
-<h2 class="font-headline-md text-primary mb-2">Premium Required</h2>
-<p class="text-on-surface-variant mb-6">You've reached the limit for today's orders. Upgrade to Restron Premium for unlimited transactions and advanced CRM tools.</p>
-<button class="w-full bg-primary text-on-primary font-bold py-4 rounded-2xl active-scale shadow-lg">Upgrade Now</button>
-<button class="mt-4 text-text-secondary hover:text-primary transition-colors" onclick="document.getElementById('sub-overlay').classList.add('hidden')">Close</button>
-</div>
-</div>
-<!-- Modals -->
-<!-- Phone Order Modal -->
-<div class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm" id="phone-order-modal">
-<div class="glass-panel w-[95%] h-[90%] md:w-[500px] md:h-[800px] rounded-3xl relative overflow-hidden shadow-2xl flex flex-col">
-<div class="p-4 border-b border-white/10 flex justify-between items-center bg-surface-container-low">
-<h3 class="font-bold flex items-center gap-2"><span class="material-symbols-outlined">phone_in_talk</span> Phone Order Terminal</h3>
-<button class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-error transition-colors active-scale" onclick="closePhoneOrderModal()">
-<span class="material-symbols-outlined">close</span>
-</button>
-</div>
-<div class="flex-1 bg-white">
-<iframe class="w-full h-full border-none" id="menu-iframe" src=""></iframe>
-</div>
-</div>
-</div>
-<!-- Checkout Modal -->
-<div class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" id="checkout-modal">
-<div class="glass-panel max-w-lg w-full rounded-3xl overflow-hidden shadow-2xl">
-<div class="p-6 border-b border-white/10 flex justify-between items-center">
-<h3 class="font-headline-sm text-primary">Table 3 - Settlement</h3>
-<button class="material-symbols-outlined hover:text-error transition-colors" onclick="closeCheckoutModal()">close</button>
-</div>
-<div class="p-6 space-y-6 max-h-[618px] overflow-y-auto" id="checkout-details">
-<div>
-<label class="text-xs text-text-secondary uppercase tracking-widest mb-2 block">Customer Contact</label>
-<input class="w-full bg-background-base/50 border border-outline-variant rounded-xl px-4 py-3 focus:border-primary outline-none" id="checkout-phone" placeholder="Enter mobile number..." type="tel"/>
-</div>
-<div class="hidden" id="customer-info">
-<div class="bg-primary/5 p-4 rounded-xl border border-primary/20" id="customer-details">
-<p class="font-bold">Ananya Sharma <span class="text-xs bg-primary text-on-primary px-2 py-0.5 rounded ml-2">VIP (10%)</span></p>
-<p class="text-sm text-text-secondary">Loyalty points: 450</p>
-</div>
-</div>
-<div class="space-y-4" id="new-customer-form">
-<div class="grid grid-cols-2 gap-4">
-<input class="w-full bg-background-base/30 border border-outline-variant rounded-xl px-4 py-2 text-sm outline-none" id="new-customer-name" placeholder="Full Name" type="text"/>
-<input class="w-full bg-background-base/30 border border-outline-variant rounded-xl px-4 py-2 text-sm outline-none" id="new-customer-discount" placeholder="Flat Discount" type="number"/>
-</div>
-<label class="flex items-center gap-2 cursor-pointer">
-<input class="rounded border-outline-variant bg-transparent text-primary focus:ring-primary" id="save-customer-check" type="checkbox"/>
-<span class="text-sm text-text-secondary">Save to CRM</span>
-</label>
-</div>
-<div class="border-t border-outline-variant/30 pt-4" id="bill-summary">
-<h4 class="text-label-md mb-3">Bill Breakdown</h4>
-<div class="space-y-2 text-sm text-on-surface-variant" id="bill-breakdown">
-<div class="flex justify-between"><span>Subtotal</span><span>₹1,050.00</span></div>
-<div class="flex justify-between"><span>Taxes (GST 5%)</span><span>₹52.50</span></div>
-<div class="flex justify-between text-error"><span>Discount</span><span>-₹100.00</span></div>
-</div>
-<div class="flex justify-between items-center mt-4 pt-4 border-t border-primary/20">
-<span class="font-headline-sm text-primary">Total Payable</span>
-<span class="font-headline-sm text-primary">₹1,002.50</span>
-</div>
-</div>
-<div class="space-y-3">
-<label class="text-xs text-text-secondary uppercase tracking-widest block">Payment Method</label>
-<select class="w-full bg-surface-container-high border border-outline-variant rounded-xl px-4 py-3 focus:border-primary outline-none" id="payment-method">
-<option value="UPI">UPI / Digital (GPay/PhonePe)</option>
-<option value="Cash">Cash</option>
-<option value="Card">Credit/Debit Card</option>
-</select>
-</div>
-<button class="w-full bg-primary text-on-primary font-bold py-4 rounded-2xl active-scale shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2 text-lg" onclick="processCheckout()">
-<span class="material-symbols-outlined">task_alt</span> Confirm Payment
-                </button>
-</div>
-</div>
-</div>
-<!-- Success Modal -->
-<div class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black/90 backdrop-blur-md" id="success-modal">
-<div class="text-center p-8 max-w-sm">
-<div class="w-24 h-24 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-success">
-<span class="material-symbols-outlined text-success text-5xl">check_circle</span>
-</div>
-<h2 class="font-headline-md text-white mb-2">Payment Successful</h2>
-<div class="text-on-surface-variant mb-8" id="success-details">
-                Bill #423 settled for Table 3.
+</head>
+<body>
+    <div class="subscription-overlay" id="sub-overlay"><div class="msg"><h2>⚠️ Subscription Expired</h2><p>Your subscription has expired. Please contact Restron support.</p></div></div>
+    <div class="header">
+        <h1>👨‍💼 Manager Dashboard</h1>
+        <button class="big-btn" onclick="openPhoneOrderModal()">📞 New Phone Order</button>
+    </div>
+
+    <div class="panel" style="width: 100%;">
+        <h2>🍽️ Tables</h2>
+        <div class="tables-grid" id="tables-grid">Loading...</div>
+    </div>
+
+    <div class="grid">
+        <div class="panel" style="flex: 2;">
+            <h2>👥 Customer Database (A-Z)</h2>
+            <input id="customer-search" placeholder="Search by name or phone..." oninput="loadCustomers()">
+            <div class="customer-list" id="customer-list">Loading...</div>
+        </div>
+
+        <div class="panel">
+            <h2>➕ Add/Update Customer</h2>
+            <input id="c-phone" placeholder="Phone Number (Unique ID)">
+            <div style="display:flex; gap:10px;">
+                <input id="c-name" placeholder="Customer Name">
+                <input id="c-disc" type="number" placeholder="Discount % (e.g. 5)" style="width:80px;">
             </div>
-<div class="grid grid-cols-2 gap-4">
-<button class="bg-[#25D366] text-white py-3 rounded-xl font-bold active-scale flex items-center justify-center gap-2" onclick="sendWhatsAppReceipt()">
-<span class="material-symbols-outlined">chat</span> WhatsApp
+            <select id="c-rel">
+                <option value="Regular">Regular Customer</option>
+                <option value="Owner Friend">Owner Friend</option>
+                <option value="VIP">VIP</option>
+                <option value="Staff">Staff</option>
+            </select>
+            <button onclick="saveCustomer()">Save / Update Customer</button>
+            <p id="crm-msg" style="color:#28a745; margin-top:5px; height:20px;"></p>
+
+            <h2 style="margin-top:30px;">📝 Inventory Request</h2>
+            <textarea id="inv-item" rows="4" placeholder="e.g.&#10;5kg Tomatoes&#10;2kg Onions&#10;1L Oil"></textarea>
+            <button onclick="sendRequest()">Send Request</button>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="panel" style="flex:2;">
+            <h2>🔥 Running Orders</h2>
+            <div id="active-orders">Loading...</div>
+        </div>
+        <div class="panel" style="flex:2;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 style="margin: 0;">📜 Recent History</h2>
+                <button onclick="resetTodayHistory()" style="background: #dc3545; padding: 8px 15px; font-size: 0.9em; width: auto;">Archive Today</button>
+            </div>
+            <div id="history-orders">Loading...</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="panel">
+            <h2>🔴 Stock Control (86)</h2>
+            <div id="menu-list">Loading...</div>
+        </div>
+    </div>
+
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="modal-close" onclick="closeCheckoutModal()">&times;</span>
+            <h2>💳 Checkout Order</h2>
+            <div id="checkout-details"></div>
+
+            <label>Customer Phone (for receipt):</label>
+            <input id="checkout-phone" placeholder="Enter phone number" oninput="lookupCustomer()" type="tel">
+            <div id="customer-info" style="margin: 10px 0; padding: 10px; background: #2a2a2a; border-radius: 6px; display: none;">
+                <div id="customer-details"></div>
+            </div>
+
+            <div id="new-customer-form" style="display: none; margin: 10px 0; padding: 10px; background: #2a2a2a; border-radius: 6px;">
+                <p style="color: #ff9800; font-size: 12px; margin-bottom: 8px;">❓ New Customer - Add to database?</p>
+                <input id="new-customer-name" placeholder="Name (optional)" style="margin-bottom: 8px;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input id="new-customer-discount" type="number" placeholder="Discount %" style="width: 100px; margin-bottom: 0;" oninput="recalculateNewCustomerDiscount()" min="0" max="100">
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 12px;">
+                        <input type="checkbox" id="save-customer-check" checked>
+                        Save to database
+                    </label>
+                </div>
+            </div>
+
+            <div id="bill-summary" style="margin: 15px 0; padding: 15px; background: #1a1a1a; border-radius: 6px;">
+                <div id="bill-breakdown"></div>
+            </div>
+
+            <label>Payment Method:</label>
+            <select id="payment-method">
+                <option value="Cash">Cash</option>
+                <option value="Card">Card</option>
+                <option value="UPI">UPI</option>
+            </select>
+
+            <div class="modal-actions">
+                <button class="secondary" onclick="closeCheckoutModal()">Cancel</button>
+                <button onclick="processCheckout()">Confirm Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="modal-close" onclick="closeSuccessModal()">&times;</span>
+            <h2 style="color: #4caf50;">✅ Payment Successful!</h2>
+            <div id="success-details"></div>
+            <div class="modal-actions" style="flex-direction: column; gap: 10px;">
+                <button onclick="sendWhatsAppReceipt()" style="background: #25D366; width: 100%;">
+                    📱 Send Receipt via WhatsApp
                 </button>
-<button class="bg-white/10 text-white py-3 rounded-xl font-bold active-scale border border-white/20 flex items-center justify-center gap-2" onclick="viewReceiptPDF()">
-<span class="material-symbols-outlined">picture_as_pdf</span> PDF
+                <button class="secondary" onclick="viewReceiptPDF()" style="width: 100%;">
+                    📄 View Receipt PDF
                 </button>
-</div>
-<button class="mt-8 text-text-secondary hover:text-white transition-colors" onclick="closeSuccessModal()">Back to Dashboard</button>
-</div>
-</div>
-<!-- Micro-Interactions & Functions -->
-<script>
+                <button class="secondary" onclick="closeSuccessModal()" style="width: 100%;">
+                    ✖ Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="phone-order-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="modal-close" onclick="closePhoneOrderModal()">&times;</span>
+            <h2>📞 Take Phone Order</h2>
+            <iframe id="menu-iframe" src="/mobile" style="width: 100%; height: 600px; border: none; border-radius: 8px;"></iframe>
+            <p style="color: #aaa; font-size: 12px; margin-top: 10px;">🎯 Use the menu above to take customer's order. Customer will enter phone number and details on final screen.</p>
+        </div>
+    </div>
+
+    <script>
         let currentOrder = null;
         let currentCustomer = null;
         let originalBillAmount = 0;
@@ -479,24 +295,17 @@
 
             data.tables.forEach(table => {
                 const card = document.createElement('div');
-                if (table.status === 'Occupied') {
-                    card.className = "table-card occupied glass-panel bg-primary/10 border-primary/30 rounded-xl p-4 cursor-pointer active-scale transition-all hover:bg-primary/20";
-                    card.onclick = () => openCheckoutModal(table);
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-2">
-                        <span class="font-bold text-lg">Table ${table.table_number}</span>
-                        <span class="bg-primary text-on-primary text-[10px] px-2 py-0.5 rounded-full uppercase">Occupied</span>
-                        </div>
-                        <p class="text-headline-sm text-primary">₹${table.bill_amount}</p>
-                        <p class="text-label-sm text-text-secondary mt-1">${table.created_at}</p>
-                    `;
-                } else {
-                    card.className = "table-card glass-panel rounded-xl p-4 cursor-pointer active-scale transition-all hover:bg-white/5 flex flex-col justify-center items-center opacity-60";
-                    card.innerHTML = `
-                        <span class="font-bold text-lg">Table ${table.table_number}</span>
-                        <p class="text-label-sm uppercase">${table.status}</p>
-                    `;
-                }
+                card.className = `table-card ${table.status.toLowerCase()}`;
+                card.onclick = () => table.status === 'Occupied' ? openCheckoutModal(table) : null;
+
+                card.innerHTML = `
+                    <div class="table-num">Table ${table.table_number}</div>
+                    <div class="table-status">${table.status}</div>
+                    ${table.status === 'Occupied' ? `
+                        <div class="table-bill">₹${table.bill_amount}</div>
+                        <div style="font-size:11px; color:#ccc; margin-top:3px;">${table.created_at}</div>
+                    ` : ''}
+                `;
                 grid.appendChild(card);
             });
         }
@@ -507,7 +316,7 @@
             currentCustomer = null;
             receiptData = null;
 
-            document.getElementById('checkout-modal').classList.remove('hidden');
+            document.getElementById('checkout-modal').style.display = 'block';
             document.getElementById('checkout-details').innerHTML = `
                 <p><strong>Order #${table.order_id}</strong></p>
                 <p><strong>Table ${table.table_number}</strong></p>
@@ -518,8 +327,8 @@
 
             // Reset form
             document.getElementById('checkout-phone').value = '';
-            document.getElementById('customer-info').classList.add('hidden');
-            document.getElementById('new-customer-form').classList.add('hidden');
+            document.getElementById('customer-info').style.display = 'none';
+            document.getElementById('new-customer-form').style.display = 'none';
             document.getElementById('new-customer-name').value = '';
             document.getElementById('new-customer-discount').value = '';
             document.getElementById('save-customer-check').checked = true;
@@ -528,7 +337,7 @@
         }
 
         function closeCheckoutModal() {
-            document.getElementById('checkout-modal').classList.add('hidden');
+            document.getElementById('checkout-modal').style.display = 'none';
             // Don't clear currentOrder here - we need it for receipt generation
             // It will be cleared when a new checkout starts or success modal closes
             currentCustomer = null;
@@ -715,11 +524,11 @@
                 ${discountText}
                 ${currentCustomer ? `<p style="color: #aaa; margin-top: 10px;">Customer: ${currentCustomer.name || 'Anonymous'} (${document.getElementById('checkout-phone').value})</p>` : ''}
             `;
-            document.getElementById('success-modal').classList.remove('hidden');
+            document.getElementById('success-modal').style.display = 'block';
         }
 
         function closeSuccessModal() {
-            document.getElementById('success-modal').classList.add('hidden');
+            document.getElementById('success-modal').style.display = 'none';
             // Clear order info after success modal is closed
             currentOrder = null;
             lastCheckoutOrderId = null;
@@ -902,18 +711,11 @@
             list.innerHTML = '';
             customers.forEach(c => {
                 const card = document.createElement('div');
-                card.className = "flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/10";
+                card.className = 'customer-card';
                 card.onclick = () => fillCustomerForm(c);
-                const initial = (c.name || 'A').charAt(0).toUpperCase();
                 card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-secondary-container/30 flex items-center justify-center text-secondary">${initial}</div>
-                    <div>
-                    <p class="font-bold">${c.name || 'Anonymous Customer'}</p>
-                    <p class="text-xs text-text-secondary">${c.phone}</p>
-                    </div>
-                    </div>
-                    <span class="text-xs bg-secondary-container text-on-secondary-container px-2 py-1 rounded-lg">${c.relation}</span>
+                    <div class="customer-name">${c.name || 'Anonymous Customer'}</div>
+                    <div class="customer-info">📞 ${c.phone} | 🎫 ${c.relation} | 💰 ${c.discount_percent}% off | 📊 ${c.visit_count} visits</div>
                 `;
                 list.appendChild(card);
             });
@@ -964,53 +766,34 @@
             menuContainer.innerHTML = '';
             menu.forEach(item => {
                 menuContainer.innerHTML += `
-                    <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm ${item.is_available ? '' : 'text-error'}">${item.name}</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" class="sr-only peer" ${item.is_available ? 'checked' : ''} onchange="toggleStock(${item.id}, this)">
-                    <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                    </label>
-                    </div>
-                `;
+                    <div class="menu-row">
+                        <span>${item.name}</span>
+                        <label class="switch">
+                            <input type="checkbox" ${item.is_available ? 'checked' : ''} onchange="toggleStock(${item.id}, this)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>`;
             });
         }
 
         function renderTable(elementId, orders, isActive) {
             const container = document.getElementById(elementId);
             if(orders.length === 0) {
-                container.innerHTML = "<p class='text-center text-xs text-text-secondary py-4'>No orders found.</p>";
+                container.innerHTML = "<p style='color:#777'>No orders found.</p>";
                 return;
             }
-            let html = '';
+            let html = `<table><thead><tr><th>ID</th><th>Table</th><th>Items</th><th>Total</th><th>Status</th>${isActive ? '<th>Action</th>' : ''}</tr></thead><tbody>`;
             orders.forEach(o => {
-                if (isActive) {
-                    html += `
-                        <div class="glass-panel rounded-xl p-4 border-l-4 border-primary mb-3">
-                        <div class="flex justify-between items-start mb-2">
-                        <p class="font-bold">Order #${o.id} - ${o.order_type === 'Delivery' ? 'Delivery' : 'Table ' + o.table_number}</p>
-                        <span class="text-xs text-text-secondary">${o.status}</span>
-                        </div>
-                        <div class="text-sm space-y-1 text-on-surface-variant">
-                        <p>${o.items_summary}</p>
-                        </div>
-                        <div class="mt-4 flex justify-between items-center">
-                        <span class="font-bold">₹${o.total_amount}</span>
-                        <button onclick="cancelOrder(${o.id})" class="bg-error/20 text-error text-xs px-4 py-2 rounded-lg border border-error/30 active-scale">Cancel</button>
-                        </div>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 opacity-70 mb-2">
-                        <div>
-                        <p class="text-sm font-medium">#${o.id} - ${o.order_type === 'Delivery' ? 'Delivery' : 'Table ' + o.table_number}</p>
-                        <p class="text-xs text-text-secondary">${o.status}</p>
-                        </div>
-                        <p class="font-bold">₹${o.total_amount}</p>
-                        </div>
-                    `;
-                }
+                html += `<tr>
+                    <td>#${o.id}</td>
+                    <td>${o.order_type === 'Delivery' ? '🛵' : 'Table ' + o.table_number}</td>
+                    <td style="color:#ccc;">${o.items_summary}</td>
+                    <td>₹${o.total_amount}</td>
+                    <td><span class="status-tag ${isActive ? 'pending' : 'completed'}">${o.status}</span></td>
+                    ${isActive ? `<td><button onclick="cancelOrder(${o.id})" style="background:#dc3545; padding:5px; width:auto; font-size:0.8em;">❌ Cancel</button></td>` : ''}
+                </tr>`;
             });
+            html += `</tbody></table>`;
             container.innerHTML = html;
         }
 
@@ -1062,13 +845,13 @@
         }
 
         function openPhoneOrderModal() {
-            document.getElementById('phone-order-modal').classList.remove('hidden');
+            document.getElementById('phone-order-modal').style.display = 'block';
             // Reload iframe to reset menu
             document.getElementById('menu-iframe').src = '/mobile';
         }
 
         function closePhoneOrderModal() {
-            document.getElementById('phone-order-modal').classList.add('hidden');
+            document.getElementById('phone-order-modal').style.display = 'none';
         }
 
         // Initial load
@@ -1080,7 +863,7 @@
                     let expired = false;
                     if (data.is_active === false) expired = true;
                     if (data.plan_expires_at && new Date(data.plan_expires_at) < new Date()) expired = true;
-                    if (expired) document.getElementById('sub-overlay').classList.remove('hidden');
+                    if (expired) document.getElementById('sub-overlay').style.display = 'flex';
                 }
             } catch (e) { }
         }
@@ -1099,4 +882,5 @@
             navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
         }
     </script>
-</body></html>
+</body>
+</html>
