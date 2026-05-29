@@ -34,16 +34,22 @@ def checkout_order_logic(
             models.Customer.phone == customer_phone,
         ).first()
 
-        if not customer and data.save_customer:
-            customer = models.Customer(
-                restaurant_id=restaurant_id,
-                name=data.customer_name or "Valued Customer",
-                phone=customer_phone,
-                discount_percent=data.customer_discount or 0.0,
-                visit_count=0,
-            )
-            db.add(customer)
-            db.flush()
+        if data.save_customer:
+            if customer:
+                if data.customer_name:
+                    customer.name = data.customer_name
+                if data.customer_discount is not None:
+                    customer.discount_percent = data.customer_discount
+            else:
+                customer = models.Customer(
+                    restaurant_id=restaurant_id,
+                    name=data.customer_name or "Valued Customer",
+                    phone=customer_phone,
+                    discount_percent=data.customer_discount or 0.0,
+                    visit_count=0,
+                )
+                db.add(customer)
+                db.flush()
 
         if customer:
             customer.visit_count += 1

@@ -126,40 +126,32 @@ def step_5_fix_customer_phone_constraint():
         print("      SQLite does not support DROP CONSTRAINT — skipping. Composite constraint is in model definition.")
         return
 
-    with engine.begin() as conn:
+    with engine.connect() as conn:
         inspector = inspect(conn)
         if not _table_exists(inspector, "customers"):
             print("      customers table does not exist — skipping.")
             return
 
-        unique_constraints = inspector.get_unique_constraints("customers")
-        existing_names = {uc["name"] for uc in unique_constraints if uc.get("name")}
-        existing_columns = {tuple(sorted(uc["column_names"])) for uc in unique_constraints}
+        statements = [
+            ("drop old phone index", "DROP INDEX IF EXISTS ix_customers_phone"),
+            (
+                "drop old phone unique constraint",
+                "ALTER TABLE customers DROP CONSTRAINT IF EXISTS customers_phone_key",
+            ),
+            (
+                "add restaurant-scoped phone constraint",
+                "ALTER TABLE customers ADD CONSTRAINT uq_customer_phone_restaurant UNIQUE (phone, restaurant_id)",
+            ),
+        ]
 
-        for uc in unique_constraints:
-            cols = tuple(sorted(uc["column_names"]))
-            if cols == ("phone",) and uc.get("name"):
-                conn.execute(text(f'ALTER TABLE customers DROP CONSTRAINT "{uc["name"]}"'))
-                print(f"      Dropped old unique constraint: {uc['name']}")
-                break
-        else:
+        for label, ddl in statements:
             try:
-                conn.execute(text('ALTER TABLE customers DROP CONSTRAINT "customers_phone_key"'))
-                print("      Dropped old unique constraint: customers_phone_key")
-            except Exception:
-                print("      No global phone unique constraint found to drop.")
-
-        if "uq_customer_phone_restaurant" not in existing_names:
-            try:
-                conn.execute(text(
-                    'ALTER TABLE customers ADD CONSTRAINT uq_customer_phone_restaurant '
-                    'UNIQUE (phone, restaurant_id)'
-                ))
-                print("      Added composite unique constraint: uq_customer_phone_restaurant")
+                conn.execute(text(ddl))
+                conn.commit()
+                print(f"      {label}: ok")
             except Exception as exc:
-                print(f"      Constraint may already exist: {exc}")
-        else:
-            print("      Composite constraint already exists.")
+                conn.rollback()
+                print(f"      {label}: {exc}")
 
     print("      Done.")
 
