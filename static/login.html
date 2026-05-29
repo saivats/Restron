@@ -7,6 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
         :root {
+            --bg-base: #0D0A06;
+            --bg-surface: #1A1208;
+            --bg-card: #221A0E;
+            --primary: #E8851A;
+            --primary-dark: #C4690E;
+            --secondary: #8B1A3A;
+            --text-primary: #F5E6D0;
+            --text-muted: #9A8070;
+            --border: rgba(232, 133, 26, 0.15);
+            --glow: rgba(232, 133, 26, 0.08);
+            --success: #2D7A4F;
+            --danger: #8B1A1A;
             --bg-color: #0D0A06;
             --surface-color: rgba(26, 21, 16, 0.8);
             --primary-color: #E8851A;
@@ -233,6 +245,10 @@
         
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .box { max-width: 400px; margin: 12vh auto 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 32px; box-shadow: 0 0 80px rgba(232,133,26,0.15), 0 24px 80px rgba(0,0,0,0.55); }
+        .box h2 { font-size: 34px !important; text-align: center; }
+        .box button { width: 100%; background: linear-gradient(135deg, #E8851A, #C4690E) !important; color: white !important; padding: 12px 18px; }
+        .table-card, .occupied, .available, .order-card, .done-btn, .timer-badge, .item-row, .qty-btn, .staff-card, .qr-card, .checkout-modal, .customer-card, .history-row, .menu-item-row { border-radius: 12px; }
 
         .qr-modal-overlay {
             position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
@@ -296,7 +312,7 @@
                 const res = await fetch(url, { method: 'POST', body: formData, credentials: 'include' });
                 if (res.ok) {
                     const data = await res.json();
-                    window.location.href = data.redirect || '/';
+                    window.location.href = data.redirect_url || data.redirect || '/';
                 } else {
                     const err = await res.json().catch(() => ({ detail: 'Login failed' }));
                     if (res.status === 403) {

@@ -1,322 +1,154 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Restron | Customer Receipt</title>
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            "colors": {
-                "inverse-primary": "#8f4e00",
-                "text-primary": "#F5EBE1",
-                "background": "#1a120b",
-                "surface-container-low": "#231a13",
-                "on-primary": "#4c2700",
-                "on-surface": "#f1dfd3",
-                "surface-variant": "#3d332b",
-                "on-error-container": "#ffdad6",
-                "surface-container": "#271e16",
-                "secondary": "#ffb2bd",
-                "on-background": "#f1dfd3",
-                "tertiary-fixed": "#c9e6ff",
-                "outline-variant": "#554336",
-                "inverse-surface": "#f1dfd3",
-                "error-container": "#93000a",
-                "text-secondary": "#A89F95",
-                "surface-container-highest": "#3d332b",
-                "on-primary-fixed-variant": "#6d3a00",
-                "on-secondary": "#670024",
-                "surface-dim": "#1a120b",
-                "surface": "#1a120b",
-                "surface-bright": "#42372f",
-                "primary-fixed": "#ffdcc2",
-                "on-secondary-fixed": "#400013",
-                "on-secondary-container": "#ff97a8",
-                "surface-container-high": "#322820",
-                "on-primary-container": "#532b00",
-                "on-secondary-fixed-variant": "#891838",
-                "on-primary-fixed": "#2e1500",
-                "surface-container-lowest": "#140d06",
-                "tertiary-container": "#00a7ee",
-                "primary-fixed-dim": "#ffb77b",
-                "surface-tint": "#ffb77b",
-                "tertiary": "#8aceff",
-                "background-surface": "#1A1510",
-                "outline": "#a38c7c",
-                "secondary-fixed-dim": "#ffb2bd",
-                "on-surface-variant": "#dbc2b0",
-                "inverse-on-surface": "#392e26",
-                "tertiary-fixed-dim": "#8aceff",
-                "secondary-fixed": "#ffd9dd",
-                "primary-container": "#e8851a",
-                "primary": "#ffb77b",
-                "success": "#2E7D32",
-                "on-tertiary-fixed": "#001e2f",
-                "background-base": "#0D0A06",
-                "error": "#ffb4ab",
-                "secondary-container": "#891838",
-                "on-tertiary-container": "#003854",
-                "on-tertiary-fixed-variant": "#004b6e",
-                "on-error": "#690005",
-                "on-tertiary": "#00344e"
-            },
-            "borderRadius": {
-                "DEFAULT": "0.25rem",
-                "lg": "0.5rem",
-                "xl": "0.75rem",
-                "full": "9999px"
-            },
-            "spacing": {
-                "margin-desktop": "40px",
-                "gutter": "24px",
-                "unit": "8px",
-                "margin-mobile": "16px",
-                "container-max": "1280px"
-            },
-            "fontFamily": {
-                "display-lg-mobile": ["Playfair Display"],
-                "body-md": ["DM Sans"],
-                "label-sm": ["DM Sans"],
-                "display-lg": ["Playfair Display"],
-                "label-md": ["DM Sans"],
-                "headline-sm": ["Playfair Display"],
-                "body-lg": ["DM Sans"],
-                "headline-md": ["Playfair Display"]
-            },
-            "fontSize": {
-                "display-lg-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}],
-                "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
-                "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
-                "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
-                "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
-                "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
-                "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}]
-            }
-          },
-        },
-      }
-    </script>
-<style>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Restron Receipt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0D0A06;
+            --bg-surface: #1A1208;
+            --bg-card: #221A0E;
+            --primary: #E8851A;
+            --primary-dark: #C4690E;
+            --secondary: #8B1A3A;
+            --text-primary: #F5E6D0;
+            --text-muted: #9A8070;
+            --border: rgba(232, 133, 26, 0.15);
+            --glow: rgba(232, 133, 26, 0.08);
+            --success: #2D7A4F;
+            --danger: #8B1A1A;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #0D0A06;
-            background-image: radial-gradient(circle at 50% -20%, rgba(232, 133, 26, 0.15) 0%, transparent 60%);
             min-height: 100vh;
+            background: var(--bg-base);
+            background-image: radial-gradient(ellipse at top, #2A1A08 0%, #0D0A06 70%);
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            padding: 24px 14px;
         }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; color: var(--primary); }
+        .receipt-shell { max-width: 600px; margin: 0 auto; }
         .receipt-card {
-            background: rgba(26, 21, 16, 0.8);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(232, 133, 26, 0.05);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.55), 0 0 80px rgba(232,133,26,0.08);
         }
-        .dotted-divider {
-            border-top: 2px dashed rgba(168, 159, 149, 0.2);
+        .brand { text-align: center; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
+        #restaurant-name { font-size: 36px; margin-bottom: 8px; }
+        .muted { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 22px 0; }
+        .meta-box { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+        .meta-label { color: var(--text-muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        th { padding: 12px 10px; text-align: left; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+        td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-primary); }
+        tr:hover td { background: rgba(232,133,26,0.04); }
+        .right { text-align: right; }
+        .center { text-align: center; }
+        .totals { margin-top: 16px; background: rgba(0,0,0,0.22); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+        .total-row { display: flex; justify-content: space-between; padding: 8px 0; color: var(--text-muted); }
+        .grand-total { color: var(--primary); font-size: 24px; font-weight: 800; border-top: 1px solid var(--border); margin-top: 8px; padding-top: 14px; }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+        .btn {
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            transition: all 0.15s ease;
         }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .spring-btn {
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .spring-btn:active {
-            transform: scale(0.96);
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: linear-gradient(135deg, #E8851A, #C4690E); color: white; }
+        .btn-primary:hover { background: linear-gradient(135deg, #F09030, #D4790E); box-shadow: 0 4px 16px rgba(232,133,26,0.4); }
+        .btn-success { background: linear-gradient(135deg, #2D7A4F, #1D5A3F); color: white; }
+        @media print {
+            body { background: white; color: #111; padding: 0; }
+            .receipt-card { box-shadow: none; border: none; color: #111; }
+            .actions { display: none; }
         }
     </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
-  </head>
+</head>
 <body>
-<!-- Top AppBar (from Shared Components) -->
-<header class="fixed top-0 w-full flex items-center justify-center px-margin-mobile md:px-margin-desktop h-16 z-50 bg-transparent">
-<div class="flex items-center gap-2 group cursor-pointer transition-opacity hover:opacity-80">
-<span class="material-symbols-outlined text-primary text-headline-md" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>
-<h1 class="font-headline-md text-headline-md font-semibold text-primary tracking-tight">Restron</h1>
-</div>
-</header>
-<!-- Main Receipt Container -->
-<main class="w-full max-w-md mt-16 mb-20">
-<div class="receipt-card rounded-2xl p-8 md:p-10 relative overflow-hidden">
-<!-- Warm Accents -->
-<div class="absolute -top-24 -right-24 w-48 h-48 bg-primary-container/10 blur-[60px] rounded-full"></div>
-<!-- Header Section -->
-<section class="text-center relative z-10 mb-8">
-<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-container mb-4 shadow-[0_0_20px_rgba(232,133,26,0.3)]" id="restaurant-logo">
-<span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings: 'FILL' 1;">restaurant</span>
-</div>
-<h2 class="font-headline-md text-headline-md text-text-primary mb-2" id="restaurant-name">Restron</h2>
-<div class="space-y-1">
-<p class="font-label-md text-label-md text-text-secondary" id="restaurant-address">123 Saffron Lane, Mumbai, MH</p>
-<p class="font-label-md text-label-md text-text-secondary" id="restaurant-phone">+91 98765 43210</p>
-<p class="font-label-sm text-label-sm text-outline tracking-widest mt-2" id="restaurant-gstin">GSTIN: 27AAAAA0000A1Z5</p>
-</div>
-</section>
-<div class="dotted-divider my-6"></div>
-<!-- Order Info Section -->
-<section class="relative z-10 grid grid-cols-2 gap-y-4 mb-8">
-<div>
-<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-1">Order ID</p>
-<p class="font-body-md text-body-md text-text-primary font-bold" id="order-id">#RES-901</p>
-</div>
-<div class="text-right">
-<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-1">Time</p>
-<p class="font-body-md text-body-md text-text-primary" id="order-time">Oct 24, 2024, 8:45 PM</p>
-</div>
-<div class="col-span-2">
-<p class="font-label-sm text-label-sm text-outline uppercase tracking-wider mb-1">Order Type</p>
-<p class="font-body-md text-body-md text-text-primary" id="order-type">Dine-in • Table 12</p>
-</div>
-</section>
-<div class="dotted-divider my-6"></div>
-<!-- Items List Section -->
-<section class="relative z-10 mb-8">
-<div class="grid grid-cols-12 gap-2 mb-4">
-<div class="col-span-7 font-label-sm text-label-sm text-outline uppercase tracking-wider">Item</div>
-<div class="col-span-2 text-center font-label-sm text-label-sm text-outline uppercase tracking-wider">Qty</div>
-<div class="col-span-3 text-right font-label-sm text-label-sm text-outline uppercase tracking-wider">Price</div>
-</div>
-<div class="space-y-4" id="receipt-items">
-<!-- Sample Items for Context -->
-<div class="grid grid-cols-12 gap-2 items-center">
-<div class="col-span-7">
-<p class="font-body-md text-body-md text-text-primary">Saffron Infused Biryani</p>
-<p class="font-label-sm text-label-sm text-outline">Signature Dish</p>
-</div>
-<div class="col-span-2 text-center font-body-md text-body-md text-text-primary">1</div>
-<div class="col-span-3 text-right font-body-md text-body-md text-text-primary">₹450.00</div>
-</div>
-<div class="grid grid-cols-12 gap-2 items-center">
-<div class="col-span-7">
-<p class="font-body-md text-body-md text-text-primary">Butter Garlic Naan</p>
-</div>
-<div class="col-span-2 text-center font-body-md text-body-md text-text-primary">2</div>
-<div class="col-span-3 text-right font-body-md text-body-md text-text-primary">₹180.00</div>
-</div>
-<div class="grid grid-cols-12 gap-2 items-center">
-<div class="col-span-7">
-<p class="font-body-md text-body-md text-text-primary">Smoked Dal Makhani</p>
-</div>
-<div class="col-span-2 text-center font-body-md text-body-md text-text-primary">1</div>
-<div class="col-span-3 text-right font-body-md text-body-md text-text-primary">₹210.00</div>
-</div>
-</div>
-</section>
-<div class="bg-white/5 rounded-xl p-6 relative overflow-hidden border border-white/5">
-<!-- Summary Section -->
-<div class="space-y-3 relative z-10">
-<div class="flex justify-between items-center">
-<span class="font-body-md text-body-md text-text-secondary">Subtotal</span>
-<span class="font-body-md text-body-md text-text-primary" id="receipt-subtotal">₹840.00</span>
-</div>
-<div class="flex justify-between items-center">
-<span class="font-body-md text-body-md text-text-secondary">GST (<span id="receipt-gst-rate">5%</span>)</span>
-<span class="font-body-md text-body-md text-text-primary" id="receipt-gst-amount">₹42.00</span>
-</div>
-<div class="pt-3 mt-3 border-t border-white/10 flex justify-between items-center">
-<span class="font-headline-sm text-headline-sm text-text-primary">Total</span>
-<span class="font-headline-sm text-headline-sm text-primary-container font-bold" id="receipt-total">₹882.00</span>
-</div>
-</div>
-</div>
-<!-- Footer Message -->
-<div class="mt-8 text-center">
-<p class="font-label-sm text-label-sm text-outline italic">Thank you for dining with us!</p>
-<div class="mt-4 flex justify-center gap-1">
-<div class="w-1 h-1 rounded-full bg-primary-container/40"></div>
-<div class="w-1 h-1 rounded-full bg-primary-container/40"></div>
-<div class="w-1 h-1 rounded-full bg-primary-container/40"></div>
-</div>
-</div>
-</div>
-<!-- Action Buttons -->
-<div class="mt-8 space-y-4 px-4 md:px-0">
-<button class="spring-btn w-full bg-primary-container text-on-primary font-label-md text-label-md py-4 rounded-xl flex items-center justify-center gap-2 shadow-[0_10px_30px_rgba(232,133,26,0.2)] hover:shadow-[0_15px_35px_rgba(232,133,26,0.3)] transition-all" id="download-pdf-btn">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">download</span>
-                Download PDF Receipt
-            </button>
-<button class="spring-btn w-full bg-white/5 backdrop-blur text-text-primary border border-white/10 font-label-md text-label-md py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-white/10 transition-all">
-<span class="material-symbols-outlined">share</span>
-                Share Receipt
-            </button>
-</div>
-</main>
-<!-- Footer (from Shared Components) -->
-<footer class="fixed bottom-0 w-full flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop py-4 z-50 bg-transparent">
-<p class="font-label-sm text-label-sm text-text-secondary">© 2024 Restron POS. Precision Craftsmanship.</p>
-<div class="flex gap-4 mt-2 md:mt-0">
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-colors" href="#">Privacy</a>
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-colors" href="#">Terms</a>
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-colors underline" href="#">Support</a>
-</div>
-</footer>
-<!-- Micro-interactions Script -->
-<script>
+    <main class="receipt-shell">
+        <section class="receipt-card">
+            <div class="brand">
+                <h1 id="restaurant-name">Restron</h1>
+                <p class="muted" id="restaurant-address">Loading address...</p>
+                <p class="muted" id="restaurant-phone"></p>
+                <p class="muted" id="restaurant-gstin"></p>
+            </div>
+
+            <div class="meta-grid">
+                <div class="meta-box">
+                    <div class="meta-label">Invoice</div>
+                    <strong id="order-id">Loading...</strong>
+                </div>
+                <div class="meta-box">
+                    <div class="meta-label">Time</div>
+                    <strong id="order-time">--</strong>
+                </div>
+                <div class="meta-box">
+                    <div class="meta-label">Order</div>
+                    <strong id="order-type">--</strong>
+                </div>
+                <div class="meta-box">
+                    <div class="meta-label">Payment</div>
+                    <strong id="payment-method">--</strong>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr><th>Item</th><th class="center">Qty</th><th class="right">Amount</th></tr>
+                </thead>
+                <tbody id="receipt-items">
+                    <tr><td colspan="3" class="center muted">Loading items...</td></tr>
+                </tbody>
+            </table>
+
+            <div class="totals">
+                <div class="total-row"><span>Subtotal</span><span id="receipt-subtotal">&#8377;0.00</span></div>
+                <div class="total-row"><span>Discount</span><span id="receipt-discount">&#8377;0.00</span></div>
+                <div class="total-row"><span>CGST</span><span id="receipt-cgst">&#8377;0.00</span></div>
+                <div class="total-row"><span>SGST</span><span id="receipt-sgst">&#8377;0.00</span></div>
+                <div class="total-row"><span>GST Total</span><span id="receipt-gst-amount">&#8377;0.00</span></div>
+                <div class="total-row grand-total"><span>Total</span><span id="receipt-total">&#8377;0.00</span></div>
+            </div>
+
+            <p class="muted" style="text-align:center; margin-top:18px;">Thank you for dining with us.</p>
+
+            <div class="actions">
+                <button class="btn btn-primary" id="download-pdf-btn">Download PDF</button>
+                <button class="btn btn-success" id="whatsapp-share-btn">WhatsApp Share</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
         let pdfDownloadPath = '';
+        let whatsappText = '';
+
         document.getElementById('download-pdf-btn').addEventListener('click', function(e) {
             e.preventDefault();
-            if (!pdfDownloadPath) return;
-            const btn = this;
-            const originalContent = btn.innerHTML;
-            
-            btn.innerHTML = `
-                <span class="animate-spin material-symbols-outlined">sync</span>
-                Generating...
-            `;
-            btn.classList.add('opacity-80', 'pointer-events-none');
-            
-            setTimeout(() => {
-                btn.innerHTML = `
-                    <span class="material-symbols-outlined">check_circle</span>
-                    Download Started
-                `;
-                btn.classList.remove('bg-primary-container');
-                btn.classList.add('bg-success', 'text-white');
-                window.location.href = `/${pdfDownloadPath}`;
-                
-                setTimeout(() => {
-                    btn.innerHTML = originalContent;
-                    btn.classList.remove('bg-success', 'text-white', 'opacity-80', 'pointer-events-none');
-                    btn.classList.add('bg-primary-container');
-                }, 2000);
-            }, 1500);
+            if (pdfDownloadPath) window.location.href = `/${pdfDownloadPath}`;
+            else window.print();
         });
 
-        // Add a subtle parallax effect to the card on mouse move (Desktop)
-        if (window.innerWidth > 768) {
-            const card = document.querySelector('.receipt-card');
-            document.addEventListener('mousemove', (e) => {
-                const xAxis = (window.innerWidth / 2 - e.pageX) / 50;
-                const yAxis = (window.innerHeight / 2 - e.pageY) / 50;
-                card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-            });
-            
-            document.addEventListener('mouseenter', () => {
-                card.style.transition = 'none';
-            });
-            
-            document.addEventListener('mouseleave', () => {
-                card.style.transition = 'transform 0.5s ease';
-                card.style.transform = `rotateY(0deg) rotateX(0deg)`;
-            });
-        }
-    
-        // Fetch receipt data based on URL
+        document.getElementById('whatsapp-share-btn').addEventListener('click', function() {
+            const text = encodeURIComponent(whatsappText || 'Thank you for dining with us.');
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        });
+
         async function fetchReceiptData() {
             const pathParts = window.location.pathname.split('/');
-            const slug = pathParts[2];
-            const orderId = pathParts[4];
-            
+            const slug = pathParts[2] || 'default';
+            const orderId = pathParts[4] || pathParts[pathParts.length - 1];
             try {
                 const res = await fetch(`/r/${slug}/receipt/${orderId}/data`);
                 if (!res.ok) {
@@ -324,53 +156,42 @@
                     return;
                 }
                 const data = await res.json();
-                
-                // Populate business details
-                document.getElementById('restaurant-name').innerText = data.business.name;
-                document.getElementById('restaurant-address').innerText = data.business.address;
-                document.getElementById('restaurant-phone').innerText = data.business.phone;
-                document.getElementById('restaurant-gstin').innerText = `GSTIN: ${data.business.gstin}`;
-                
-                // Populate order details
-                document.getElementById('order-id').innerText = data.invoice_number || `#RES-${data.order_id}`;
-                document.getElementById('order-time').innerText = data.date;
-                document.getElementById('order-type').innerText = `${data.type.replace('_', '-')} • Table ${data.table || 'N/A'}`;
-                
-                // Populate items
+                const currency = data.business.currency_symbol || '₹';
+                document.getElementById('restaurant-name').innerText = data.business.name || 'Restron';
+                document.getElementById('restaurant-address').innerText = data.business.address || '';
+                document.getElementById('restaurant-phone').innerText = data.business.phone || '';
+                document.getElementById('restaurant-gstin').innerText = data.business.gstin ? `GSTIN: ${data.business.gstin}` : '';
+                document.getElementById('order-id').innerText = data.invoice_number || `#${data.order_id}`;
+                document.getElementById('order-time').innerText = data.date || '--';
+                document.getElementById('order-type').innerText = `${data.type || 'Dine-in'} | Table ${data.table || 'N/A'}`;
+                document.getElementById('payment-method').innerText = data.payment_method || '--';
+
                 const itemsContainer = document.getElementById('receipt-items');
                 itemsContainer.innerHTML = '';
                 data.items.forEach(item => {
-                    const modifiersStr = item.modifiers && item.modifiers.length > 0 
-                        ? `<p class="font-label-sm text-label-sm text-outline">${item.modifiers.join(', ')}</p>` 
-                        : '';
-                    
+                    const total = item.total != null ? item.total : item.qty * item.price;
                     itemsContainer.innerHTML += `
-                        <div class="grid grid-cols-12 gap-2 items-start mb-2">
-                            <div class="col-span-7">
-                                <p class="font-body-md text-body-md text-text-primary">${item.name}</p>
-                                ${modifiersStr}
-                            </div>
-                            <div class="col-span-2 text-center font-body-md text-body-md text-text-primary">${item.qty}</div>
-                            <div class="col-span-3 text-right font-body-md text-body-md text-text-primary">${data.business.currency_symbol}${item.price.toFixed(2)}</div>
-                        </div>
-                    `;
+                        <tr>
+                            <td>${item.name}</td>
+                            <td class="center">${item.qty}</td>
+                            <td class="right">${currency}${total.toFixed(2)}</td>
+                        </tr>`;
                 });
-                
-                // Populate summary
-                document.getElementById('receipt-subtotal').innerText = `${data.business.currency_symbol}${data.subtotal.toFixed(2)}`;
-                document.getElementById('receipt-gst-rate').innerText = `${data.business.gst_rate}%`;
-                document.getElementById('receipt-gst-amount').innerText = `${data.business.currency_symbol}${data.gst.toFixed(2)}`;
-                document.getElementById('receipt-total').innerText = `${data.business.currency_symbol}${data.total.toFixed(2)}`;
-                
-                // PDF Button
-                pdfDownloadPath = data.receipt_upload_path;
-                
+
+                document.getElementById('receipt-subtotal').innerText = `${currency}${data.subtotal.toFixed(2)}`;
+                document.getElementById('receipt-discount').innerText = `${currency}${(data.discount || 0).toFixed(2)}`;
+                document.getElementById('receipt-cgst').innerText = `${currency}${(data.cgst || 0).toFixed(2)}`;
+                document.getElementById('receipt-sgst').innerText = `${currency}${(data.sgst || 0).toFixed(2)}`;
+                document.getElementById('receipt-gst-amount').innerText = `${currency}${data.gst.toFixed(2)}`;
+                document.getElementById('receipt-total').innerText = `${currency}${data.total.toFixed(2)}`;
+                pdfDownloadPath = data.receipt_upload_path || '';
+                whatsappText = data.whatsapp_text || '';
             } catch (err) {
-                console.error("Error fetching receipt:", err);
+                console.error('Error fetching receipt:', err);
             }
         }
-        
-        document.addEventListener('DOMContentLoaded', fetchReceiptData);
 
-</script>
-</body></html>
+        document.addEventListener('DOMContentLoaded', fetchReceiptData);
+    </script>
+</body>
+</html>

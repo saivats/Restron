@@ -1,323 +1,250 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html lang="en">
 <head>
     <title>Restron Menu</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0D0A06;
-            --surface-color: rgba(26, 21, 16, 0.8);
-            --primary-color: #E8851A;
-            --secondary-color: #8B1A3A;
-            --success-color: #2E7D32;
-            --error-color: #93000a;
-            --text-primary: #F5EBE1;
-            --text-secondary: #A89F95;
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-base: #0D0A06;
+            --bg-surface: #1A1208;
+            --bg-card: #221A0E;
+            --primary: #E8851A;
+            --primary-dark: #C4690E;
+            --secondary: #8B1A3A;
+            --text-primary: #F5E6D0;
+            --text-muted: #9A8070;
+            --border: rgba(232, 133, 26, 0.15);
+            --glow: rgba(232, 133, 26, 0.08);
+            --success: #2D7A4F;
+            --danger: #8B1A1A;
         }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body {
-            background-color: var(--bg-color) !important;
-            color: var(--text-primary) !important;
-            font-family: 'DM Sans', sans-serif !important;
             min-height: 100vh;
-            padding: 1rem;
-            background-image: radial-gradient(circle at 50% -20%, rgba(232, 133, 26, 0.15) 0%, transparent 60%) !important;
+            background: var(--bg-base);
+            background-image: radial-gradient(ellipse at top, #2A1A08 0%, #0D0A06 70%);
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            padding-bottom: 110px;
         }
-        @media (min-width: 768px) { body { padding: 2rem; } }
-        
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', serif !important;
-            color: var(--primary-color) !important;
-            margin-bottom: 1rem;
+        h1, h2, h3 { font-family: 'Playfair Display', serif; color: var(--primary); }
+        button, .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            transition: all 0.15s ease;
         }
-        
-        h1 { font-size: 1.875rem !important; font-weight: 700; }
-        h2 { font-size: 1.5rem !important; font-weight: 600; }
-        h3 { font-size: 1.25rem !important; font-weight: 500; }
-        
-        p { color: var(--text-secondary); margin-bottom: 1rem; }
-        
+        button:active, .btn:active { transform: scale(0.97); }
+        button:disabled { opacity: 0.55; cursor: not-allowed; }
+        .btn-primary, .add-btn {
+            background: linear-gradient(135deg, #E8851A, #C4690E);
+            color: white;
+        }
+        .btn-primary:hover, .add-btn:hover {
+            background: linear-gradient(135deg, #F09030, #D4790E);
+            box-shadow: 0 4px 16px rgba(232,133,26,0.4);
+        }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
         input, select, textarea {
             width: 100%;
-            background-color: #1A1510;
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
             color: var(--text-primary);
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s ease;
         }
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(232, 133, 26, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(232,133,26,0.1);
         }
-        
-        label {
-            display: block;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
-        }
-        
-        table { width: 100%; text-align: left; border-collapse: collapse; margin-bottom: 1.5rem; }
-        th { 
-            padding: 0.75rem 1rem; 
-            background-color: rgba(255, 255, 255, 0.05); 
-            font-size: 0.75rem; 
-            color: rgba(255, 255, 255, 0.5); 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em; 
-            border-bottom: 1px solid var(--border-color); 
-        }
-        td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.875rem; }
-        tr:hover { background-color: rgba(255, 255, 255, 0.05); transition: background-color 0.3s; }
-        
-        .login-container, .form-container {
-            background-color: var(--surface-color);
+        .app-shell { max-width: 720px; margin: 0 auto; padding: 18px 14px; }
+        .menu-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            margin: -18px -14px 18px;
+            padding: 18px 14px 12px;
+            background: rgba(13,10,6,0.92);
+            border-bottom: 1px solid var(--border);
             backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            border-radius: 1rem;
-            padding: 2rem;
-            max-width: 28rem;
-            margin: 0 auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
         }
-        
-        .form-group { margin-bottom: 1rem; }
-        
-        .header { display: flex; flex-direction: column; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; }
-        @media (min-width: 768px) { .header { flex-direction: row; } }
-        
-        .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
-        
-        .card, .menu-item, .order-card, .table-card, .staff-card, .qr-card {
-            background-color: var(--surface-color) !important;
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color) !important;
-            border-radius: 1rem !important;
-            padding: 1.5rem !important;
-            box-shadow: 0 4px 30px rgba(232,133,26,0.05) !important;
-            margin-bottom: 1.5rem !important;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            color: var(--text-primary);
-        }
-        .card:hover, .menu-item:hover, .order-card:hover, .table-card:hover, .staff-card:hover, .qr-card:hover {
-            box-shadow: 0 8px 40px rgba(232,133,26,0.15) !important;
-            border-color: rgba(232,133,26,0.2) !important;
-            transform: translateY(-4px);
-        }
-        
-        /* Table specifics */
-        .table-card { text-align: center; justify-content: center; align-items: center; }
-        .table-card h3 { margin-bottom: 0.5rem; }
-        .table-card.occupied { border-color: rgba(147, 0, 10, 0.5) !important; box-shadow: 0 0 15px rgba(147, 0, 10, 0.2) !important; }
-        .table-card.available { border-color: rgba(46, 125, 50, 0.5) !important; box-shadow: 0 0 15px rgba(46, 125, 50, 0.2) !important; }
-
-        /* Kitchen Orders */
-        .order-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
-        .order-items { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
-        .order-item { display: flex; justify-content: space-between; font-size: 0.875rem; padding: 0.5rem; background-color: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; }
-        
-        /* Buttons */
-        button, .btn {
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 600;
-            transition: all 0.3s ease-out;
-            padding: 0.5rem 1.5rem;
-            border-radius: 0.75rem;
+        .restaurant-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+        .restaurant-name { font-size: 31px; line-height: 1; }
+        .table-badge, .badge {
             display: inline-flex;
             align-items: center;
+            padding: 5px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(232,133,26,0.3);
+            background: rgba(232,133,26,0.16);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .category-nav {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 12px 0 2px;
+            scrollbar-width: none;
+        }
+        .category-nav::-webkit-scrollbar { display: none; }
+        .category-pill {
+            flex: 0 0 auto;
+            text-decoration: none;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            border-radius: 999px;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .category-pill.active, .category-pill:hover { background: var(--primary); color: white; border-color: transparent; }
+        .section-title { margin: 24px 0 12px; font-size: 24px; }
+        #menu-container { display: grid; gap: 12px; }
+        .menu-item-row {
+            display: grid;
+            grid-template-columns: 96px 1fr;
+            gap: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 10px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .food-photo, .photo-placeholder {
+            width: 96px;
+            height: 96px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #E8851A, #8B1A3A);
+            color: white;
+            display: grid;
+            place-items: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+        }
+        .item-body { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+        .item-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .item-name { color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; }
+        .item-price { color: var(--primary); font-weight: 800; white-space: nowrap; }
+        .item-desc { color: var(--text-muted); font-size: 13px; line-height: 1.35; }
+        .veg-dot, .nonveg-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 7px; }
+        .veg-dot { background: #35A866; }
+        .nonveg-dot { background: #D84A4A; }
+        .item-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+        .qty-control { display: flex; align-items: center; gap: 10px; }
+        .qty-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            padding: 0;
+            color: white;
+            background: var(--primary);
+            font-size: 18px;
+        }
+        .qty-value { min-width: 22px; text-align: center; font-weight: 800; color: var(--primary); }
+        .floating-cart {
+            position: fixed;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            max-width: 700px;
+            margin: 0 auto;
+            z-index: 30;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #E8851A, #C4690E);
+            color: white;
+            box-shadow: 0 16px 44px rgba(0,0,0,0.5), 0 6px 24px rgba(232,133,26,0.35);
+        }
+        .cart-meta { display: flex; flex-direction: column; gap: 2px; }
+        .cart-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.75; }
+        #view-cart-btn { background: rgba(13,10,6,0.22); color: white; border: 1px solid rgba(255,255,255,0.22); }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            align-items: flex-end;
             justify-content: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            border: none;
         }
-        button:active, .btn:active { transform: scale(0.95); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        
-        .btn-primary, button[type="submit"], button[onclick*="login"], button[onclick*="generate"], .place-btn {
-            background-color: var(--primary-color) !important;
-            color: #4c2700 !important;
-            box-shadow: 0 4px 15px rgba(232, 133, 26, 0.2);
+        .modal-overlay.active { display: flex; }
+        .cart-drawer {
+            width: min(100%, 720px);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 22px 22px 0 0;
+            padding: 22px;
+            box-shadow: 0 -24px 80px rgba(0,0,0,0.6);
         }
-        .btn-primary:hover, button[type="submit"]:hover, button[onclick*="login"]:hover, button[onclick*="generate"]:hover, .place-btn:hover {
-            background-color: #ffb77b !important;
+        .drawer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .cart-summary-line { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .cart-total-line { display: flex; justify-content: space-between; padding: 14px 0; color: var(--primary); font-size: 20px; font-weight: 800; }
+        .drawer-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+        .empty-state { text-align: center; color: var(--text-muted); padding: 36px 0; }
+        @media (min-width: 640px) {
+            .menu-item-row { grid-template-columns: 132px 1fr; }
+            .food-photo, .photo-placeholder { width: 132px; height: 132px; }
         }
-        
-        .btn-danger { background-color: var(--error-color); color: #ffdad6; }
-        .btn-danger:hover { background-color: #ffb4ab; color: #690005; }
-        
-        .btn-outline, .btn-secondary {
-            background-color: transparent;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-        .btn-outline:hover, .btn-secondary:hover { background-color: rgba(232, 133, 26, 0.1); }
-        
-        .btn-small { padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 0.5rem; }
-        
-        .btn-success, .done-btn { background-color: var(--success-color) !important; color: white !important; }
-        .btn-success:hover, .done-btn:hover { background-color: #388e3c !important; }
-
-        .qty-btn { 
-            width: 2rem; height: 2rem; border-radius: 0.5rem; padding: 0; display: inline-flex; 
-            align-items: center; justify-content: center; font-weight: bold; background-color: rgba(255,255,255,0.1); color: var(--text-primary);
-        }
-        .qty-btn:hover { background-color: rgba(255,255,255,0.2); }
-        
-        .modal {
-            position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
-            background-color: rgba(13, 10, 6, 0.8); backdrop-filter: blur(4px); padding: 1rem;
-        }
-        .modal-content {
-            background-color: rgba(26, 21, 16, 0.95); backdrop-filter: blur(12px); width: 100%; max-width: 42rem;
-            border-radius: 1rem; padding: 2rem; border: 1px solid var(--border-color); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            position: relative; max-height: 90vh; overflow-y: auto; margin: auto; margin-top: 2.5rem;
-        }
-        .modal-close {
-            position: absolute; right: 1rem; top: 1rem; color: rgba(255, 255, 255, 0.5); cursor: pointer; font-size: 1.5rem; line-height: 1;
-        }
-        .modal-close:hover { color: white; }
-        
-        .badge, .timer-badge {
-            padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; display: inline-block;
-        }
-        .badge-active { background-color: rgba(46, 125, 50, 0.2); color: #4ade80; border-color: rgba(46, 125, 50, 0.3); }
-        .badge-inactive { background-color: rgba(147, 0, 10, 0.2); color: #f87171; border-color: rgba(147, 0, 10, 0.3); }
-        .badge-paid, .badge-premium, .status-paid, .status-ready { background-color: rgba(232, 133, 26, 0.2); color: var(--primary-color); border-color: rgba(232, 133, 26, 0.3); }
-        .badge-trial, .status-pending, .status-preparing, .timer-badge { background-color: rgba(120, 53, 15, 0.3); color: #facc15; border-color: rgba(234, 179, 8, 0.3); }
-        .badge-free { background-color: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border-color: var(--border-color); }
-        .status-delivered { background-color: rgba(46, 125, 50, 0.2); color: #4ade80; border-color: rgba(46, 125, 50, 0.3); }
-        
-        .stats-panel, .credentials-box, .order-details, .items-list {
-            background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.05); margin-top: 1rem;
-        }
-        .stat-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label { color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        .stat-value { font-weight: 700; color: var(--primary-color); font-size: 1.125rem; }
-        
-        .tabs, .tab-bar { display: flex; overflow-x: auto; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; padding-bottom: 0.5rem; gap: 1rem; }
-        .tab { padding: 0.5rem 1rem; cursor: pointer; color: var(--text-secondary); border-bottom: 2px solid transparent; transition: color 0.3s; white-space: nowrap; }
-        .tab:hover { color: white; }
-        .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        #orders-container, #menu-container, #staff-list, .grid-cards {
-            display: grid; grid-template-columns: 1fr; gap: 1.5rem;
-        }
-        @media (min-width: 768px) { #orders-container, #menu-container, #staff-list, .grid-cards { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1024px) { #orders-container, #menu-container, #staff-list, .grid-cards { grid-template-columns: repeat(3, 1fr); } }
-        
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .item-row:last-child { border-bottom: none; }
-        .modifier-group { background-color: rgba(0, 0, 0, 0.2); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 0.75rem; }
-        
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .qr-modal-overlay {
-            position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
-            background-color: rgba(13, 10, 6, 0.8); backdrop-filter: blur(4px); padding: 1rem;
-        }
-        .qr-modal {
-            background-color: rgba(26, 21, 16, 0.95); backdrop-filter: blur(12px); border-radius: 1rem; padding: 2rem; border: 1px solid var(--border-color); text-align: center;
-        }
-        .qr-modal img { margin: 1rem auto; max-width: 200px; display: block; border-radius: 0.5rem; }
-        .qr-url { word-break: break-all; color: var(--text-secondary); font-size: 0.875rem; }
-
-        .subscription-overlay {
-            display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; text-align: center; color: #F5EBE1;
-        }
-        
-        /* Menu overrides that were lost when stripping tailwind */
-        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-color); padding: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; z-index: 50; }
-        .search-box { margin-bottom: 1rem; }
-        .ornate-divider { display: flex; align-items: center; margin: 2rem 0 1rem; text-align: center; }
-        .ornate-divider::before, .ornate-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--primary-color); opacity: 0.3; }
-        .scroll-mt-40 { scroll-margin-top: 10rem; }
-        .glass-effect { background-color: rgba(26, 21, 16, 0.9); backdrop-filter: blur(12px); }
-
     </style>
 </head>
 <body>
-
-    <header class="fixed top-0 inset-x-0 z-50 border-b border-[#db421f]/20 glass-effect transition-all duration-300">
-        <div class="flex flex-col items-center w-full px-4 pt-2">
-            <h1 class="text-xl font-bold tracking-tight text-primary uppercase" style="letter-spacing: 0.1em;">Restron POS</h1>
-            <span class="text-[10px] uppercase tracking-widest opacity-60 font-medium">Fresh, fast, accurate</span>
-        </div>
-        <div class="overflow-x-auto hide-scrollbar border-t border-[#db421f]/5 py-2 px-4">
-            <div class="flex gap-3 min-w-max" id="category-nav"></div>
-        </div>
-    </header>
-
-    <main class="relative w-full max-w-lg mx-auto pt-36 px-4 min-h-screen">
-        <div class="mb-6 relative">
-            <input type="text" id="search-input" placeholder="Search menu..." oninput="filterMenu()">
-        </div>
-
-        <div id="menu-container">
-            <p class="text-center mt-10 text-gray-500">Loading Menu...</p>
-        </div>
-    </main>
-
-    <div class="fixed bottom-0 inset-x-0 z-40 p-4 max-w-lg mx-auto pointer-events-none">
-        <div class="bg-text-main text-white rounded-xl shadow-2xl p-4 flex items-center justify-between pointer-events-auto ring-1 ring-white/10 relative overflow-hidden">
-            <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/black-linen.png')]"></div>
-            <div class="flex flex-col z-10">
-                <span class="text-xs uppercase tracking-wider text-white/60 font-medium">Your Order</span>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-lg font-bold" id="total-items">0 Items</span>
-                    <span class="text-white/40">|</span>
-                    <span class="text-lg font-bold" id="total-price">₹0</span>
+    <div class="app-shell">
+        <header class="menu-header">
+            <div class="restaurant-row">
+                <div>
+                    <h1 class="restaurant-name" id="restaurant-name">Restron POS</h1>
+                    <div style="color:var(--text-muted); font-size:13px; margin-top:4px;">Fresh, fast, accurate</div>
                 </div>
+                <span class="table-badge" id="table-badge">Table</span>
             </div>
-            <button onclick="openModal()" id="view-cart-btn" disabled class="z-10 bg-primary hover:bg-primary-dark disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 shadow-lg pointer-events-auto transition-colors">
-                <span>Place Order</span>
-                <span class="material-symbols-outlined !text-[20px]">arrow_forward</span>
-            </button>
-        </div>
+            <input type="text" id="search-input" placeholder="Search menu..." oninput="filterMenu()">
+            <nav class="category-nav" id="category-nav"></nav>
+        </header>
+
+        <main id="menu-container"><p class="empty-state">Loading menu...</p></main>
     </div>
 
-    <div id="order-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="modal-content bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden border-2 border-primary/20">
-            <div class="bg-primary p-4 text-center">
-                <h3 class="text-white font-bold text-lg uppercase tracking-wide">Finalize Order</h3>
-                <p class="text-white/80 text-xs">Enter details to confirm</p>
+    <div class="floating-cart">
+        <div class="cart-meta">
+            <span class="cart-label">Your Order</span>
+            <strong><span id="total-items">0 Items</span> | <span id="total-price">&#8377;0</span></strong>
+        </div>
+        <button onclick="openModal()" id="view-cart-btn" disabled>View Cart</button>
+    </div>
+
+    <div id="order-modal" class="modal-overlay">
+        <div class="cart-drawer">
+            <div class="drawer-head">
+                <h2>Confirm Order</h2>
+                <button class="btn-outline" onclick="closeModal()">Close</button>
             </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-text-sub uppercase mb-1">Table Number</label>
-                    <input type="text" id="modal-table" placeholder="Enter No. or 'D' for Delivery" class="w-full border-gray-300 rounded-lg focus:border-primary p-3">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-text-sub uppercase mb-1">Phone <span class="text-gray-400 font-normal">(Optional)</span></label>
-                    <input type="tel" id="modal-phone" placeholder="For Loyalty Discounts" class="w-full border-gray-300 rounded-lg focus:border-primary p-3">
-                </div>
-            </div>
-            <div class="p-4 bg-gray-50 flex gap-3">
-                <button onclick="closeModal()" class="flex-1 py-3 text-sm font-bold text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-100">Cancel</button>
-                <button onclick="confirmOrder()" class="flex-1 py-3 text-sm font-bold text-white bg-primary rounded-xl hover:bg-primary-dark shadow-md">Confirm</button>
+            <div id="cart-lines"></div>
+            <div class="cart-total-line"><span>Total</span><span id="drawer-total">&#8377;0</span></div>
+            <label>Table Number</label>
+            <input type="text" id="modal-table" placeholder="Enter no. or D for delivery">
+            <label style="margin-top:10px; display:block;">Phone (optional)</label>
+            <input type="tel" id="modal-phone" placeholder="For loyalty discounts">
+            <div class="drawer-actions">
+                <button class="btn-outline" onclick="closeModal()">Cancel</button>
+                <button class="btn-primary" onclick="confirmOrder()">Confirm</button>
             </div>
         </div>
     </div>
@@ -325,7 +252,6 @@
     <script>
         let userInRange = false;
         let geofenceConfig = { latitude: null, longitude: null, radius_meters: 50 };
-
         let cart = {};
         let menuItems = [];
         let fuse;
@@ -335,65 +261,58 @@
             return match ? match[1] : 'default';
         }
 
+        function getQueryTable() {
+            return new URLSearchParams(window.location.search).get('table') || '';
+        }
+
         async function loadGeofenceConfig() {
             const slug = extractSlugFromUrl();
             try {
                 const res = await fetch(`/restaurant/geofence/${slug}`);
-                if (res.ok) {
-                    geofenceConfig = await res.json();
-                }
+                if (res.ok) geofenceConfig = await res.json();
             } catch (e) { }
-
             if (geofenceConfig.latitude == null || geofenceConfig.longitude == null) {
                 userInRange = true;
                 return;
             }
-
             checkLocation();
         }
 
         function checkLocation() {
-            if (!navigator.geolocation) return;
+            if (!navigator.geolocation) {
+                userInRange = true;
+                return;
+            }
             navigator.geolocation.getCurrentPosition((pos) => {
                 const radiusKm = (geofenceConfig.geofence_radius_meters || 50) / 1000;
-                const dist = getDistanceFromLatLonInKm(
-                    pos.coords.latitude, pos.coords.longitude,
-                    geofenceConfig.latitude, geofenceConfig.longitude
-                );
-                if (dist > radiusKm) {
-                    userInRange = false;
-                    const btn = document.getElementById('view-cart-btn');
-                    btn.disabled = true;
-                    btn.innerText = "❌ Out of Range";
-                    btn.classList.add("bg-gray-500");
-                    const radiusLabel = geofenceConfig.geofence_radius_meters >= 1000
-                        ? `${(geofenceConfig.geofence_radius_meters / 1000).toFixed(1)}km`
-                        : `${geofenceConfig.geofence_radius_meters}m`;
-                    alert(`You are ${(dist * 1000).toFixed(0)}m away. Orders restricted to ${radiusLabel}.`);
-                } else {
-                    userInRange = true;
-                    updateCartFooter();
-                }
-            }, (err) => console.log("Loc access denied"));
+                const dist = getDistanceFromLatLonInKm(pos.coords.latitude, pos.coords.longitude, geofenceConfig.latitude, geofenceConfig.longitude);
+                userInRange = dist <= radiusKm;
+                if (!userInRange) alert(`You are ${(dist * 1000).toFixed(0)}m away. Ordering is restricted near the restaurant.`);
+                updateCartFooter();
+            }, () => { userInRange = true; updateCartFooter(); });
         }
 
         function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
             var R = 6371;
-            var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1);
+            var dLat = deg2rad(lat2-lat1);
+            var dLon = deg2rad(lon2-lon1);
             var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
-            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
         }
-        function deg2rad(deg) { return deg * (Math.PI/180) }
+        function deg2rad(deg) { return deg * (Math.PI/180); }
 
         async function loadMenu() {
             try {
                 const response = await fetch('/menu/?slug=' + encodeURIComponent(extractSlugFromUrl()));
                 menuItems = await response.json();
                 fuse = new Fuse(menuItems, { keys: ['name', 'category'], threshold: 0.3 });
+                document.getElementById('table-badge').innerText = getQueryTable() ? `Table ${getQueryTable()}` : 'Table';
                 renderMenu(menuItems);
                 await loadGeofenceConfig();
-            } catch (error) { console.error(error); }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('menu-container').innerHTML = '<p class="empty-state">Could not load the menu.</p>';
+            }
         }
 
         function filterMenu() {
@@ -403,144 +322,150 @@
             renderMenu(result.map(r => r.item));
         }
 
+        function imageUrl(item) {
+            const query = encodeURIComponent(`${item.name},food,indian`);
+            return item.image_url || `https://source.unsplash.com/200x200/?${query}`;
+        }
+
+        function imageFallback(img, name) {
+            const div = document.createElement('div');
+            div.className = 'photo-placeholder';
+            div.textContent = (name || '?').charAt(0).toUpperCase();
+            img.replaceWith(div);
+        }
+
         function renderMenu(itemsToRender) {
             const container = document.getElementById('menu-container');
             const navContainer = document.getElementById('category-nav');
-            container.innerHTML = ''; navContainer.innerHTML = '';
-
+            container.innerHTML = '';
+            navContainer.innerHTML = '';
             const availableItems = itemsToRender.filter(item => item.is_available);
-
-            if(availableItems.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500 mt-10">No items match your search.</p>';
+            if (availableItems.length === 0) {
+                container.innerHTML = '<p class="empty-state">No items match your search.</p>';
                 return;
             }
-
             const categories = {};
             availableItems.forEach(item => {
                 if (!categories[item.category]) categories[item.category] = [];
                 categories[item.category].push(item);
             });
-
-            for (const [catName, items] of Object.entries(categories)) {
-                const navLink = document.createElement('a');
-                navLink.className = "px-4 py-2 rounded-full bg-[#f3eae8] text-text-main text-xs font-medium border border-[#db421f]/10 hover:border-primary/50 transition-colors whitespace-nowrap";
-                navLink.href = `#${catName.replace(/\s+/g, '-').toLowerCase()}`;
-                navLink.innerText = catName;
-                navContainer.appendChild(navLink);
-
+            Object.entries(categories).forEach(([catName, items], index) => {
                 const sectionId = catName.replace(/\s+/g, '-').toLowerCase();
-                let sectionHTML = `<div class="mb-8 scroll-mt-40" id="${sectionId}"><div class="ornate-divider"><span class="text-lg font-bold text-primary mx-4 uppercase tracking-wide">${catName}</span></div>`;
-
+                navContainer.innerHTML += `<a class="category-pill ${index === 0 ? 'active' : ''}" href="#${sectionId}">${catName}</a>`;
+                const section = document.createElement('section');
+                section.id = sectionId;
+                section.innerHTML = `<h2 class="section-title">${catName}</h2>`;
                 items.forEach(item => {
                     const qty = cart[item.id] || 0;
-                    const dotColor = item.is_veg ? "green-600" : "red-600";
-                    let buttonHTML = qty === 0
-                        ? `<button onclick="updateQty(${item.id}, 1)" class="btn-primary btn-small">Add</button>`
-                        : `<div style="display:flex; gap:0.5rem; align-items:center;"><button onclick="updateQty(${item.id}, -1)" class="qty-btn">-</button><span class="text-sm font-bold text-primary w-6 text-center">${qty}</span><button onclick="updateQty(${item.id}, 1)" class="qty-btn">+</button></div>`;
-
-                    sectionHTML += `
-                        <div class="card mb-3">
-                            <div class="flex justify-between items-start mb-2">
-                                <div class="flex-1 pr-2">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <div class="flex justify-center size-3 border border-${dotColor} rounded-sm p-[1px] shrink-0"><div class="size-1.5 bg-${dotColor} rounded-full"></div></div>
-                                        <h3 >${item.name}</h3>
+                    const buttonHTML = qty === 0
+                        ? `<button onclick="updateQty(${item.id}, 1)" class="add-btn">Add</button>`
+                        : `<div class="qty-control"><button onclick="updateQty(${item.id}, -1)" class="qty-btn">-</button><span class="qty-value">${qty}</span><button onclick="updateQty(${item.id}, 1)" class="qty-btn">+</button></div>`;
+                    section.innerHTML += `
+                        <article class="menu-item-row">
+                            <img class="food-photo" loading="lazy" src="${imageUrl(item)}" alt="${item.name}" onerror="imageFallback(this, '${String(item.name).replace(/'/g, "\\'")}')">
+                            <div class="item-body">
+                                <div class="item-title-row">
+                                    <div>
+                                        <h3 class="item-name"><span class="${item.is_veg ? 'veg-dot' : 'nonveg-dot'}"></span>${item.name}</h3>
                                     </div>
+                                    <div class="item-price">&#8377;${item.price}</div>
                                 </div>
-                                <div class="flex flex-col items-end gap-1 shrink-0">
-                                    <span style="font-weight:bold; color:var(--primary-color);">₹${item.price}</span>
-                                </div>
+                                <p class="item-desc">${item.description || 'Chef selected favourite.'}</p>
+                                <div class="item-actions">${buttonHTML}</div>
                             </div>
-                            <p style="color:var(--text-secondary); margin-bottom:1rem; border-left:2px solid var(--primary-color); padding-left:0.5rem;">${item.description || ''}</p>
-                            <div class="self-end">${buttonHTML}</div>
-                        </div>`;
+                        </article>`;
                 });
-                sectionHTML += `</div>`;
-                container.innerHTML += sectionHTML;
-            }
+                container.appendChild(section);
+            });
         }
 
         function updateQty(id, change) {
-            if (!cart[id]) cart[id] = 0;
-            cart[id] += change;
-            if (cart[id] < 0) cart[id] = 0;
-            filterMenu(); updateCartFooter();
+            cart[id] = (cart[id] || 0) + change;
+            if (cart[id] <= 0) delete cart[id];
+            filterMenu();
+            updateCartFooter();
         }
 
         function updateCartFooter() {
-            let totalCount = 0; let totalPrice = 0;
+            let totalCount = 0;
+            let totalPrice = 0;
             menuItems.forEach(item => {
                 const qty = cart[item.id] || 0;
-                if (qty > 0) { totalCount += qty; totalPrice += (item.price * qty); }
+                totalCount += qty;
+                totalPrice += item.price * qty;
             });
             document.getElementById('total-items').innerText = `${totalCount} Items`;
             document.getElementById('total-price').innerText = `₹${totalPrice}`;
             const btn = document.getElementById('view-cart-btn');
-
-            // Allow button if items exist AND user is in range
-            btn.disabled = (totalCount === 0 || !userInRange);
+            btn.disabled = totalCount === 0 || !userInRange;
         }
 
         function openModal() {
-            document.getElementById('order-modal').classList.remove('hidden');
+            renderCartLines();
+            const table = getQueryTable();
+            if (table) document.getElementById('modal-table').value = table;
+            document.getElementById('order-modal').classList.add('active');
             setTimeout(() => document.getElementById('modal-table').focus(), 100);
         }
-        function closeModal() { document.getElementById('order-modal').classList.add('hidden'); }
+        function closeModal() { document.getElementById('order-modal').classList.remove('active'); }
+
+        function renderCartLines() {
+            const lines = [];
+            let total = 0;
+            menuItems.forEach(item => {
+                const qty = cart[item.id] || 0;
+                if (!qty) return;
+                total += qty * item.price;
+                lines.push(`<div class="cart-summary-line"><span>${qty} x ${item.name}</span><strong>₹${qty * item.price}</strong></div>`);
+            });
+            document.getElementById('cart-lines').innerHTML = lines.join('') || '<p class="empty-state">Your cart is empty.</p>';
+            document.getElementById('drawer-total').innerText = `₹${total}`;
+        }
 
         async function confirmOrder() {
             const geofenceActive = geofenceConfig.latitude != null && geofenceConfig.longitude != null;
             const lastOrderTime = localStorage.getItem('lastOrderTime');
-            if (geofenceActive && lastOrderTime) {
-                const diffMinutes = (Date.now() - parseInt(lastOrderTime)) / 1000 / 60;
-                if (diffMinutes > 10) {
-                    alert("\ud83d\udd52 Session expired (10 mins limit). Verifying location again...");
-                    checkLocation();
-                    if (!userInRange) {
-                        const radiusLabel = geofenceConfig.geofence_radius_meters >= 1000
-                            ? `${(geofenceConfig.geofence_radius_meters / 1000).toFixed(1)}km`
-                            : `${geofenceConfig.geofence_radius_meters}m`;
-                        alert(`\u274c You must be within ${radiusLabel} to place a new order.`);
-                        return;
-                    }
+            if (geofenceActive && lastOrderTime && (Date.now() - parseInt(lastOrderTime)) / 60000 > 10) {
+                checkLocation();
+                if (!userInRange) {
+                    alert('Please move closer to the restaurant to place a new order.');
+                    return;
                 }
             }
-
             const tableInput = document.getElementById('modal-table').value.trim();
             const phoneInput = document.getElementById('modal-phone').value.trim();
-
-            if (!tableInput) { alert("Table Number required!"); return; }
-
+            if (!tableInput) { alert('Table number required.'); return; }
             const orderItems = [];
-            for (let id in cart) {
-                if (cart[id] > 0) orderItems.push({ "menu_item_id": parseInt(id), "quantity": cart[id] });
-            }
-
-            let tableNum = 0, type = "Dine-in";
-            if (tableInput.toLowerCase() === 'd' || tableInput.toLowerCase() === 'delivery') { type = "Delivery"; tableNum = 0; }
-            else { tableNum = parseInt(tableInput) || 0; }
-
+            for (let id in cart) if (cart[id] > 0) orderItems.push({ menu_item_id: parseInt(id), quantity: cart[id] });
+            let tableNum = 0;
+            let type = 'Dine-in';
+            if (tableInput.toLowerCase() === 'd' || tableInput.toLowerCase() === 'delivery') type = 'Delivery';
+            else tableNum = parseInt(tableInput) || 0;
             try {
                 const response = await fetch('/order/?slug=' + encodeURIComponent(extractSlugFromUrl()), {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "table_number": tableNum, "items": orderItems, "order_type": type, "customer_phone": phoneInput || null })
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ table_number: tableNum, items: orderItems, order_type: type, customer_phone: phoneInput || null })
                 });
-
                 if (response.ok) {
-                    alert(type === "Delivery" ? "Delivery Order Placed! 🛵" : "Order Placed! 🍽️");
-
-                    // SAVE TIME OF ORDER
+                    alert(type === 'Delivery' ? 'Delivery order placed.' : 'Order placed.');
                     localStorage.setItem('lastOrderTime', Date.now().toString());
-
-                    cart = {}; closeModal(); document.getElementById('modal-table').value="";
-                    filterMenu(); updateCartFooter();
+                    cart = {};
+                    closeModal();
+                    document.getElementById('modal-table').value = '';
+                    filterMenu();
+                    updateCartFooter();
+                } else {
+                    const err = await response.json().catch(() => ({ detail: 'Could not place order' }));
+                    alert(err.detail || 'Could not place order.');
                 }
-            } catch (error) { alert("Network error."); }
+            } catch (error) {
+                alert('Network error.');
+            }
         }
 
         loadMenu();
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
-        }
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
     </script>
 </body>
 </html>

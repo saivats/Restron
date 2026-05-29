@@ -94,6 +94,15 @@ def create_customer(
         raise HTTPException(status_code=500, detail=f"Customer save error: {exc}") from exc
 
 
+@router.put("/")
+def update_customer(
+    c: CustomerCreate,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(require_permission(CAN_MANAGE_CUSTOMERS)),
+):
+    return create_customer(c, db, user)
+
+
 @router.get("/lookup/{phone}")
 def lookup_customer(
     phone: str,

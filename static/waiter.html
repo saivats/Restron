@@ -8,6 +8,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
         :root {
+            --bg-base: #0D0A06;
+            --bg-surface: #1A1208;
+            --bg-card: #221A0E;
+            --primary: #E8851A;
+            --primary-dark: #C4690E;
+            --secondary: #8B1A3A;
+            --text-primary: #F5E6D0;
+            --text-muted: #9A8070;
+            --border: rgba(232, 133, 26, 0.15);
+            --glow: rgba(232, 133, 26, 0.08);
+            --success: #2D7A4F;
+            --danger: #8B1A1A;
             --bg-color: #0D0A06;
             --surface-color: rgba(26, 21, 16, 0.8);
             --primary-color: #E8851A;
@@ -250,8 +262,10 @@
         }
         
         /* Menu overrides that were lost when stripping tailwind */
-        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-color); padding: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; z-index: 50; }
-        .search-box { margin-bottom: 1rem; }
+        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #E8851A, #C4690E); padding: 1rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 50; box-shadow: 0 -14px 40px rgba(0,0,0,0.5); color: white; }
+        .search-box { margin-bottom: 1rem; font-size: 1.1rem; }
+        .menu-item-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+        .staff-card, .qr-card, .checkout-modal, .customer-card, .history-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
         .ornate-divider { display: flex; align-items: center; margin: 2rem 0 1rem; text-align: center; }
         .ornate-divider::before, .ornate-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--primary-color); opacity: 0.3; }
         .scroll-mt-40 { scroll-margin-top: 10rem; }
@@ -268,7 +282,7 @@
 
     <input class="search-box" id="search" placeholder="Search item (Fuzzy)..." oninput="doSearch()">
 
-    <div id="list">Loading...</div>
+    <div id="list">Preparing menu...</div>
     <div style="height: 80px;"></div> <div class="cart-bar">
         <span id="summary">0 items | ₹0</span>
         <button class="place-btn" onclick="placeOrder()">SEND TO KITCHEN</button>

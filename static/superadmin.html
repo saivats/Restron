@@ -7,6 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
         :root {
+            --bg-base: #0D0A06;
+            --bg-surface: #1A1208;
+            --bg-card: #221A0E;
+            --primary: #E8851A;
+            --primary-dark: #C4690E;
+            --secondary: #8B1A3A;
+            --text-primary: #F5E6D0;
+            --text-muted: #9A8070;
+            --border: rgba(232, 133, 26, 0.15);
+            --glow: rgba(232, 133, 26, 0.08);
+            --success: #2D7A4F;
+            --danger: #8B1A1A;
             --bg-color: #0D0A06;
             --surface-color: rgba(26, 21, 16, 0.8);
             --primary-color: #E8851A;
@@ -97,7 +109,7 @@
         
         .form-group { margin-bottom: 1rem; }
         
-        .header { display: flex; flex-direction: column; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; }
+        .header { display: flex; flex-direction: column; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; padding: 18px; border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 0 60px rgba(232,133,26,0.10); }
         @media (min-width: 768px) { .header { flex-direction: row; } }
         
         .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
@@ -249,6 +261,7 @@
         }
         
         /* Menu overrides that were lost when stripping tailwind */
+        .table-card, .occupied, .available, .order-card, .done-btn, .timer-badge, .item-row, .qty-btn, .staff-card, .qr-card, .checkout-modal, .customer-card, .history-row, .menu-item-row { border-radius: 12px; }
         .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-color); padding: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; z-index: 50; }
         .search-box { margin-bottom: 1rem; }
         .ornate-divider { display: flex; align-items: center; margin: 2rem 0 1rem; text-align: center; }

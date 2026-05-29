@@ -81,7 +81,12 @@ async def login(
     elif user.role == "chef":
         redirect_url = f"{slug_prefix}/kitchen"
 
-    return {"access_token": access_token, "token_type": "bearer", "redirect": redirect_url}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "redirect": redirect_url,
+        "redirect_url": redirect_url,
+    }
 
 
 @router.post("/logout")

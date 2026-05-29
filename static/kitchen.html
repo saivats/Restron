@@ -7,6 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
         :root {
+            --bg-base: #0D0A06;
+            --bg-surface: #1A1208;
+            --bg-card: #221A0E;
+            --primary: #E8851A;
+            --primary-dark: #C4690E;
+            --secondary: #8B1A3A;
+            --text-primary: #F5E6D0;
+            --text-muted: #9A8070;
+            --border: rgba(232, 133, 26, 0.15);
+            --glow: rgba(232, 133, 26, 0.08);
+            --success: #2D7A4F;
+            --danger: #8B1A1A;
             --bg-color: #0D0A06;
             --surface-color: rgba(26, 21, 16, 0.8);
             --primary-color: #E8851A;
@@ -227,7 +239,17 @@
         @media (min-width: 768px) { #orders-container, #menu-container, #staff-list, .grid-cards { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1024px) { #orders-container, #menu-container, #staff-list, .grid-cards { grid-template-columns: repeat(3, 1fr); } }
         
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .table-no { font-size: 48px; line-height: 1; font-weight: 800; color: var(--text-primary); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin: 14px 0; }
+        .order-id { color: var(--text-muted); font-weight: 700; }
+        .items { font-size: 1.2rem; line-height: 1.5; margin: 1rem 0; color: var(--text-primary); }
+        .done-btn { width: 100%; padding: 16px 20px !important; font-size: 1.1rem; border-radius: 12px !important; background: linear-gradient(135deg, #2D7A4F, #1D5A3F) !important; }
+        .timer-badge.time-ok { background: rgba(45,122,79,0.2); color: #4CAF7D; border-color: rgba(45,122,79,0.3); }
+        .timer-badge.time-warn { background: rgba(232,133,26,0.2); color: #E8851A; border-color: rgba(232,133,26,0.3); }
+        .timer-badge.time-late { background: rgba(139,26,26,0.25); color: #E85A5A; border-color: rgba(139,26,26,0.35); }
+        .delivery-tag { color: #F5E6D0; background: rgba(139,26,58,0.35); border: 1px solid rgba(139,26,58,0.45); padding: 8px 12px; border-radius: 999px; display: inline-flex; margin-bottom: 8px; font-weight: 800; }
+        .item-row, .menu-item-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .staff-card, .qr-card, .checkout-modal, .customer-card, .history-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
         .item-row:last-child { border-bottom: none; }
         .modifier-group { background-color: rgba(0, 0, 0, 0.2); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 0.75rem; }
         

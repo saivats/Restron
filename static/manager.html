@@ -7,6 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
         :root {
+            --bg-base: #0D0A06;
+            --bg-surface: #1A1208;
+            --bg-card: #221A0E;
+            --primary: #E8851A;
+            --primary-dark: #C4690E;
+            --secondary: #8B1A3A;
+            --text-primary: #F5E6D0;
+            --text-muted: #9A8070;
+            --border: rgba(232, 133, 26, 0.15);
+            --glow: rgba(232, 133, 26, 0.08);
+            --success: #2D7A4F;
+            --danger: #8B1A1A;
             --bg-color: #0D0A06;
             --surface-color: rgba(26, 21, 16, 0.8);
             --primary-color: #E8851A;
@@ -249,6 +261,28 @@
         }
         
         /* Menu overrides that were lost when stripping tailwind */
+        .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05); }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px; }
+        @media (min-width: 900px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        .tables-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+        .table-num { font-family: 'Playfair Display', serif; color: var(--primary); font-size: 28px; }
+        .table-status, .table-bill { color: var(--text-muted); margin-top: 6px; }
+        .customer-list { display: grid; gap: 10px; max-height: 420px; overflow: auto; }
+        .customer-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 12px; cursor: pointer; }
+        .customer-card:hover { border-color: var(--primary); background: rgba(232,133,26,0.08); }
+        .customer-name { color: var(--text-primary); font-weight: 800; }
+        .customer-info { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+        .menu-row, .menu-item-row, .history-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .checkout-modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; }
+        .staff-card, .qr-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+        .status-tag { display:inline-flex; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+        .status-tag.pending { color: #E8851A; background: rgba(232,133,26,0.16); }
+        .status-tag.completed { color: #4CAF7D; background: rgba(45,122,79,0.16); }
+        .switch input { display: none; }
+        .slider { display: inline-block; width: 44px; height: 24px; background: var(--danger); border-radius: 999px; position: relative; }
+        .slider::after { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: .2s; }
+        .switch input:checked + .slider { background: var(--success); }
+        .switch input:checked + .slider::after { transform: translateX(20px); }
         .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-color); padding: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; z-index: 50; }
         .search-box { margin-bottom: 1rem; }
         .ornate-divider { display: flex; align-items: center; margin: 2rem 0 1rem; text-align: center; }
@@ -427,7 +461,7 @@
             currentCustomer = null;
             receiptData = null;
 
-            document.getElementById('checkout-modal').style.display = 'block';
+            document.getElementById('checkout-modal').style.display = 'flex';
             document.getElementById('checkout-details').innerHTML = `
                 <p><strong>Order #${table.order_id}</strong></p>
                 <p><strong>Table ${table.table_number}</strong></p>
@@ -635,7 +669,7 @@
                 ${discountText}
                 ${currentCustomer ? `<p style="color: #aaa; margin-top: 10px;">Customer: ${currentCustomer.name || 'Anonymous'} (${document.getElementById('checkout-phone').value})</p>` : ''}
             `;
-            document.getElementById('success-modal').style.display = 'block';
+            document.getElementById('success-modal').style.display = 'flex';
         }
 
         function closeSuccessModal() {
@@ -956,7 +990,7 @@
         }
 
         function openPhoneOrderModal() {
-            document.getElementById('phone-order-modal').style.display = 'block';
+            document.getElementById('phone-order-modal').style.display = 'flex';
             // Reload iframe to reset menu
             document.getElementById('menu-iframe').src = '/mobile';
         }
