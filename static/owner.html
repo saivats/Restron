@@ -277,6 +277,13 @@
         .settings-form { display: grid; grid-template-columns: 1fr; gap: 8px; }
         @media (min-width: 760px) { .settings-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } .settings-form h2, .settings-form p, .settings-form button { grid-column: 1 / -1; } }
         .checkout-modal, .customer-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+        .bulk-import-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem; }
+        .bulk-preview-wrap { display: none; max-height: 320px; overflow: auto; border: 1px solid var(--border-color); border-radius: 12px; margin-top: 1rem; }
+        .bulk-preview-wrap table { margin-bottom: 0; min-width: 520px; }
+        .bulk-more-note { display: none; color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.75rem; }
+        .bulk-message { min-height: 20px; margin-top: 0.75rem; font-size: 0.9rem; }
+        .bulk-message.success { color: #4ade80; }
+        .bulk-message.error { color: #ffb4ab; white-space: pre-line; }
         .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-color); padding: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; z-index: 50; }
         .search-box { margin-bottom: 1rem; }
         .ornate-divider { display: flex; align-items: center; margin: 2rem 0 1rem; text-align: center; }
@@ -387,6 +394,26 @@
                 <input id="price" placeholder="Price" style="width:100%;">
                 <input id="cat" placeholder="Category" style="width:100%;">
                 <button onclick="addItem()" class="green" style="margin-top:5px;">Add to Menu</button>
+            </div>
+            <div class="card">
+                <h2>Bulk Import Menu</h2>
+                <label for="bulk-menu-file">CSV File</label>
+                <input id="bulk-menu-file" type="file" accept=".csv,text/csv">
+                <div class="bulk-import-actions">
+                    <button type="button" class="btn-secondary" onclick="downloadMenuTemplate()">Download Template</button>
+                    <button type="button" onclick="previewBulkMenuImport()">Upload & Import</button>
+                    <button type="button" id="bulk-confirm-btn" class="btn-success" onclick="confirmBulkMenuImport()" style="display:none;">Confirm Import</button>
+                </div>
+                <div id="bulk-preview-wrap" class="bulk-preview-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Name</th><th>Price</th><th>Category</th><th>Veg</th></tr>
+                        </thead>
+                        <tbody id="bulk-preview-body"></tbody>
+                    </table>
+                </div>
+                <p id="bulk-more-note" class="bulk-more-note"></p>
+                <p id="bulk-import-msg" class="bulk-message"></p>
             </div>
         </div>
     </div>
@@ -594,6 +621,157 @@
                 await fetch(`/menu/?name=${name}&price=${price}&category=${cat || 'General'}`, { method: 'POST' });
                 alert("Added!"); loadData();
             }
+        }
+
+        let bulkMenuRows = [];
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[ch]));
+        }
+
+        function downloadMenuTemplate() {
+            const csv = [
+                'name,price,category,is_veg',
+                'Paneer Tikka,220,Starters,yes',
+                'Chicken Biryani,280,Rice,non-veg',
+                'Masala Dosa,140,South Indian,veg'
+            ].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'menu_import_template.csv';
+            document.body.appendChild(link);
+            link.click();
+            URL.revokeObjectURL(link.href);
+            link.remove();
+        }
+
+        function parseCsvLine(line) {
+            const values = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const next = line[i + 1];
+                if (char === '"' && inQuotes && next === '"') {
+                    current += '"';
+                    i++;
+                } else if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    values.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            values.push(current.trim());
+            return values;
+        }
+
+        function parseBulkMenuCsv(text) {
+            return text
+                .replace(/^\uFEFF/, '')
+                .split(/\r?\n/)
+                .slice(1)
+                .map(parseCsvLine)
+                .filter(cols => cols.some(value => value.trim() !== ''))
+                .map(cols => ({
+                    name: (cols[0] || '').trim(),
+                    price: (cols[1] || '').trim(),
+                    category: (cols[2] || '').trim(),
+                    is_veg: (cols[3] || '').trim()
+                }));
+        }
+
+        function showBulkMenuMessage(message, type) {
+            const msg = document.getElementById('bulk-import-msg');
+            msg.className = `bulk-message ${type || ''}`;
+            msg.innerText = message;
+        }
+
+        function renderBulkMenuPreview(rows) {
+            const body = document.getElementById('bulk-preview-body');
+            const previewRows = rows.slice(0, 20);
+            body.innerHTML = previewRows.map(row => `
+                <tr>
+                    <td>${escapeHtml(row.name)}</td>
+                    <td>${escapeHtml(row.price)}</td>
+                    <td>${escapeHtml(row.category || 'General')}</td>
+                    <td>${escapeHtml(row.is_veg)}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('bulk-preview-wrap').style.display = previewRows.length ? 'block' : 'none';
+            const note = document.getElementById('bulk-more-note');
+            if (rows.length > 20) {
+                note.innerText = `and ${rows.length - 20} more items...`;
+                note.style.display = 'block';
+            } else {
+                note.innerText = '';
+                note.style.display = 'none';
+            }
+            document.getElementById('bulk-confirm-btn').style.display = rows.length ? 'inline-flex' : 'none';
+        }
+
+        function previewBulkMenuImport() {
+            const input = document.getElementById('bulk-menu-file');
+            const file = input.files && input.files[0];
+            if (!file) {
+                showBulkMenuMessage('Choose a CSV file first.', 'error');
+                return;
+            }
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                showBulkMenuMessage('Only .csv files are supported.', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                bulkMenuRows = parseBulkMenuCsv(reader.result || '');
+                renderBulkMenuPreview(bulkMenuRows);
+                showBulkMenuMessage(
+                    bulkMenuRows.length ? `${bulkMenuRows.length} rows ready to review.` : 'No menu rows found in the CSV.',
+                    bulkMenuRows.length ? '' : 'error'
+                );
+            };
+            reader.onerror = () => showBulkMenuMessage('Could not read the selected file.', 'error');
+            reader.readAsText(file);
+        }
+
+        async function confirmBulkMenuImport() {
+            if (!bulkMenuRows.length) {
+                showBulkMenuMessage('Preview a CSV file before importing.', 'error');
+                return;
+            }
+
+            const res = await fetch('/menu/bulk/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bulkMenuRows)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                showBulkMenuMessage(data.detail || 'Bulk import failed.', 'error');
+                return;
+            }
+
+            const errorText = data.errors && data.errors.length
+                ? '\nFailed rows:\n' + data.errors.map(err => `Row ${err.row}: ${err.reason}`).join('\n')
+                : '';
+            showBulkMenuMessage(`Imported ${data.imported} items.${errorText}`, data.errors && data.errors.length ? 'error' : 'success');
+            if (!data.errors || !data.errors.length) {
+                bulkMenuRows = [];
+                document.getElementById('bulk-menu-file').value = '';
+                renderBulkMenuPreview([]);
+            }
+            loadData();
         }
 
         async function clearList() {

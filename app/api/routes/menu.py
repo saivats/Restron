@@ -3,10 +3,23 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import CAN_MANAGE_MENU, get_current_user, get_db, require_permission, user_restaurant_id
 from app.models import models
-from app.schemas.schemas import AvailabilityUpdate, MenuItemCreate
+from app.schemas.schemas import AvailabilityUpdate, BulkMenuItemCreate, MenuItemCreate
 from app.services.audit_service import write_audit_log
 
 router = APIRouter()
+
+
+def _parse_bulk_bool(value) -> bool | None:
+    if isinstance(value, bool):
+        return value
+    normalized = str(value).strip().lower()
+    truthy = {"true", "yes", "1", "veg"}
+    falsy = {"false", "no", "0", "non-veg", "non veg", "nonveg"}
+    if normalized in truthy:
+        return True
+    if normalized in falsy:
+        return False
+    return None
 
 
 @router.get("/")
@@ -50,6 +63,67 @@ def create_item(
     db.commit()
     db.refresh(menu_item)
     return {"status": "Added", "id": menu_item.id, "name": menu_item.name}
+
+
+@router.post("/bulk/")
+def bulk_create_items(
+    items: list[BulkMenuItemCreate],
+    db: Session = Depends(get_db),
+    user: models.User = Depends(require_permission(CAN_MANAGE_MENU)),
+):
+    restaurant_id = user_restaurant_id(user)
+    menu_items = []
+    errors = []
+
+    for index, item in enumerate(items, start=1):
+        data = item.model_dump()
+        name = str(data.get("name") or "").strip()
+        category = str(data.get("category") or "").strip() or "General"
+
+        if not name:
+            errors.append({"row": index, "reason": "Name is required"})
+            continue
+
+        try:
+            price = float(data.get("price"))
+        except (TypeError, ValueError):
+            errors.append({"row": index, "reason": "Price must be a positive number"})
+            continue
+
+        if price <= 0:
+            errors.append({"row": index, "reason": "Price must be a positive number"})
+            continue
+
+        is_veg = _parse_bulk_bool(data.get("is_veg"))
+        if is_veg is None:
+            errors.append({"row": index, "reason": "is_veg must be true/false, yes/no, 1/0, veg/non-veg"})
+            continue
+
+        menu_items.append(
+            models.MenuItem(
+                restaurant_id=restaurant_id,
+                name=name,
+                price=price,
+                category=category,
+                is_veg=is_veg,
+            )
+        )
+
+    if menu_items:
+        db.add_all(menu_items)
+        db.flush()
+        write_audit_log(
+            db,
+            action="menu.bulk_created",
+            entity_type="menu_item",
+            entity_id="bulk",
+            restaurant_id=restaurant_id,
+            user=user,
+            after_state={"imported": len(menu_items), "skipped": len(errors)},
+        )
+        db.commit()
+
+    return {"imported": len(menu_items), "skipped": len(errors), "errors": errors}
 
 
 @router.delete("/{item_id}")

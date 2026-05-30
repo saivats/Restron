@@ -45,6 +45,13 @@ class MenuItemCreate(BaseModel):
     hindi_name: str = ""
 
 
+class BulkMenuItemCreate(BaseModel):
+    name: Any = ""
+    price: Any = None
+    category: Any = ""
+    is_veg: Any = True
+
+
 class InventoryCreate(BaseModel):
     item_name: str
 
