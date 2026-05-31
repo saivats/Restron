@@ -303,23 +303,26 @@
             formData.append('username', u);
             formData.append('password', p);
 
-            let url = '/auth/token';
-            if (slug) {
-                url += '?slug=' + encodeURIComponent(slug);
-            }
+            const activeSlug = slug || 'default';
+            const roleRedirects = {
+                owner: `/r/${activeSlug}/owner`,
+                manager: `/r/${activeSlug}/manager`,
+                waiter: `/r/${activeSlug}/waiter`,
+                chef: `/r/${activeSlug}/kitchen`
+            };
+            const url = slug ? `/r/${encodeURIComponent(slug)}/auth/token` : '/auth/token';
 
             try {
                 const res = await fetch(url, { method: 'POST', body: formData, credentials: 'include' });
+                const data = await res.json().catch(() => ({}));
                 if (res.ok) {
-                    const data = await res.json();
-                    window.location.href = data.redirect_url || data.redirect || '/';
+                    window.location.href = data.redirect_url || roleRedirects[data.role] || '/';
                 } else {
-                    const err = await res.json().catch(() => ({ detail: 'Login failed' }));
                     if (res.status === 403) {
                         document.getElementById('login-box').style.display = 'none';
                         document.getElementById('inactive-box').style.display = 'block';
                     } else {
-                        document.getElementById('msg').innerText = err.detail || "Invalid credentials";
+                        document.getElementById('msg').innerText = data.detail || "Invalid credentials";
                     }
                 }
             } catch (error) {

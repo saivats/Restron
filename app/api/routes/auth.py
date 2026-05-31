@@ -84,6 +84,7 @@ async def login(
     return {
         "access_token": access_token,
         "token_type": "bearer",
+        "role": user.role,
         "redirect": redirect_url,
         "redirect_url": redirect_url,
     }

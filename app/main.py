@@ -1,12 +1,10 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from jose import JWTError, jwt
 from sqlalchemy import text
-from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.api.deps import get_current_user, get_db
 from app.api.routes import analytics, auth, checkout, customers, inventory, legacy, menu, orders, tables
@@ -14,8 +12,7 @@ from app.api.routes import qr as qr_routes
 from app.api.routes import settings as settings_routes
 from app.api.routes import staff as staff_routes
 from app.api.routes import superadmin as superadmin_routes
-from app.core.config import ALGORITHM, ALLOWED_ORIGINS, SECRET_KEY, STATIC_DIR
-from app.core.security import create_access_token
+from app.core.config import ALLOWED_ORIGINS, STATIC_DIR
 from app.db.database import SessionLocal
 from app.db.schema_guard import ensure_schema
 from app.models import models
@@ -32,34 +29,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-class TokenRefreshMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        response = await call_next(request)
-        token = request.cookies.get("access_token")
-        if not token:
-            return response
-
-        try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            exp = payload.get("exp")
-            if exp:
-                expire_time = datetime.fromtimestamp(exp, tz=timezone.utc)
-                remaining = expire_time - datetime.now(timezone.utc)
-                if timedelta(0) < remaining < timedelta(minutes=120):
-                    new_token = create_access_token(
-                        data={k: v for k, v in payload.items() if k != "exp"},
-                    )
-                    response.set_cookie(key="access_token", value=new_token, httponly=True, samesite="lax")
-        except (JWTError, Exception):
-            pass
-
-        return response
-
-
-app.add_middleware(TokenRefreshMiddleware)
-
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(auth.router, prefix="/r/{slug}/auth", tags=["Authentication Slug"])
 app.include_router(auth.router, tags=["Authentication Legacy"])
 app.include_router(menu.router, prefix="/menu", tags=["Menu"])
 app.include_router(orders.router, prefix="/orders", tags=["Orders"])

@@ -276,6 +276,10 @@
         .table-label { font-size: 20px; color: var(--text-primary); font-weight: 800; }
         .settings-form { display: grid; grid-template-columns: 1fr; gap: 8px; }
         @media (min-width: 760px) { .settings-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } .settings-form h2, .settings-form p, .settings-form button { grid-column: 1 / -1; } }
+        .settings-field, .settings-section-label { grid-column: 1 / -1; }
+        .settings-form > label[style*="border-top"] { grid-column: 1 / -1; }
+        .settings-field label { margin-bottom: 0.25rem; }
+        .settings-field input { margin-bottom: 1rem; }
         .checkout-modal, .customer-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
         .bulk-import-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem; }
         .bulk-preview-wrap { display: none; max-height: 320px; overflow: auto; border: 1px solid var(--border-color); border-radius: 12px; margin-top: 1rem; }
@@ -465,12 +469,18 @@
                 <label>Menu PDF URL</label>
                 <input id="set-menu-pdf" style="width:100%;">
                 <label style="margin-top:20px; border-top:2px solid #ff5722; padding-top:12px; display:block;">📍 Geofencing (for mobile ordering)</label>
-                <label>Latitude</label>
-                <input id="set-latitude" type="number" step="any" placeholder="e.g. 28.6543" style="width:100%;">
-                <label>Longitude</label>
-                <input id="set-longitude" type="number" step="any" placeholder="e.g. 77.5061" style="width:100%;">
-                <label>Geofence Radius (meters)</label>
-                <input id="set-geofence-radius" type="number" min="10" placeholder="50" style="width:100%;">
+                <div class="settings-field">
+                    <label>Latitude</label>
+                    <input id="set-latitude" type="number" step="any" placeholder="e.g. 28.6543" style="width:100%;">
+                </div>
+                <div class="settings-field">
+                    <label>Longitude</label>
+                    <input id="set-longitude" type="number" step="any" placeholder="e.g. 77.5061" style="width:100%;">
+                </div>
+                <div class="settings-field">
+                    <label>Geofence Radius (meters)</label>
+                    <input id="set-geofence-radius" type="number" min="10" placeholder="50" style="width:100%;">
+                </div>
                 <p style="color:#999; font-size:0.8em; margin-top:4px;">Leave lat/lng empty to allow orders from anywhere. Right-click your restaurant on Google Maps to copy coordinates.</p>
                 <button onclick="saveSettings()" class="green" style="margin-top:15px;">Save Settings</button>
                 <p id="settings-msg" style="color:#28a745; margin-top:5px; height:20px;"></p>
