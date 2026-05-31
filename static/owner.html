@@ -288,6 +288,10 @@
         .bulk-message { min-height: 20px; margin-top: 0.75rem; font-size: 0.9rem; }
         .bulk-message.success { color: #4ade80; }
         .bulk-message.error { color: #ffb4ab; white-space: pre-line; }
+        .plan-warning { display: none; background: rgba(232,133,26,0.12); border: 1px solid rgba(232,133,26,0.35); border-radius: 12px; padding: 12px; margin: 12px 0; color: var(--text-primary); }
+        .plan-warning p { margin-bottom: 10px; color: var(--text-primary); }
+        .settings-toggle { display: flex; align-items: center; gap: 10px; grid-column: 1 / -1; margin-bottom: 1rem; }
+        .settings-toggle input { width: auto; margin: 0; }
         .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-color); padding: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; z-index: 50; }
         .search-box { margin-bottom: 1rem; }
         .ornate-divider { display: flex; align-items: center; margin: 2rem 0 1rem; text-align: center; }
@@ -439,6 +443,7 @@
                     <option value="cashier">Cashier</option>
                 </select>
                 <button onclick="addStaff()" class="green" style="margin-top:5px;">Add Staff Member</button>
+                <div id="staff-limit-warning" class="plan-warning"></div>
                 <p id="staff-msg" style="color:#28a745; margin-top:5px; height:20px;"></p>
             </div>
         </div>
@@ -468,6 +473,7 @@
                 <input id="set-currency" style="width:100%;">
                 <label>Menu PDF URL</label>
                 <input id="set-menu-pdf" style="width:100%;">
+                <label class="settings-toggle"><input id="set-auto-print-kot" type="checkbox"> Auto-print KOT when new order arrives</label>
                 <label style="margin-top:20px; border-top:2px solid #ff5722; padding-top:12px; display:block;">📍 Geofencing (for mobile ordering)</label>
                 <div class="settings-field">
                     <label>Latitude</label>
@@ -483,6 +489,7 @@
                 </div>
                 <p style="color:#999; font-size:0.8em; margin-top:4px;">Leave lat/lng empty to allow orders from anywhere. Right-click your restaurant on Google Maps to copy coordinates.</p>
                 <button onclick="saveSettings()" class="green" style="margin-top:15px;">Save Settings</button>
+                <div id="settings-limit-warning" class="plan-warning"></div>
                 <p id="settings-msg" style="color:#28a745; margin-top:5px; height:20px;"></p>
             </div>
         </div>
@@ -526,6 +533,42 @@
             document.getElementById('hist-month').style.display = (type === 'month') ? 'inline-block' : 'none';
         }
 
+        function showExpiredOverlay(data) {
+            const overlay = document.getElementById('sub-overlay');
+            if (!overlay) return;
+            if (data.plan === 'trial' && data.expired === true) {
+                overlay.querySelector('p').innerText = 'Your 15-day free trial has ended. Contact Restron to activate your subscription.';
+            } else if (data.plan === 'starter' && data.growth_preview_used === true && data.growth_preview_expires_at) {
+                overlay.querySelector('p').innerText = 'Your Growth preview has ended. Contact Restron to upgrade your plan.';
+            } else {
+                overlay.querySelector('p').innerText = 'Your subscription has expired. Please contact Restron support to renew.';
+            }
+            overlay.style.display = 'flex';
+        }
+
+        async function startGrowthPreview() {
+            const res = await fetch('/restaurant/growth-preview/', { method: 'POST' });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+                alert('Growth preview activated for 7 days.');
+                window.location.reload();
+            } else {
+                alert(data.error || data.detail || 'Could not start Growth preview.');
+            }
+        }
+
+        function showPlanLimitWarning(containerId, data, type) {
+            const box = document.getElementById(containerId);
+            if (!box) return;
+            const noun = type === 'staff' ? 'staff members' : 'tables';
+            const message = `You've reached your ${data.plan} plan limit of ${data.limit} ${noun}.`;
+            const action = data.growth_preview_used === false
+                ? '<button type="button" onclick="startGrowthPreview()">Try Growth free for 7 days</button>'
+                : '<a class="btn btn-secondary" href="mailto:your@email.com?subject=Upgrade%20Request">Contact Restron to upgrade</a>';
+            box.innerHTML = `<p>${message}</p>${action}`;
+            box.style.display = 'block';
+        }
+
         async function checkSubscription() {
             try {
                 const res = await fetch('/restaurant/status/');
@@ -533,14 +576,12 @@
                     const data = await res.json();
                     let expired = false;
                     if (data.is_active === false) expired = true;
+                    if (data.expired === true) expired = true;
                     if (data.plan_expires_at) {
                         const expDate = new Date(data.plan_expires_at);
                         if (expDate < new Date()) expired = true;
                     }
-                    if (expired) {
-                        const overlay = document.getElementById('sub-overlay');
-                        overlay.style.display = 'flex';
-                    }
+                    if (expired) showExpiredOverlay(data);
                 }
             } catch (e) { }
         }
@@ -828,8 +869,15 @@
                 document.getElementById('staff-username').value = '';
                 document.getElementById('staff-password').value = '';
                 setTimeout(() => document.getElementById('staff-msg').innerText = '', 3000);
+                document.getElementById('staff-limit-warning').style.display = 'none';
                 loadStaff();
             } else {
+                if (res.status === 403 && data.error === 'staff_limit_reached') {
+                    const statusRes = await fetch('/restaurant/status/');
+                    const status = statusRes.ok ? await statusRes.json() : {};
+                    showPlanLimitWarning('staff-limit-warning', { ...data, ...status, limit: data.limit, plan: data.plan }, 'staff');
+                    return;
+                }
                 alert(data.detail || 'Failed to create staff');
             }
         }
@@ -859,6 +907,7 @@
             document.getElementById('set-gst').value = data.gst_rate || 5.0;
             document.getElementById('set-currency').value = data.currency_symbol || '₹';
             document.getElementById('set-menu-pdf').value = data.menu_pdf_url || '';
+            document.getElementById('set-auto-print-kot').checked = !!data.auto_print_kot;
             document.getElementById('set-latitude').value = data.latitude != null ? data.latitude : '';
             document.getElementById('set-longitude').value = data.longitude != null ? data.longitude : '';
             document.getElementById('set-geofence-radius').value = data.geofence_radius_meters || 50;
@@ -876,6 +925,7 @@
                 gst_rate: parseFloat(document.getElementById('set-gst').value) || undefined,
                 currency_symbol: document.getElementById('set-currency').value || undefined,
                 menu_pdf_url: document.getElementById('set-menu-pdf').value || undefined,
+                auto_print_kot: document.getElementById('set-auto-print-kot').checked,
                 latitude: document.getElementById('set-latitude').value ? parseFloat(document.getElementById('set-latitude').value) : null,
                 longitude: document.getElementById('set-longitude').value ? parseFloat(document.getElementById('set-longitude').value) : null,
                 geofence_radius_meters: parseInt(document.getElementById('set-geofence-radius').value) || undefined,
@@ -888,10 +938,17 @@
                 body: JSON.stringify(payload)
             });
             if (res.ok) {
+                document.getElementById('settings-limit-warning').style.display = 'none';
                 document.getElementById('settings-msg').innerText = '✅ Settings saved!';
                 setTimeout(() => document.getElementById('settings-msg').innerText = '', 3000);
             } else {
                 const data = await res.json();
+                if (res.status === 403 && data.error === 'table_limit_reached') {
+                    const statusRes = await fetch('/restaurant/status/');
+                    const status = statusRes.ok ? await statusRes.json() : {};
+                    showPlanLimitWarning('settings-limit-warning', { ...data, ...status, limit: data.limit, plan: data.plan }, 'tables');
+                    return;
+                }
                 alert(data.detail || 'Failed to save settings');
             }
         }

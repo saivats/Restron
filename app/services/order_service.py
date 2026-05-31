@@ -117,6 +117,15 @@ def _serialize_order(order: models.Order) -> dict:
         "created_at": order.created_at.isoformat() if order.created_at else None,
         "taken_by": order.taken_by,
         "payment_method": order.payment_method,
+        "items": [
+            {
+                "name": item.item_name,
+                "qty": item.quantity,
+                "price": item.price,
+                "total": item.line_total if item.line_total is not None else round(item.price * item.quantity, 2),
+            }
+            for item in order.items
+        ],
     }
 
 

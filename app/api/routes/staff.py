@@ -1,7 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.api.deps import CAN_MANAGE_STAFF, get_db, require_permission, user_restaurant_id
+from app.core.plans import limits_for_plan
 from app.core.security import get_password_hash
 from app.models import models
 from app.schemas.schemas import StaffCreate
@@ -45,6 +48,23 @@ def create_staff(
         raise HTTPException(status_code=400, detail=f"Invalid role. Must be one of: {', '.join(sorted(VALID_STAFF_ROLES))}")
 
     restaurant_id = user_restaurant_id(user)
+    restaurant = db.get(models.Restaurant, restaurant_id)
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+
+    staff_limit = limits_for_plan(restaurant.plan).get("max_staff")
+    active_staff_count = (
+        db.query(func.count(models.User.id))
+        .filter(models.User.restaurant_id == restaurant_id, models.User.is_active == True)
+        .scalar()
+        or 0
+    )
+    if staff_limit is not None and active_staff_count >= staff_limit:
+        return JSONResponse(
+            status_code=403,
+            content={"error": "staff_limit_reached", "limit": staff_limit, "plan": restaurant.plan},
+        )
+
     existing = db.query(models.User).filter(models.User.username == payload.username).first()
     if existing:
         raise HTTPException(status_code=409, detail="Username already exists")

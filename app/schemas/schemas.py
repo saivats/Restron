@@ -118,6 +118,7 @@ class RestaurantUpdate(BaseModel):
     slug: Optional[str] = None
     is_active: Optional[bool] = None
     plan: Optional[str] = None
+    plan_set_by: Optional[str] = None
     plan_expires_at: Optional[str] = None
     table_count: Optional[int] = None
     gst_rate: Optional[float] = None
@@ -139,6 +140,7 @@ class RestaurantSettingsUpdate(BaseModel):
     table_count: Optional[int] = None
     gst_rate: Optional[float] = None
     menu_pdf_url: Optional[str] = None
+    auto_print_kot: Optional[bool] = None
     currency_symbol: Optional[str] = None
     gstin: Optional[str] = None
     upi_id: Optional[str] = None

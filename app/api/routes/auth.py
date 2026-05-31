@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Response
@@ -31,9 +31,6 @@ async def login(
         if not restaurant.is_active:
             raise HTTPException(status_code=403, detail="This account is inactive. Please contact Restron support.")
 
-        if restaurant.plan_expires_at and restaurant.plan_expires_at < datetime.now(timezone.utc):
-            raise HTTPException(status_code=403, detail="This account is inactive. Please contact Restron support.")
-
         restaurant_id = restaurant.id
 
     user_query = db.query(models.User).filter(
@@ -51,9 +48,6 @@ async def login(
         restaurant = db.get(models.Restaurant, user.restaurant_id)
         if restaurant and not restaurant.is_active:
             raise HTTPException(status_code=403, detail="This account is inactive. Please contact Restron support.")
-        if restaurant and restaurant.plan_expires_at and restaurant.plan_expires_at < datetime.now(timezone.utc):
-            raise HTTPException(status_code=403, detail="This account is inactive. Please contact Restron support.")
-
     effective_restaurant_id = user_restaurant_id(user)
     effective_slug = ""
     if restaurant:

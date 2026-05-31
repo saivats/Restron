@@ -288,12 +288,45 @@
     <script>
         let orders = [];
         let kitchenSocket = null;
+        let autoPrintKot = false;
+        const printedKotIds = new Set();
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[ch]));
+        }
+
+        async function loadKitchenSettings() {
+            try {
+                const res = await fetch('/restaurant/settings/', { credentials: 'include' });
+                if (res.ok) {
+                    const data = await res.json();
+                    autoPrintKot = !!data.auto_print_kot;
+                }
+            } catch (e) { }
+        }
 
         function connectKitchenSocket() {
             if (!('WebSocket' in window)) return;
             const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
             kitchenSocket = new WebSocket(`${protocol}://${window.location.host}/orders/ws/kitchen`);
-            kitchenSocket.onmessage = () => fetchOrders();
+            kitchenSocket.onmessage = async (event) => {
+                let incomingOrderId = null;
+                try {
+                    const payload = JSON.parse(event.data);
+                    incomingOrderId = payload.order?.id || payload.order?.order_id || null;
+                } catch (e) { }
+                await fetchOrders();
+                if (autoPrintKot && incomingOrderId && !printedKotIds.has(incomingOrderId)) {
+                    printedKotIds.add(incomingOrderId);
+                    printKOT(incomingOrderId);
+                }
+            };
             kitchenSocket.onclose = () => setTimeout(connectKitchenSocket, 5000);
         }
 
@@ -348,6 +381,7 @@
                             <span class="order-id">#${order.id}</span>
                         </div>
                         <div class="items">${order.items_summary}</div>
+                        <button onclick="printKOT(${order.id})" class="btn btn-outline btn-small" style="margin-bottom:10px;">Print KOT</button>
                         <button class="done-btn" onclick="markDone(${order.id})">✔ Mark Ready</button>
                     </div>
                 `;
@@ -393,6 +427,39 @@
             });
         }
 
+        function printKOT(orderId) {
+            const order = orders.find(o => o.id === orderId || o.order_id === orderId);
+            if (!order) return alert('Order not found for printing.');
+            const lines = (order.items && order.items.length)
+                ? order.items.map(item => `<div>${escapeHtml(item.qty)}x ${escapeHtml(item.name)}</div>`).join('')
+                : escapeHtml(order.items_summary || '').split(',').map(line => `<div>${escapeHtml(line.trim())}</div>`).join('');
+            const time = order.created_at ? new Date(order.created_at).toLocaleString() : new Date().toLocaleString();
+            const html = `<!doctype html><html><head><title>KOT ${order.id}</title><style>
+                body { font-family: 'Courier New', monospace; font-size: 10px; width: 80mm; color: black; background: white; }
+                .center { text-align: center; font-weight: bold; }
+                @media print {
+                  @page { width: 80mm; margin: 2mm; }
+                  body { font-family: 'Courier New', monospace; font-size: 10px; width: 80mm; color: black; background: white; }
+                }
+            </style></head><body>
+                <div>================================</div>
+                <div class="center">KITCHEN ORDER</div>
+                <div>================================</div>
+                <div>Table: ${escapeHtml(order.table_number || '-')}     KOT: ${escapeHtml(order.kot_number || order.id)}</div>
+                <div>Time: ${escapeHtml(time)}</div>
+                <div>--------------------------------</div>
+                ${lines}
+                <div>--------------------------------</div>
+                <div>Order Type: ${escapeHtml(order.order_type || 'Dine-in')}</div>
+                <div>================================</div>
+                <script>window.onload=function(){window.print(); setTimeout(function(){window.close();}, 500);};<\/script>
+            </body></html>`;
+            const win = window.open('', '_blank', 'width=360,height=640');
+            if (!win) return alert('Allow popups to print KOT.');
+            win.document.write(html);
+            win.document.close();
+        }
+
         async function markDone(orderId) {
             try {
                 const response = await fetch(`/order/${orderId}/done`, {
@@ -418,6 +485,17 @@
         }
 
         // Initial Load
+        function showExpiredOverlay(data) {
+            const overlay = document.getElementById('sub-overlay');
+            if (!overlay) return;
+            if (data.plan === 'trial' && data.expired === true) {
+                overlay.querySelector('p').innerText = 'Your 15-day free trial has ended. Contact Restron to activate your subscription.';
+            } else if (data.plan === 'starter' && data.growth_preview_used === true && data.growth_preview_expires_at) {
+                overlay.querySelector('p').innerText = 'Your Growth preview has ended. Contact Restron to upgrade your plan.';
+            }
+            overlay.style.display = 'flex';
+        }
+
         async function checkSubscription() {
             try {
                 const res = await fetch('/restaurant/status/');
@@ -425,13 +503,15 @@
                     const data = await res.json();
                     let expired = false;
                     if (data.is_active === false) expired = true;
+                    if (data.expired === true) expired = true;
                     if (data.plan_expires_at && new Date(data.plan_expires_at) < new Date()) expired = true;
-                    if (expired) document.getElementById('sub-overlay').style.display = 'flex';
+                    if (expired) showExpiredOverlay(data);
                 }
             } catch (e) { }
         }
 
         checkSubscription();
+        loadKitchenSettings();
         fetchOrders();
         connectKitchenSocket();
         // Poll for new orders every 10s

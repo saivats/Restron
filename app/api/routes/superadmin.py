@@ -7,6 +7,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_superadmin
+from app.core.plans import PLAN_LIMITS
 from app.core.security import create_access_token, get_password_hash, verify_password
 from app.models import models
 from app.schemas.schemas import RestaurantCreate, RestaurantUpdate
@@ -62,12 +63,16 @@ def list_restaurants(
             "name": restaurant.name,
             "slug": restaurant.slug,
             "plan": restaurant.plan,
+            "plan_set_by": restaurant.plan_set_by,
+            "plan_expires_at": restaurant.plan_expires_at.isoformat() if restaurant.plan_expires_at else None,
             "is_active": restaurant.is_active,
             "created_at": restaurant.created_at.isoformat() if restaurant.created_at else None,
             "order_count_30d": order_count,
             "table_count": restaurant.table_count,
             "address": restaurant.address,
             "phone": restaurant.phone,
+            "growth_preview_used": bool(restaurant.growth_preview_used),
+            "growth_preview_expires_at": restaurant.growth_preview_expires_at.isoformat() if restaurant.growth_preview_expires_at else None,
         })
     return result
 
@@ -89,16 +94,20 @@ def create_restaurant(
     generated_password = payload.owner_password or secrets.token_urlsafe(12)
 
     try:
+        created_at = datetime.now(timezone.utc)
         restaurant = models.Restaurant(
             name=payload.restaurant_name,
             slug=payload.slug,
             address=payload.address,
             phone=payload.phone,
             table_count=payload.table_count,
-            plan=payload.plan,
+            plan="trial",
+            plan_set_by="system",
+            plan_expires_at=created_at + timedelta(days=PLAN_LIMITS["trial"]["duration_days"]),
             gst_rate=payload.gst_rate,
             owner_email=payload.owner_email,
             is_active=True,
+            created_at=created_at,
         )
         db.add(restaurant)
         db.flush()
@@ -155,6 +164,8 @@ def update_restaurant(
 
     if "plan_expires_at" in updates and updates["plan_expires_at"]:
         updates["plan_expires_at"] = datetime.fromisoformat(updates["plan_expires_at"]).replace(tzinfo=timezone.utc)
+    if "plan" in updates:
+        updates["plan_set_by"] = "superadmin"
 
     try:
         for field, value in updates.items():

@@ -289,6 +289,7 @@
                     <th>Name</th>
                     <th>Slug</th>
                     <th>Plan</th>
+                    <th>Growth Preview</th>
                     <th>Status</th>
                     <th>Orders (30d)</th>
                     <th>Tables</th>
@@ -296,7 +297,7 @@
                 </tr>
             </thead>
             <tbody id="restaurant-table">
-                <tr><td colspan="8" style="color:#666;">Loading...</td></tr>
+                <tr><td colspan="9" style="color:#666;">Loading...</td></tr>
             </tbody>
         </table>
     </div>
@@ -327,8 +328,9 @@
             <label>Plan</label>
             <select id="cr-plan">
                 <option value="trial">Trial</option>
-                <option value="basic">Basic</option>
-                <option value="premium">Premium</option>
+                <option value="starter">Starter</option>
+                <option value="growth">Growth</option>
+                <option value="pro">Pro</option>
             </select>
             <button class="btn-primary" onclick="createRestaurant()" style="width:100%; margin-top:10px;">Create Restaurant</button>
             <div id="create-result" style="display:none;"></div>
@@ -348,9 +350,9 @@
             <label>Plan</label>
             <select id="edit-plan">
                 <option value="trial">Trial</option>
-                <option value="basic">Basic</option>
-                <option value="premium">Premium</option>
-                <option value="free">Free</option>
+                <option value="starter">Starter</option>
+                <option value="growth">Growth</option>
+                <option value="pro">Pro</option>
             </select>
             <label>Plan Expires At (ISO date, leave blank for no expiry)</label>
             <input id="edit-expires" type="date" placeholder="YYYY-MM-DD">
@@ -371,7 +373,7 @@
             const tbody = document.getElementById('restaurant-table');
 
             if (!data.length) {
-                tbody.innerHTML = '<tr><td colspan="8" style="color:#666;">No restaurants yet. Create one!</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="color:#666;">No restaurants yet. Create one!</td></tr>';
                 return;
             }
 
@@ -379,18 +381,20 @@
             data.forEach(r => {
                 const planBadge = r.plan === 'trial' ? 'badge-trial' : r.plan === 'free' ? 'badge-free' : 'badge-paid';
                 const statusBadge = r.is_active ? 'badge-active' : 'badge-inactive';
+                const previewBadge = r.growth_preview_used ? 'Preview Used' : 'Preview Available';
                 tbody.innerHTML += `
                     <tr>
                         <td>${r.id}</td>
                         <td><strong>${r.name}</strong></td>
                         <td><code>${r.slug || '-'}</code></td>
                         <td><span class="badge ${planBadge}">${r.plan || 'free'}</span></td>
+                        <td><span class="badge ${r.growth_preview_used ? 'badge-inactive' : 'badge-active'}">${previewBadge}</span></td>
                         <td><span class="badge ${statusBadge}">${r.is_active ? 'Active' : 'Inactive'}</span></td>
                         <td>${r.order_count_30d}</td>
                         <td>${r.table_count || '-'}</td>
                         <td>
                             <button class="btn-small btn-outline" onclick="viewStats(${r.id})">Stats</button>
-                            <button class="btn-small btn-outline" onclick="editRestaurant(${r.id}, ${r.is_active}, '${r.plan || 'free'}', '${r.plan_expires_at || ''}', ${r.table_count || 10})">Edit</button>
+                            <button class="btn-small btn-outline" onclick="editRestaurant(${r.id}, ${r.is_active}, '${r.plan || 'trial'}', '${r.plan_expires_at || ''}', ${r.table_count || 10})">Edit</button>
                             ${r.is_active
                                 ? `<button class="btn-small btn-danger" onclick="toggleActive(${r.id}, false)">Deactivate</button>`
                                 : `<button class="btn-small btn-primary" onclick="toggleActive(${r.id}, true)">Activate</button>`
@@ -501,6 +505,7 @@
             const payload = {
                 is_active: document.getElementById('edit-active').value === 'true',
                 plan: document.getElementById('edit-plan').value,
+                plan_set_by: 'superadmin',
                 table_count: parseInt(document.getElementById('edit-tables').value) || 10,
             };
             const expiresVal = document.getElementById('edit-expires').value;

@@ -363,6 +363,17 @@
 
         function logout() { fetch('/logout', {method:'POST'}).then(() => window.location.href='/'); }
 
+        function showExpiredOverlay(data) {
+            const overlay = document.getElementById('sub-overlay');
+            if (!overlay) return;
+            if (data.plan === 'trial' && data.expired === true) {
+                overlay.querySelector('p').innerText = 'Your 15-day free trial has ended. Contact Restron to activate your subscription.';
+            } else if (data.plan === 'starter' && data.growth_preview_used === true && data.growth_preview_expires_at) {
+                overlay.querySelector('p').innerText = 'Your Growth preview has ended. Contact Restron to upgrade your plan.';
+            }
+            overlay.style.display = 'flex';
+        }
+
         async function checkSubscription() {
             try {
                 const res = await fetch('/restaurant/status/');
@@ -370,8 +381,9 @@
                     const data = await res.json();
                     let expired = false;
                     if (data.is_active === false) expired = true;
+                    if (data.expired === true) expired = true;
                     if (data.plan_expires_at && new Date(data.plan_expires_at) < new Date()) expired = true;
-                    if (expired) document.getElementById('sub-overlay').style.display = 'flex';
+                    if (expired) showExpiredOverlay(data);
                 }
             } catch (e) { }
         }
