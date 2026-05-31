@@ -3,6 +3,18 @@
 <head>
     <title>Restron Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#E8851A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Restron">
+    <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', {scope: '/'})
+        .then(reg => console.log('SW registered'))
+        .catch(err => console.log('SW failed:', err));
+    }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
@@ -293,6 +305,9 @@
     </style>
 </head>
 <body>
+    <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#8B1A1A; color:white; text-align:center; padding:8px; font-size:13px; font-family:'DM Sans';">
+      ⚡ You are offline — changes will sync when connection returns
+    </div>
     <div class="subscription-overlay" id="sub-overlay"><div class="msg"><h2>⚠️ Subscription Expired</h2><p>Your subscription has expired. Please contact Restron support.</p></div></div>
     <div class="header">
         <h1>👨‍💼 Manager Dashboard</h1>
@@ -1096,19 +1111,48 @@
             } catch (e) { }
         }
 
+        function openRestronDB() {
+          return new Promise((resolve, reject) => {
+            const req = indexedDB.open('restron-offline', 1);
+            req.onupgradeneeded = e => {
+              const db = e.target.result;
+              if (!db.objectStoreNames.contains('pending_orders'))
+                db.createObjectStore('pending_orders', {keyPath: 'id', autoIncrement: true});
+              if (!db.objectStoreNames.contains('pending_checkouts'))
+                db.createObjectStore('pending_checkouts', {keyPath: 'id', autoIncrement: true});
+            };
+            req.onsuccess = e => resolve(e.target.result);
+            req.onerror = e => reject(e.target.error);
+          });
+        }
+
+        function updateOnlineStatus() {
+          const banner = document.getElementById('offline-banner');
+          if (banner) banner.style.display = navigator.onLine ? 'none' : 'block';
+        }
+        window.addEventListener('online', () => {
+          updateOnlineStatus();
+          if ('serviceWorker' in navigator && 'SyncManager' in window) {
+            navigator.serviceWorker.ready.then(sw => {
+              sw.sync.register('sync-orders');
+              sw.sync.register('sync-checkouts');
+            });
+          }
+          if (typeof loadTables === 'function') loadTables();
+          if (typeof loadDashboard === 'function') loadDashboard();
+        });
+        window.addEventListener('offline', updateOnlineStatus);
+        document.addEventListener('DOMContentLoaded', updateOnlineStatus);
+
         checkSubscription();
         loadTables();
         loadCustomers();
         loadDashboard();
 
-        // Auto-refresh every 10 seconds
         setInterval(() => {
             loadTables();
             loadDashboard();
         }, 10000);
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
-        }
     </script>
 </body>
 </html>

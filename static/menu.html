@@ -3,6 +3,18 @@
 <head>
     <title>Restron Menu</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#E8851A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Restron">
+    <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', {scope: '/'})
+        .then(reg => console.log('SW registered'))
+        .catch(err => console.log('SW failed:', err));
+    }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -206,6 +218,9 @@
     </style>
 </head>
 <body>
+    <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#8B1A1A; color:white; text-align:center; padding:8px; font-size:13px; font-family:'DM Sans';">
+      ⚡ You are offline — orders will sync when connection returns
+    </div>
     <div class="app-shell">
         <header class="menu-header">
             <div class="restaurant-row">
@@ -422,6 +437,50 @@
             document.getElementById('drawer-total').innerText = `₹${total}`;
         }
 
+        function openRestronDB() {
+          return new Promise((resolve, reject) => {
+            const req = indexedDB.open('restron-offline', 1);
+            req.onupgradeneeded = e => {
+              const db = e.target.result;
+              if (!db.objectStoreNames.contains('pending_orders'))
+                db.createObjectStore('pending_orders', {keyPath: 'id', autoIncrement: true});
+              if (!db.objectStoreNames.contains('pending_checkouts'))
+                db.createObjectStore('pending_checkouts', {keyPath: 'id', autoIncrement: true});
+            };
+            req.onsuccess = e => resolve(e.target.result);
+            req.onerror = e => reject(e.target.error);
+          });
+        }
+
+        async function submitOrderWithOfflineSupport(orderData, slug) {
+          if (navigator.onLine) {
+            return await fetch('/order/?slug=' + encodeURIComponent(slug), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(orderData)
+            });
+          }
+          const db = await openRestronDB();
+          await new Promise((resolve, reject) => {
+            const tx = db.transaction('pending_orders', 'readwrite');
+            tx.objectStore('pending_orders').add({
+              slug: slug,
+              data: orderData,
+              timestamp: Date.now()
+            });
+            tx.oncomplete = resolve;
+            tx.onerror = reject;
+          });
+          if ('serviceWorker' in navigator && 'SyncManager' in window) {
+            const sw = await navigator.serviceWorker.ready;
+            await sw.sync.register('sync-orders');
+          }
+          return {
+            ok: true,
+            json: async () => ({ message: 'Order queued for sync', offline: true })
+          };
+        }
+
         async function confirmOrder() {
             const geofenceActive = geofenceConfig.latitude != null && geofenceConfig.longitude != null;
             const lastOrderTime = localStorage.getItem('lastOrderTime');
@@ -442,13 +501,16 @@
             if (tableInput.toLowerCase() === 'd' || tableInput.toLowerCase() === 'delivery') type = 'Delivery';
             else tableNum = parseInt(tableInput) || 0;
             try {
-                const response = await fetch('/order/?slug=' + encodeURIComponent(extractSlugFromUrl()), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ table_number: tableNum, items: orderItems, order_type: type, customer_phone: phoneInput || null })
-                });
+                const response = await submitOrderWithOfflineSupport(
+                    { table_number: tableNum, items: orderItems, order_type: type, customer_phone: phoneInput || null },
+                    extractSlugFromUrl()
+                );
                 if (response.ok) {
-                    alert(type === 'Delivery' ? 'Delivery order placed.' : 'Order placed.');
+                    const data = await response.json();
+                    const offlineMsg = data.offline
+                        ? 'Order saved! It will be sent to the kitchen when connection is restored.'
+                        : (type === 'Delivery' ? 'Delivery order placed.' : 'Order placed.');
+                    alert(offlineMsg);
                     localStorage.setItem('lastOrderTime', Date.now().toString());
                     cart = {};
                     closeModal();
@@ -464,8 +526,22 @@
             }
         }
 
+        function updateOnlineStatus() {
+          const banner = document.getElementById('offline-banner');
+          if (banner) banner.style.display = navigator.onLine ? 'none' : 'block';
+        }
+        window.addEventListener('online', () => {
+          updateOnlineStatus();
+          if ('serviceWorker' in navigator && 'SyncManager' in window) {
+            navigator.serviceWorker.ready.then(sw => {
+              sw.sync.register('sync-orders');
+            });
+          }
+        });
+        window.addEventListener('offline', updateOnlineStatus);
+        document.addEventListener('DOMContentLoaded', updateOnlineStatus);
+
         loadMenu();
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
     </script>
 </body>
 </html>

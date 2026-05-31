@@ -3,6 +3,18 @@
 <head>
     <title>Restron Owner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#E8851A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Restron">
+    <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', {scope: '/'})
+        .then(reg => console.log('SW registered'))
+        .catch(err => console.log('SW failed:', err));
+    }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
@@ -302,6 +314,9 @@
     </style>
 </head>
 <body>
+    <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#8B1A1A; color:white; text-align:center; padding:8px; font-size:13px; font-family:'DM Sans';">
+      ⚡ You are offline — showing cached data
+    </div>
     <div class="subscription-overlay" id="sub-overlay">
         <div class="msg">
             <h2>⚠️ Subscription Expired</h2>
@@ -1015,11 +1030,19 @@
             document.getElementById('qr-modal-overlay').style.display = 'none';
         }
 
+        function updateOnlineStatus() {
+          const banner = document.getElementById('offline-banner');
+          if (banner) banner.style.display = navigator.onLine ? 'none' : 'block';
+        }
+        window.addEventListener('online', () => {
+          updateOnlineStatus();
+          if (typeof loadData === 'function') loadData();
+        });
+        window.addEventListener('offline', updateOnlineStatus);
+        document.addEventListener('DOMContentLoaded', updateOnlineStatus);
+
         checkSubscription();
         loadData();
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
-        }
     </script>
 </body>
 </html>

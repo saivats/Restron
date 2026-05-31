@@ -3,6 +3,18 @@
 <head>
     <title>Restron Kitchen Display</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#E8851A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Restron">
+    <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', {scope: '/'})
+        .then(reg => console.log('SW registered'))
+        .catch(err => console.log('SW failed:', err));
+    }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
@@ -281,8 +293,11 @@
     </style>
 </head>
 <body>
+    <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#8B1A1A; color:white; text-align:center; padding:8px; font-size:13px; font-family:'DM Sans';">
+      ⚡ You are offline — showing last known orders
+    </div>
     <div class="subscription-overlay" id="sub-overlay"><div class="msg"><h2>⚠️ Subscription Expired</h2><p>Your subscription has expired. Please contact Restron support.</p></div></div>
-    <div class="header"><h1>🧑‍🍳 Kitchen Live Orders</h1></div>
+    <div class="header"><h1>🧑‍🍳 Kitchen Live Orders</h1><span id="last-updated-label" style="color:var(--text-muted); font-size:12px;"></span></div>
     <div id="orders-container"><p style="text-align:center; width:100%">Connecting to Kitchen...</p></div>
 
     <script>
@@ -514,13 +529,42 @@
         loadKitchenSettings();
         fetchOrders();
         connectKitchenSocket();
-        // Poll for new orders every 10s
-        setInterval(fetchOrders, 10000);
-        // Update Timers every 1s
-        setInterval(updateTimers, 1000);
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js').catch(console.warn);
+        let lastDataFetchTime = null;
+
+        function updateLastUpdatedLabel() {
+            const label = document.getElementById('last-updated-label');
+            if (!label || !lastDataFetchTime) return;
+            if (navigator.onLine) { label.innerText = ''; return; }
+            const diffMs = Date.now() - lastDataFetchTime;
+            const diffMin = Math.floor(diffMs / 60000);
+            label.innerText = diffMin < 1 ? 'Last updated: just now' : `Last updated: ${diffMin} min ago`;
         }
+
+        const origFetchOrders = fetchOrders;
+        fetchOrders = async function() {
+            try {
+                await origFetchOrders.apply(this, arguments);
+                lastDataFetchTime = Date.now();
+            } catch (e) {
+                updateLastUpdatedLabel();
+            }
+        };
+
+        function updateOnlineStatus() {
+          const banner = document.getElementById('offline-banner');
+          if (banner) banner.style.display = navigator.onLine ? 'none' : 'block';
+          updateLastUpdatedLabel();
+        }
+        window.addEventListener('online', () => {
+          updateOnlineStatus();
+          if (typeof fetchOrders === 'function') fetchOrders();
+          if (typeof connectKitchenSocket === 'function') connectKitchenSocket();
+        });
+        window.addEventListener('offline', updateOnlineStatus);
+        document.addEventListener('DOMContentLoaded', updateOnlineStatus);
+        setInterval(updateLastUpdatedLabel, 30000);
+        setInterval(fetchOrders, 10000);
+        setInterval(updateTimers, 1000);
 
     </script>
 </body>

@@ -186,12 +186,19 @@ def _get_user_slug(user: models.User | None) -> str:
 
 @app.get("/manifest.json")
 async def manifest():
-    return static_file("manifest.json")
+    return FileResponse(
+        STATIC_DIR / "manifest.json",
+        media_type="application/manifest+json",
+    )
 
 
-@app.get("/service-worker.js")
+@app.get("/sw.js")
 async def service_worker():
-    return static_file("service-worker.js")
+    return FileResponse(
+        STATIC_DIR / "sw.js",
+        media_type="application/javascript",
+        headers={"Service-Worker-Allowed": "/"},
+    )
 
 
 @app.get("/health")

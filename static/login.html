@@ -3,6 +3,18 @@
 <head>
     <title>Restron Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#E8851A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Restron">
+    <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', {scope: '/'})
+        .then(reg => console.log('SW registered'))
+        .catch(err => console.log('SW failed:', err));
+    }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <style>
@@ -249,38 +261,6 @@
         .box h2 { font-size: 34px !important; text-align: center; }
         .box button { width: 100%; background: linear-gradient(135deg, #E8851A, #C4690E) !important; color: white !important; padding: 12px 18px; }
         .table-card, .occupied, .available, .order-card, .done-btn, .timer-badge, .item-row, .qty-btn, .staff-card, .qr-card, .checkout-modal, .customer-card, .history-row, .menu-item-row { border-radius: 12px; }
-
-        .qr-modal-overlay {
-            position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
-            background-color: rgba(13, 10, 6, 0.8); backdrop-filter: blur(4px); padding: 1rem;
-        }
-        .qr-modal {
-            background-color: rgba(26, 21, 16, 0.95); backdrop-filter: blur(12px); border-radius: 1rem; padding: 2rem; border: 1px solid var(--border-color); text-align: center;
-        }
-        .qr-modal img { margin: 1rem auto; max-width: 200px; display: block; border-radius: 0.5rem; }
-        .qr-url { word-break: break-all; color: var(--text-secondary); font-size: 0.875rem; }
-
-        .subscription-overlay {
-            display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; text-align: center; color: #F5EBE1;
-        }
-        
-        /* Menu overrides that were lost when stripping tailwind */
-        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-color); padding: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; z-index: 50; }
-        .search-box { margin-bottom: 1rem; }
-        .ornate-divider { display: flex; align-items: center; margin: 2rem 0 1rem; text-align: center; }
-        .ornate-divider::before, .ornate-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--primary-color); opacity: 0.3; }
-        .scroll-mt-40 { scroll-margin-top: 10rem; }
-        .glass-effect { background-color: rgba(26, 21, 16, 0.9); backdrop-filter: blur(12px); }
-
-    </style>
-</head>
-<body>
-    <div class="box" id="login-box">
-        <h2>🔒 Staff Login</h2>
-        <input id="u" placeholder="Username">
-        <input id="p" type="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <p id="msg" style="color:red; margin-top:10px; font-size:0.9em;"></p>
     </div>
     <div class="box inactive-banner" id="inactive-box" style="display:none;">
         <h2>⚠️ Account Inactive</h2>
@@ -333,6 +313,14 @@
         document.getElementById('p').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') login();
         });
+
+        function updateOnlineStatus() {
+          const banner = document.getElementById('offline-banner');
+          if (banner) banner.style.display = navigator.onLine ? 'none' : 'block';
+        }
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        document.addEventListener('DOMContentLoaded', updateOnlineStatus);
     </script>
 </body>
 </html>
