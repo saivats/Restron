@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db
 from app.api.routes import analytics, auth, checkout, customers, inventory, legacy, menu, orders, tables
@@ -189,6 +190,35 @@ async def manifest():
     return FileResponse(
         STATIC_DIR / "manifest.json",
         media_type="application/manifest+json",
+    )
+
+
+@app.get("/r/{slug}/manifest.json")
+async def restaurant_manifest(slug: str, db: Session = Depends(get_db)):
+    restaurant = db.query(models.Restaurant).filter(
+        models.Restaurant.slug == slug).first()
+    if not restaurant:
+        raise HTTPException(status_code=404)
+    return JSONResponse(
+        content={
+            "name": f"{restaurant.name} POS",
+            "short_name": restaurant.name[:12],
+            "start_url": f"/r/{slug}/login",
+            "scope": "/",
+            "display": "standalone",
+            "background_color": "#0D0A06",
+            "theme_color": "#E8851A",
+            "orientation": "any",
+            "icons": [
+                {"src": "/static/icon-192.png",
+                 "sizes": "192x192", "type": "image/png",
+                 "purpose": "any maskable"},
+                {"src": "/static/icon-512.png",
+                 "sizes": "512x512", "type": "image/png",
+                 "purpose": "any maskable"}
+            ]
+        },
+        media_type="application/manifest+json"
     )
 
 

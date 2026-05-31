@@ -261,6 +261,22 @@
         .box h2 { font-size: 34px !important; text-align: center; }
         .box button { width: 100%; background: linear-gradient(135deg, #E8851A, #C4690E) !important; color: white !important; padding: 12px 18px; }
         .table-card, .occupied, .available, .order-card, .done-btn, .timer-badge, .item-row, .qty-btn, .staff-card, .qr-card, .checkout-modal, .customer-card, .history-row, .menu-item-row { border-radius: 12px; }
+    </style>
+    <script>
+    (function() {
+      const parts = window.location.pathname.split('/');
+      const rIndex = parts.indexOf('r');
+      if (rIndex !== -1 && parts[rIndex + 1]) {
+        const slug = parts[rIndex + 1];
+        const link = document.querySelector('link[rel="manifest"]');
+        if (link) link.href = '/r/' + slug + '/manifest.json';
+      }
+    })();
+    </script>
+</head>
+<body>
+    <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#8B1A1A; color:white; text-align:center; padding:8px; font-size:13px; font-family:'DM Sans';">
+      ⚡ You are offline — orders will sync when connection returns
     </div>
     <div class="box inactive-banner" id="inactive-box" style="display:none;">
         <h2>⚠️ Account Inactive</h2>

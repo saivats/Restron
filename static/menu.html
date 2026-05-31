@@ -216,6 +216,17 @@
             .food-photo, .photo-placeholder { width: 132px; height: 132px; }
         }
     </style>
+    <script>
+    (function() {
+      const parts = window.location.pathname.split('/');
+      const rIndex = parts.indexOf('r');
+      if (rIndex !== -1 && parts[rIndex + 1]) {
+        const slug = parts[rIndex + 1];
+        const link = document.querySelector('link[rel="manifest"]');
+        if (link) link.href = '/r/' + slug + '/manifest.json';
+      }
+    })();
+    </script>
 </head>
 <body>
     <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#8B1A1A; color:white; text-align:center; padding:8px; font-size:13px; font-family:'DM Sans';">
