@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Restron — Restaurant Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0D0A06;
+      --bg-card: #221A0E;
+      --primary: #E8851A;
+      --border: rgba(232,133,26,0.15);
+      --text: #F5E6D0;
+      --muted: #9A8070;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-base);
+      background-image: radial-gradient(ellipse at top, #2A1A08 0%, #0D0A06 70%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      padding: 24px;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 40px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 80px rgba(232,133,26,0.1);
+    }
+    .logo {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, #E8851A, #C4690E);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 32px; font-weight: 700; color: white;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 40px rgba(232,133,26,0.3);
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px; color: var(--primary);
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: var(--muted); font-size: 15px;
+      line-height: 1.6; margin-bottom: 36px;
+    }
+    .input-row {
+      display: flex; gap: 8px; margin-bottom: 16px;
+    }
+    input {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-family: 'DM Sans'; font-size: 15px;
+    }
+    input:focus { outline: none; border-color: var(--primary); }
+    input::placeholder { color: var(--muted); }
+    button {
+      background: linear-gradient(135deg, #E8851A, #C4690E);
+      color: white; border: none; border-radius: 10px;
+      padding: 12px 20px; font-family: 'DM Sans';
+      font-weight: 600; font-size: 15px; cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    button:hover { box-shadow: 0 4px 16px rgba(232,133,26,0.4); }
+    button:active { transform: scale(0.97); }
+    .contact {
+      margin-top: 24px; color: var(--muted); font-size: 13px;
+    }
+    .contact a { color: var(--primary); text-decoration: none; }
+    .features {
+      display: flex; gap: 16px; margin-bottom: 36px;
+      justify-content: center; flex-wrap: wrap;
+    }
+    .feature {
+      background: rgba(232,133,26,0.08);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px;
+      font-size: 12px; color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">R</div>
+  <h1>Restron</h1>
+  <p class="subtitle">Modern restaurant management system.<br>QR ordering, kitchen display, live analytics.</p>
+  <div class="features">
+    <span class="feature">📱 QR Ordering</span>
+    <span class="feature">👨‍🍳 Kitchen Display</span>
+    <span class="feature">📊 Analytics</span>
+    <span class="feature">🧾 Receipts</span>
+  </div>
+  <div class="input-row">
+    <input type="text" id="slug" placeholder="your-restaurant-name" />
+    <button onclick="go()">Login →</button>
+  </div>
+  <div class="contact">
+    New restaurant? Contact us at
+    <a href="mailto:restronsupport@gmail.com">restronsupport@gmail.com</a>
+  </div>
+</div>
+<script>
+  function go() {
+    const slug = document.getElementById('slug').value.trim();
+    if (slug) window.location.href = '/r/' + slug + '/login';
+  }
+  document.getElementById('slug').addEventListener('keydown', e => {
+    if (e.key === 'Enter') go();
+  });
+</script>
+</body>
+</html>

@@ -58,6 +58,11 @@ def _resolve_restaurant(slug: str, db):
     return db.query(models.Restaurant).filter(models.Restaurant.slug == slug).first()
 
 
+@app.get("/", response_class=HTMLResponse)
+async def landing_page():
+    return static_file("landing.html")
+
+
 @app.get("/r/{slug}/login", response_class=HTMLResponse)
 async def slug_login_page(slug: str):
     return static_file("login.html")

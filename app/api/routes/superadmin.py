@@ -7,6 +7,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_superadmin
+from app.core.config import PUBLIC_BASE_URL
 from app.core.plans import PLAN_LIMITS
 from app.core.security import create_access_token, get_password_hash, verify_password
 from app.models import models
@@ -58,6 +59,12 @@ def list_restaurants(
             .scalar()
             or 0
         )
+        owner = (
+            db.query(models.User)
+            .filter(models.User.restaurant_id == restaurant.id, models.User.role == "owner")
+            .first()
+        )
+        login_url = f"{PUBLIC_BASE_URL}/r/{restaurant.slug}/login" if restaurant.slug else None
         result.append({
             "id": restaurant.id,
             "name": restaurant.name,
@@ -73,6 +80,8 @@ def list_restaurants(
             "phone": restaurant.phone,
             "growth_preview_used": bool(restaurant.growth_preview_used),
             "growth_preview_expires_at": restaurant.growth_preview_expires_at.isoformat() if restaurant.growth_preview_expires_at else None,
+            "owner_username": owner.username if owner else None,
+            "login_url": login_url,
         })
     return result
 
@@ -232,3 +241,31 @@ def restaurant_stats(
         "revenue_total": round(float(revenue_total), 2),
         "last_activity": last_order[0].isoformat() if last_order and last_order[0] else None,
     }
+
+
+@router.patch("/restaurants/{restaurant_id}/reset-password")
+def reset_owner_password(
+    restaurant_id: int,
+    payload: dict,
+    db: Session = Depends(get_db),
+    admin: models.SuperAdmin = Depends(require_superadmin),
+):
+    restaurant = db.get(models.Restaurant, restaurant_id)
+    if not restaurant:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+
+    new_password = payload.get("new_password", "").strip()
+    if not new_password or len(new_password) < 4:
+        raise HTTPException(status_code=400, detail="Password must be at least 4 characters")
+
+    owner = (
+        db.query(models.User)
+        .filter(models.User.restaurant_id == restaurant_id, models.User.role == "owner")
+        .first()
+    )
+    if not owner:
+        raise HTTPException(status_code=404, detail="No owner user found for this restaurant")
+
+    owner.password_hash = get_password_hash(new_password)
+    db.commit()
+    return {"success": True, "username": owner.username}

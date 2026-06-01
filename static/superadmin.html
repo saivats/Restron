@@ -303,16 +303,15 @@
                     <th>ID</th>
                     <th>Name</th>
                     <th>Slug</th>
+                    <th>Owner</th>
                     <th>Plan</th>
-                    <th>Growth Preview</th>
                     <th>Status</th>
                     <th>Orders (30d)</th>
-                    <th>Tables</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="restaurant-table">
-                <tr><td colspan="9" style="color:#666;">Loading...</td></tr>
+                <tr><td colspan="8" style="color:#666;">Loading...</td></tr>
             </tbody>
         </table>
     </div>
@@ -377,6 +376,18 @@
         </div>
     </div>
 
+    <div id="reset-modal" class="modal">
+        <div class="modal-content" style="max-width:400px;">
+            <span class="modal-close" onclick="closeResetModal()">&times;</span>
+            <h2 style="color:#a29bfe; margin-bottom:20px;">Reset Owner Password</h2>
+            <input type="hidden" id="reset-restaurant-id">
+            <p style="margin-bottom:16px; color:var(--text-secondary);">Owner: <strong id="reset-username-display"></strong></p>
+            <label>New Password</label>
+            <input id="reset-new-password" type="password" placeholder="Enter new password">
+            <button class="btn-primary" onclick="submitResetPassword()" style="width:100%; margin-top:10px;">Reset Password</button>
+        </div>
+    </div>
+
     <script>
         async function loadRestaurants() {
             const res = await fetch('/superadmin/restaurants/');
@@ -388,7 +399,7 @@
             const tbody = document.getElementById('restaurant-table');
 
             if (!data.length) {
-                tbody.innerHTML = '<tr><td colspan="9" style="color:#666;">No restaurants yet. Create one!</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="color:#666;">No restaurants yet. Create one!</td></tr>';
                 return;
             }
 
@@ -396,20 +407,20 @@
             data.forEach(r => {
                 const planBadge = r.plan === 'trial' ? 'badge-trial' : r.plan === 'free' ? 'badge-free' : 'badge-paid';
                 const statusBadge = r.is_active ? 'badge-active' : 'badge-inactive';
-                const previewBadge = r.growth_preview_used ? 'Preview Used' : 'Preview Available';
                 tbody.innerHTML += `
                     <tr>
                         <td>${r.id}</td>
                         <td><strong>${r.name}</strong></td>
                         <td><code>${r.slug || '-'}</code></td>
+                        <td>${r.owner_username || '-'}</td>
                         <td><span class="badge ${planBadge}">${r.plan || 'free'}</span></td>
-                        <td><span class="badge ${r.growth_preview_used ? 'badge-inactive' : 'badge-active'}">${previewBadge}</span></td>
                         <td><span class="badge ${statusBadge}">${r.is_active ? 'Active' : 'Inactive'}</span></td>
                         <td>${r.order_count_30d}</td>
-                        <td>${r.table_count || '-'}</td>
                         <td>
                             <button class="btn-small btn-outline" onclick="viewStats(${r.id})">Stats</button>
                             <button class="btn-small btn-outline" onclick="editRestaurant(${r.id}, ${r.is_active}, '${r.plan || 'trial'}', '${r.plan_expires_at || ''}', ${r.table_count || 10})">Edit</button>
+                            <button class="btn-small btn-outline" onclick="copyCredentials('${r.name}', '${r.slug}', '${r.owner_username || ''}')">Copy Creds</button>
+                            <button class="btn-small btn-outline" onclick="openResetModal(${r.id}, '${r.owner_username || ''}')">Reset Pwd</button>
                             ${r.is_active
                                 ? `<button class="btn-small btn-danger" onclick="toggleActive(${r.id}, false)">Deactivate</button>`
                                 : `<button class="btn-small btn-primary" onclick="toggleActive(${r.id}, true)">Activate</button>`
@@ -549,6 +560,49 @@
         async function logout() {
             await fetch('/superadmin/logout', { method: 'POST' });
             window.location.href = '/superadmin/login';
+        }
+
+        function copyCredentials(name, slug, ownerUsername) {
+            const loginUrl = window.location.origin + '/r/' + slug + '/login';
+            const text = 'Restaurant: ' + name + '\nLogin URL: ' + loginUrl + '\nOwner Username: ' + ownerUsername;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Credentials copied to clipboard!');
+            }).catch(() => {
+                prompt('Copy these credentials:', text);
+            });
+        }
+
+        function openResetModal(restaurantId, ownerUsername) {
+            document.getElementById('reset-restaurant-id').value = restaurantId;
+            document.getElementById('reset-username-display').innerText = ownerUsername || 'Unknown';
+            document.getElementById('reset-new-password').value = '';
+            document.getElementById('reset-modal').style.display = 'block';
+        }
+
+        function closeResetModal() {
+            document.getElementById('reset-modal').style.display = 'none';
+        }
+
+        async function submitResetPassword() {
+            const id = document.getElementById('reset-restaurant-id').value;
+            const newPassword = document.getElementById('reset-new-password').value;
+            if (!newPassword || newPassword.length < 4) {
+                alert('Password must be at least 4 characters');
+                return;
+            }
+            const res = await fetch('/superadmin/restaurants/' + id + '/reset-password', {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'include',
+                body: JSON.stringify({ new_password: newPassword })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert('Password reset for ' + data.username);
+                closeResetModal();
+            } else {
+                alert('Failed: ' + (data.detail || 'Unknown error'));
+            }
         }
 
         loadRestaurants();
