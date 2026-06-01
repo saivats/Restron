@@ -147,18 +147,15 @@
             transform: translateY(-4px);
         }
         
-        /* Table specifics */
         .table-card { text-align: center; justify-content: center; align-items: center; }
         .table-card h3 { margin-bottom: 0.5rem; }
         .table-card.occupied { border-color: rgba(147, 0, 10, 0.5) !important; box-shadow: 0 0 15px rgba(147, 0, 10, 0.2) !important; }
         .table-card.available { border-color: rgba(46, 125, 50, 0.5) !important; box-shadow: 0 0 15px rgba(46, 125, 50, 0.2) !important; }
 
-        /* Kitchen Orders */
         .order-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
         .order-items { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
         .order-item { display: flex; justify-content: space-between; font-size: 0.875rem; padding: 0.5rem; background-color: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; }
         
-        /* Buttons */
         button, .btn {
             font-family: 'DM Sans', sans-serif;
             font-weight: 600;
@@ -261,6 +258,28 @@
         .box h2 { font-size: 34px !important; text-align: center; }
         .box button { width: 100%; background: linear-gradient(135deg, #E8851A, #C4690E) !important; color: white !important; padding: 12px 18px; }
         .table-card, .occupied, .available, .order-card, .done-btn, .timer-badge, .item-row, .qty-btn, .staff-card, .qr-card, .checkout-modal, .customer-card, .history-row, .menu-item-row { border-radius: 12px; }
+
+        .qr-modal-overlay {
+            position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
+            background-color: rgba(13, 10, 6, 0.8); backdrop-filter: blur(4px); padding: 1rem;
+        }
+        .qr-modal {
+            background-color: rgba(26, 21, 16, 0.95); backdrop-filter: blur(12px); border-radius: 1rem; padding: 2rem; border: 1px solid var(--border-color); text-align: center;
+        }
+        .qr-modal img { margin: 1rem auto; max-width: 200px; display: block; border-radius: 0.5rem; }
+        .qr-url { word-break: break-all; color: var(--text-secondary); font-size: 0.875rem; }
+
+        .subscription-overlay {
+            display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; text-align: center; color: #F5EBE1;
+        }
+        
+        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-color); padding: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; z-index: 50; }
+        .search-box { margin-bottom: 1rem; }
+        .ornate-divider { display: flex; align-items: center; margin: 2rem 0 1rem; text-align: center; }
+        .ornate-divider::before, .ornate-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--primary-color); opacity: 0.3; }
+        .scroll-mt-40 { scroll-margin-top: 10rem; }
+        .glass-effect { background-color: rgba(26, 21, 16, 0.9); backdrop-filter: blur(12px); }
+
     </style>
     <script>
     (function() {
@@ -277,6 +296,13 @@
 <body>
     <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#8B1A1A; color:white; text-align:center; padding:8px; font-size:13px; font-family:'DM Sans';">
       ⚡ You are offline — orders will sync when connection returns
+    </div>
+    <div class="box" id="login-box">
+        <h2>🔒 Staff Login</h2>
+        <input id="u" placeholder="Username">
+        <input id="p" type="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="msg" style="color:red; margin-top:10px; font-size:0.9em;"></p>
     </div>
     <div class="box inactive-banner" id="inactive-box" style="display:none;">
         <h2>⚠️ Account Inactive</h2>
