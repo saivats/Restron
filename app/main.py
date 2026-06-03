@@ -8,7 +8,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db
-from app.api.routes import analytics, auth, checkout, customers, inventory, legacy, menu, orders, tables
+from app.api.routes import analytics, auth, checkout, customers, inventory, legacy, menu, orders, reservations, tables
 from app.api.routes import qr as qr_routes
 from app.api.routes import settings as settings_routes
 from app.api.routes import staff as staff_routes
@@ -45,6 +45,7 @@ app.include_router(staff_routes.router, prefix="/staff", tags=["Staff"])
 app.include_router(settings_routes.router, prefix="/restaurant", tags=["Restaurant Settings"])
 app.include_router(qr_routes.router, prefix="/restaurant", tags=["QR Codes"])
 app.include_router(superadmin_routes.router, prefix="/superadmin", tags=["Super Admin"])
+app.include_router(reservations.router, prefix="/reservations", tags=["Reservations"])
 app.include_router(legacy.router, tags=["Legacy Screen Compatibility"])
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
@@ -111,6 +112,11 @@ async def slug_admin(slug: str, user: models.User | None = Depends(get_current_u
 @app.get("/r/{slug}/receipt/{order_id}", response_class=HTMLResponse)
 async def slug_receipt_page(slug: str, order_id: int):
     return static_file("receipt.html")
+
+
+@app.get("/r/{slug}/reserve", response_class=HTMLResponse)
+async def slug_reserve_page(slug: str):
+    return static_file("reservations.html")
 
 
 @app.get("/r/{slug}/receipt/{order_id}/data")
@@ -211,8 +217,8 @@ async def restaurant_manifest(slug: str, db: Session = Depends(get_db)):
             "start_url": f"/r/{slug}/login",
             "scope": "/",
             "display": "standalone",
-            "background_color": "#0D0A06",
-            "theme_color": "#E8851A",
+            "background_color": "#080808",
+            "theme_color": "#6366F1",
             "orientation": "any",
             "icons": [
                 {"src": "/static/icon-192.png",

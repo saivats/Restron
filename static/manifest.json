@@ -4,8 +4,8 @@
   "description": "Restaurant Management System",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0D0A06",
-  "theme_color": "#E8851A",
+  "background_color": "#080808",
+  "theme_color": "#6366F1",
   "orientation": "any",
   "icons": [
     {

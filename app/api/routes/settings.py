@@ -67,6 +67,12 @@ def get_restaurant_settings(
         "latitude": restaurant.latitude,
         "longitude": restaurant.longitude,
         "geofence_radius_meters": restaurant.geofence_radius_meters,
+        "reservations_enabled": bool(restaurant.reservations_enabled),
+        "reservation_open_time": restaurant.reservation_open_time,
+        "reservation_close_time": restaurant.reservation_close_time,
+        "reservation_slot_duration": restaurant.reservation_slot_duration,
+        "reservation_max_party": restaurant.reservation_max_party,
+        "reservation_advance_days": restaurant.reservation_advance_days,
     }
 
 

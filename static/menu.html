@@ -4,7 +4,7 @@
     <title>Restron Menu</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#E8851A">
+    <meta name="theme-color" content="#6366F1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Restron">
@@ -16,50 +16,50 @@
     }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #0D0A06;
-            --bg-surface: #1A1208;
-            --bg-card: #221A0E;
-            --primary: #E8851A;
-            --primary-dark: #C4690E;
-            --secondary: #8B1A3A;
-            --text-primary: #F5E6D0;
-            --text-muted: #9A8070;
-            --border: rgba(232, 133, 26, 0.15);
-            --glow: rgba(232, 133, 26, 0.08);
-            --success: #2D7A4F;
-            --danger: #8B1A1A;
+            --bg-base: #080808;
+            --bg-surface: #111111;
+            --bg-card: #161616;
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --secondary: #8B5CF6;
+            --text-primary: #F0F0F0;
+            --text-muted: #888888;
+            --border: rgba(99, 102, 241, 0.15);
+            --glow: rgba(99, 102, 241, 0.08);
+            --success: #22C55E;
+            --danger: #EF4444;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             min-height: 100vh;
             background: var(--bg-base);
-            background-image: radial-gradient(ellipse at top, #2A1A08 0%, #0D0A06 70%);
+            background-image: radial-gradient(ellipse at 20% 0%, rgba(99,102,241,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(139,92,246,0.06) 0%, transparent 50%);
             color: var(--text-primary);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             padding-bottom: 110px;
         }
-        h1, h2, h3 { font-family: 'Playfair Display', serif; color: var(--primary); }
+        h1, h2, h3 { font-family: 'Inter', serif; color: var(--primary); }
         button, .btn {
             padding: 10px 20px;
             border-radius: 10px;
             border: none;
             cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             transition: all 0.15s ease;
         }
         button:active, .btn:active { transform: scale(0.97); }
         button:disabled { opacity: 0.55; cursor: not-allowed; }
         .btn-primary, .add-btn {
-            background: linear-gradient(135deg, #E8851A, #C4690E);
+            background: linear-gradient(135deg, #6366F1, #4F46E5);
             color: white;
         }
         .btn-primary:hover, .add-btn:hover {
             background: linear-gradient(135deg, #F09030, #D4790E);
-            box-shadow: 0 4px 16px rgba(232,133,26,0.4);
+            box-shadow: 0 4px 16px rgba(99,102,241,0.4);
         }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
         input, select, textarea {
@@ -69,13 +69,13 @@
             border-radius: 10px;
             padding: 12px 14px;
             color: var(--text-primary);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             transition: border-color 0.2s ease;
         }
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(232,133,26,0.1);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
         }
         .app-shell { max-width: 720px; margin: 0 auto; padding: 18px 14px; }
         .menu-header {
@@ -95,8 +95,8 @@
             align-items: center;
             padding: 5px 12px;
             border-radius: 999px;
-            border: 1px solid rgba(232,133,26,0.3);
-            background: rgba(232,133,26,0.16);
+            border: 1px solid rgba(99,102,241,0.3);
+            background: rgba(99,102,241,0.16);
             color: var(--primary);
             font-size: 12px;
             font-weight: 700;
@@ -139,16 +139,16 @@
             height: 96px;
             border-radius: 12px;
             object-fit: cover;
-            background: linear-gradient(135deg, #E8851A, #8B1A3A);
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
             color: white;
             display: grid;
             place-items: center;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', serif;
             font-size: 32px;
         }
         .item-body { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
         .item-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-        .item-name { color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700; }
+        .item-name { color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; }
         .item-price { color: var(--primary); font-weight: 800; white-space: nowrap; }
         .item-desc { color: var(--text-muted); font-size: 13px; line-height: 1.35; }
         .veg-dot, .nonveg-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 7px; }
@@ -180,9 +180,9 @@
             gap: 12px;
             padding: 14px;
             border-radius: 18px;
-            background: linear-gradient(135deg, #E8851A, #C4690E);
+            background: linear-gradient(135deg, #6366F1, #4F46E5);
             color: white;
-            box-shadow: 0 16px 44px rgba(0,0,0,0.5), 0 6px 24px rgba(232,133,26,0.35);
+            box-shadow: 0 16px 44px rgba(0,0,0,0.5), 0 6px 24px rgba(99,102,241,0.35);
         }
         .cart-meta { display: flex; flex-direction: column; gap: 2px; }
         .cart-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.75; }
@@ -229,7 +229,7 @@
     </script>
 </head>
 <body>
-    <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#8B1A1A; color:white; text-align:center; padding:8px; font-size:13px; font-family:'DM Sans';">
+    <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#EF4444; color:white; text-align:center; padding:8px; font-size:13px; font-family:'Inter';">
       ⚡ You are offline — orders will sync when connection returns
     </div>
     <div class="app-shell">
@@ -255,6 +255,8 @@
         </div>
         <button onclick="openModal()" id="view-cart-btn" disabled>View Cart</button>
     </div>
+
+    <a id="reserve-cta" style="display:none; position:fixed; bottom:90px; right:16px; z-index:40; background:linear-gradient(135deg,#6366F1,#4F46E5); color:white; padding:12px 20px; border-radius:999px; font-family:'Inter',sans-serif; font-weight:600; font-size:0.875rem; text-decoration:none; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(99,102,241,0.35); transition:all 0.2s;" onmouseover="this.style.boxShadow='0 8px 32px rgba(99,102,241,0.5)'" onmouseout="this.style.boxShadow='0 4px 20px rgba(99,102,241,0.35)'">📅 Reserve a Table</a>
 
     <div id="order-modal" class="modal-overlay">
         <div class="cart-drawer">
@@ -552,7 +554,24 @@
         window.addEventListener('offline', updateOnlineStatus);
         document.addEventListener('DOMContentLoaded', updateOnlineStatus);
 
+        async function checkReservations() {
+            try {
+                const slug = extractSlugFromUrl();
+                const res = await fetch(`/reservations/config/${slug}`);
+                if (res.ok) {
+                    const config = await res.json();
+                    if (config.enabled) {
+                        const btn = document.getElementById('reserve-cta');
+                        if (btn) {
+                            btn.href = `/r/${slug}/reserve`;
+                            btn.style.display = 'flex';
+                        }
+                }
+            } catch (e) {}
+        }
+
         loadMenu();
+        checkReservations();
     </script>
 </body>
 </html>

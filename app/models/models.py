@@ -40,6 +40,12 @@ class Restaurant(Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     geofence_radius_meters = Column(Integer, default=50)
+    reservations_enabled = Column(Boolean, default=False)
+    reservation_open_time = Column(String, default="11:00")
+    reservation_close_time = Column(String, default="22:00")
+    reservation_slot_duration = Column(Integer, default=30)
+    reservation_max_party = Column(Integer, default=10)
+    reservation_advance_days = Column(Integer, default=30)
     created_at = Column(DateTime, default=utc_now, nullable=False)
 
 
@@ -300,3 +306,20 @@ class AuditLog(Base):
     before_state = Column(JSON, nullable=True)
     after_state = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=utc_now, index=True)
+
+
+class Reservation(Base):
+    __tablename__ = "reservations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    restaurant_id = Column(Integer, ForeignKey("restaurants.id"), nullable=False, index=True)
+    customer_name = Column(String, nullable=False)
+    customer_phone = Column(String, nullable=False, index=True)
+    party_size = Column(Integer, nullable=False)
+    reservation_date = Column(String, nullable=False, index=True)
+    reservation_time = Column(String, nullable=False)
+    status = Column(String, default="confirmed", index=True)
+    special_requests = Column(Text, default="")
+    confirmation_code = Column(String, unique=True, index=True, nullable=False)
+    created_at = Column(DateTime, default=utc_now, index=True)
+    cancelled_at = Column(DateTime, nullable=True)

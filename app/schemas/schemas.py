@@ -147,3 +147,22 @@ class RestaurantSettingsUpdate(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     geofence_radius_meters: Optional[int] = None
+    reservations_enabled: Optional[bool] = None
+    reservation_open_time: Optional[str] = None
+    reservation_close_time: Optional[str] = None
+    reservation_slot_duration: Optional[int] = None
+    reservation_max_party: Optional[int] = None
+    reservation_advance_days: Optional[int] = None
+
+
+class ReservationCreate(BaseModel):
+    customer_name: str
+    customer_phone: str
+    party_size: int = Field(gt=0, le=50)
+    reservation_date: str
+    reservation_time: str
+    special_requests: str = ""
+
+
+class ReservationUpdate(BaseModel):
+    status: Optional[str] = None

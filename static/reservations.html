@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Reserve a Table — Restron</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Book a table at your favorite restaurant powered by Restron">
+    <meta name="theme-color" content="#6366F1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #080808;
+            --bg-surface: #111111;
+            --bg-card: #161616;
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --primary-light: #818CF8;
+            --secondary: #8B5CF6;
+            --text-primary: #F0F0F0;
+            --text-muted: #888888;
+            --border: rgba(99, 102, 241, 0.15);
+            --glow: rgba(99, 102, 241, 0.08);
+            --success: #22C55E;
+            --danger: #EF4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg-base);
+            background-image:
+                radial-gradient(ellipse at 20% 0%, rgba(99,102,241,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(139,92,246,0.06) 0%, transparent 50%);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .shell {
+            max-width: 540px;
+            margin: 0 auto;
+            padding-top: 2rem;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .brand p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .progress-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .progress-step {
+            flex: 1;
+            height: 4px;
+            border-radius: 999px;
+            background: rgba(99, 102, 241, 0.15);
+            transition: background 0.4s ease;
+        }
+
+        .progress-step.active {
+            background: var(--primary);
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .progress-step.done {
+            background: var(--success);
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 1.75rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            animation: fadeUp 0.4s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-card h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .step-card .step-subtitle {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.375rem;
+        }
+
+        input, select {
+            width: 100%;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        textarea {
+            width: 100%;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 1rem;
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .party-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .party-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .party-btn:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.08);
+        }
+
+        .party-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .slot-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.625rem;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .slot-btn:hover:not(.unavailable) {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.08);
+        }
+
+        .slot-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .slot-btn.unavailable {
+            opacity: 0.3;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 28px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #22C55E, #16A34A);
+            color: white;
+        }
+
+        .confirmation-hero {
+            text-align: center;
+            padding: 1.5rem 0;
+        }
+
+        .confirmation-hero .checkmark {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #22C55E, #16A34A);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .confirmation-hero h2 {
+            color: var(--success);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .conf-code {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            color: var(--primary-light);
+            margin: 1rem 0;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin: 1.25rem 0;
+        }
+
+        .summary-item {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+        }
+
+        .summary-item .s-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-item .s-value {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .hidden { display: none !important; }
+
+        .loading-text {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2rem;
+        }
+
+        .not-enabled {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .not-enabled h2 {
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 400px) {
+            .party-grid { grid-template-columns: repeat(4, 1fr); }
+            .slots-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <div class="brand">
+            <h1 id="restaurant-name">Reserve a Table</h1>
+            <p>Book your spot in seconds</p>
+        </div>
+
+        <div class="progress-bar" id="progress-bar">
+            <div class="progress-step active" data-step="1"></div>
+            <div class="progress-step" data-step="2"></div>
+            <div class="progress-step" data-step="3"></div>
+            <div class="progress-step" data-step="4"></div>
+        </div>
+
+        <div id="loading" class="step-card">
+            <p class="loading-text">Loading reservation settings...</p>
+        </div>
+
+        <div id="not-enabled" class="step-card hidden">
+            <div class="not-enabled">
+                <h2>Reservations Not Available</h2>
+                <p style="color:var(--text-muted)">This restaurant is not currently accepting online reservations.</p>
+            </div>
+        </div>
+
+        <div id="step-1" class="step-card hidden">
+            <h2>📅 Pick a Date & Party Size</h2>
+            <p class="step-subtitle">Choose when you'd like to dine</p>
+
+            <label>Date</label>
+            <input type="date" id="res-date">
+
+            <label>Party Size</label>
+            <div class="party-grid" id="party-grid"></div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" id="btn-step1-next" onclick="goToStep(2)" disabled>Next →</button>
+            </div>
+        </div>
+
+        <div id="step-2" class="step-card hidden">
+            <h2>🕐 Choose a Time</h2>
+            <p class="step-subtitle">Available time slots for <span id="selected-date-label"></span></p>
+
+            <div class="slots-grid" id="slots-grid">
+                <p class="loading-text">Loading slots...</p>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="goToStep(1)">← Back</button>
+                <button class="btn btn-primary" id="btn-step2-next" onclick="goToStep(3)" disabled>Next →</button>
+            </div>
+        </div>
+
+        <div id="step-3" class="step-card hidden">
+            <h2>👤 Your Details</h2>
+            <p class="step-subtitle">We'll send your confirmation via text</p>
+
+            <label>Full Name</label>
+            <input type="text" id="res-name" placeholder="e.g. Rahul Sharma">
+
+            <label>Phone Number</label>
+            <input type="tel" id="res-phone" placeholder="e.g. 9876543210">
+
+            <label>Special Requests (optional)</label>
+            <textarea id="res-requests" placeholder="e.g. Birthday celebration, high chair needed..."></textarea>
+
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="goToStep(2)">← Back</button>
+                <button class="btn btn-primary" id="btn-submit" onclick="submitReservation()">Confirm Reservation</button>
+            </div>
+        </div>
+
+        <div id="step-4" class="step-card hidden">
+            <div class="confirmation-hero">
+                <div class="checkmark">✓</div>
+                <h2>Reservation Confirmed!</h2>
+                <p style="color:var(--text-muted)">Your table is booked</p>
+                <div class="conf-code" id="conf-code">RSV-XXXXXX</div>
+            </div>
+
+            <div class="summary-grid" id="conf-summary"></div>
+
+            <div class="btn-row" style="flex-direction:column; gap:0.5rem;">
+                <button class="btn btn-success" onclick="downloadICS()">📅 Add to Calendar</button>
+                <button class="btn btn-outline" onclick="window.location.reload()">Make Another Reservation</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let config = {};
+        let selectedDate = "";
+        let selectedTime = "";
+        let selectedParty = 0;
+        let confirmationData = null;
+
+        function getSlug() {
+            const parts = window.location.pathname.split("/");
+            const rIdx = parts.indexOf("r");
+            return (rIdx !== -1 && parts[rIdx + 1]) ? parts[rIdx + 1] : "default";
+        }
+
+        async function init() {
+            const slug = getSlug();
+            try {
+                const res = await fetch(`/reservations/config/${slug}`);
+                if (!res.ok) throw new Error("Failed to load config");
+                config = await res.json();
+
+                document.getElementById("restaurant-name").textContent = config.restaurant_name || "Reserve a Table";
+
+                if (!config.enabled) {
+                    document.getElementById("loading").classList.add("hidden");
+                    document.getElementById("not-enabled").classList.remove("hidden");
+                    document.getElementById("progress-bar").classList.add("hidden");
+                    return;
+                }
+
+                setupDateInput();
+                buildPartyGrid();
+                document.getElementById("loading").classList.add("hidden");
+                document.getElementById("step-1").classList.remove("hidden");
+            } catch (err) {
+                document.getElementById("loading").innerHTML = `<p class="loading-text" style="color:var(--danger)">Failed to load reservation settings.</p>`;
+            }
+        }
+
+        function setupDateInput() {
+            const dateInput = document.getElementById("res-date");
+            const today = new Date();
+            const maxDate = new Date();
+            maxDate.setDate(today.getDate() + (config.advance_days || 30));
+            dateInput.min = today.toISOString().split("T")[0];
+            dateInput.max = maxDate.toISOString().split("T")[0];
+            dateInput.value = today.toISOString().split("T")[0];
+            selectedDate = dateInput.value;
+            dateInput.addEventListener("change", function() {
+                selectedDate = this.value;
+                checkStep1();
+            });
+        }
+
+        function buildPartyGrid() {
+            const grid = document.getElementById("party-grid");
+            const maxParty = config.max_party || 10;
+            grid.innerHTML = "";
+            for (let i = 1; i <= maxParty; i++) {
+                const btn = document.createElement("button");
+                btn.className = "party-btn";
+                btn.textContent = i;
+                btn.onclick = () => selectParty(i);
+                grid.appendChild(btn);
+            }
+        }
+
+        function selectParty(size) {
+            selectedParty = size;
+            document.querySelectorAll(".party-btn").forEach(b => b.classList.remove("selected"));
+            document.querySelectorAll(".party-btn").forEach(b => {
+                if (parseInt(b.textContent) === size) b.classList.add("selected");
+            });
+            checkStep1();
+        }
+
+        function checkStep1() {
+            document.getElementById("btn-step1-next").disabled = !(selectedDate && selectedParty > 0);
+        }
+
+        async function loadSlots() {
+            const slug = getSlug();
+            const grid = document.getElementById("slots-grid");
+            grid.innerHTML = '<p class="loading-text">Loading available times...</p>';
+            document.getElementById("selected-date-label").textContent = new Date(selectedDate + "T00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+
+            try {
+                const res = await fetch(`/reservations/slots/${slug}?date=${selectedDate}&party_size=${selectedParty}`);
+                if (!res.ok) throw new Error("Failed to load slots");
+                const data = await res.json();
+
+                grid.innerHTML = "";
+                if (data.slots.length === 0) {
+                    grid.innerHTML = '<p class="loading-text">No time slots available for this date.</p>';
+                    return;
+                }
+
+                data.slots.forEach(slot => {
+                    const btn = document.createElement("button");
+                    btn.className = "slot-btn" + (slot.available ? "" : " unavailable");
+                    const [h, m] = slot.time.split(":");
+                    const hour = parseInt(h);
+                    const ampm = hour >= 12 ? "PM" : "AM";
+                    const h12 = hour % 12 || 12;
+                    btn.textContent = `${h12}:${m} ${ampm}`;
+                    btn.dataset.time = slot.time;
+                    if (slot.available) {
+                        btn.onclick = () => selectSlot(slot.time, btn);
+                    }
+                    grid.appendChild(btn);
+                });
+            } catch (err) {
+                grid.innerHTML = '<p class="loading-text" style="color:var(--danger)">Failed to load time slots.</p>';
+            }
+        }
+
+        function selectSlot(time, btn) {
+            selectedTime = time;
+            document.querySelectorAll(".slot-btn").forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            document.getElementById("btn-step2-next").disabled = false;
+        }
+
+        function goToStep(step) {
+            document.querySelectorAll(".step-card").forEach(el => el.classList.add("hidden"));
+            document.getElementById(`step-${step}`).classList.remove("hidden");
+
+            document.querySelectorAll(".progress-step").forEach((el, i) => {
+                el.classList.remove("active", "done");
+                if (i + 1 < step) el.classList.add("done");
+                if (i + 1 === step) el.classList.add("active");
+            });
+
+            if (step === 2) {
+                selectedTime = "";
+                document.getElementById("btn-step2-next").disabled = true;
+                loadSlots();
+            }
+        }
+
+        async function submitReservation() {
+            const name = document.getElementById("res-name").value.trim();
+            const phone = document.getElementById("res-phone").value.trim();
+            const requests = document.getElementById("res-requests").value.trim();
+
+            if (!name) return alert("Please enter your name.");
+            if (!phone || phone.length < 10) return alert("Please enter a valid phone number.");
+
+            const submitBtn = document.getElementById("btn-submit");
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Booking...";
+
+            try {
+                const slug = getSlug();
+                const res = await fetch(`/reservations/book/${slug}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        customer_name: name,
+                        customer_phone: phone,
+                        party_size: selectedParty,
+                        reservation_date: selectedDate,
+                        reservation_time: selectedTime,
+                        special_requests: requests,
+                    }),
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({ detail: "Booking failed" }));
+                    alert(err.detail || "Failed to create reservation");
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Confirm Reservation";
+                    return;
+                }
+
+                confirmationData = await res.json();
+                showConfirmation();
+            } catch (err) {
+                alert("Network error. Please try again.");
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Confirm Reservation";
+            }
+        }
+
+        function showConfirmation() {
+            document.getElementById("conf-code").textContent = confirmationData.confirmation_code;
+
+            const [h, m] = confirmationData.time.split(":");
+            const hour = parseInt(h);
+            const ampm = hour >= 12 ? "PM" : "AM";
+            const h12 = hour % 12 || 12;
+            const timeDisplay = `${h12}:${m} ${ampm}`;
+            const dateDisplay = new Date(confirmationData.date + "T00:00").toLocaleDateString("en-US", { weekday: "short", month: "long", day: "numeric", year: "numeric" });
+
+            document.getElementById("conf-summary").innerHTML = `
+                <div class="summary-item"><div class="s-label">Date</div><div class="s-value">${dateDisplay}</div></div>
+                <div class="summary-item"><div class="s-label">Time</div><div class="s-value">${timeDisplay}</div></div>
+                <div class="summary-item"><div class="s-label">Party Size</div><div class="s-value">${confirmationData.party_size} guests</div></div>
+                <div class="summary-item"><div class="s-label">Name</div><div class="s-value">${confirmationData.customer_name}</div></div>
+            `;
+
+            goToStep(4);
+        }
+
+        function downloadICS() {
+            if (!confirmationData) return;
+
+            const dateParts = confirmationData.date.split("-");
+            const [h, m] = confirmationData.time.split(":");
+            const startDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), parseInt(h), parseInt(m));
+            const endDate = new Date(startDate.getTime() + (config.slot_duration || 30) * 60 * 1000);
+
+            const pad = (n) => String(n).padStart(2, "0");
+            const formatDT = (d) => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+
+            const icsContent = [
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//Restron//Reservation//EN",
+                "BEGIN:VEVENT",
+                `DTSTART:${formatDT(startDate)}`,
+                `DTEND:${formatDT(endDate)}`,
+                `SUMMARY:Dinner at ${confirmationData.restaurant_name || "Restaurant"}`,
+                `DESCRIPTION:Reservation for ${confirmationData.party_size} guests. Confirmation: ${confirmationData.confirmation_code}`,
+                `STATUS:CONFIRMED`,
+                `UID:${confirmationData.confirmation_code}@restron`,
+                "END:VEVENT",
+                "END:VCALENDAR",
+            ].join("\r\n");
+
+            const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `reservation-${confirmationData.confirmation_code}.ics`;
+            document.body.appendChild(link);
+            link.click();
+            URL.revokeObjectURL(link.href);
+            link.remove();
+        }
+
+        init();
+    </script>
+</body>
+</html>

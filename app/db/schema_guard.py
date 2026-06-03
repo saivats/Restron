@@ -82,6 +82,12 @@ def _ensure_columns() -> None:
             "latitude": "FLOAT",
             "longitude": "FLOAT",
             "geofence_radius_meters": "INTEGER DEFAULT 50",
+            "reservations_enabled": bool_type,
+            "reservation_open_time": "VARCHAR DEFAULT '11:00'",
+            "reservation_close_time": "VARCHAR DEFAULT '22:00'",
+            "reservation_slot_duration": "INTEGER DEFAULT 30",
+            "reservation_max_party": "INTEGER DEFAULT 10",
+            "reservation_advance_days": "INTEGER DEFAULT 30",
         }
 
         for name, ddl in user_columns.items():
