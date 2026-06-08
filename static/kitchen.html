@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html class="dark" lang="en">
 <head>
-    <title>Restron Kitchen Display</title>
+    <meta charset="utf-8">
+    <title>Kitchen Display — Restron</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Restron kitchen display — real-time order tickets for your kitchen staff.">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#6366F1">
+    <meta name="theme-color" content="#131313">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Restron">
@@ -15,281 +17,49 @@
         .catch(err => console.log('SW failed:', err));
     }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    surface: "#0C0C0C", background: "#131313", card: "#161616", elevated: "#1A1A1A",
+                    "surface-container": "#201f1f", "surface-bright": "#3a3939",
+                    primary: "#c0c1ff", "primary-container": "#8083ff", secondary: "#d0bcff", tertiary: "#4edea3",
+                    "on-surface": "#e5e2e1", "on-surface-variant": "#c7c4d7", "text-muted": "#888888",
+                    "border-glass": "rgba(255,255,255,0.08)", outline: "#908fa0", "outline-variant": "#464554",
+                    danger: "#EF4444", error: "#ffb4ab", warning: "#F59E0B",
+                    gold: { light: "#fef08a", DEFAULT: "#eab308", dark: "#a16207" }
+                },
+                fontFamily: { display: ["Playfair Display","serif"], sans: ["Inter","sans-serif"], mono: ["JetBrains Mono","monospace"] }
+            }
+        }
+    };
+    </script>
     <style>
-        :root {
-            --bg-base: #080808;
-            --bg-surface: #111111;
-            --bg-card: #161616;
-            --primary: #6366F1;
-            --primary-dark: #4F46E5;
-            --secondary: #8B5CF6;
-            --text-primary: #F0F0F0;
-            --text-muted: #888888;
-            --border: rgba(99, 102, 241, 0.15);
-            --glow: rgba(99, 102, 241, 0.08);
-            --success: #22C55E;
-            --danger: #EF4444;
-            --bg-color: #080808;
-            --surface-color: rgba(17, 17, 17, 0.8);
-            --primary-color: #6366F1;
-            --secondary-color: #8B5CF6;
-            --success-color: #22C55E;
-            --error-color: #EF4444;
-            --text-primary: #F0F0F0;
-            --text-secondary: #888888;
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body {
-            background-color: var(--bg-color) !important;
-            color: var(--text-primary) !important;
-            font-family: 'Inter', sans-serif !important;
-            min-height: 100vh;
-            padding: 1rem;
-            background-image: radial-gradient(ellipse at 20% 0%, rgba(99,102,241,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(139,92,246,0.06) 0%, transparent 50%) !important;
-        }
-        @media (min-width: 768px) { body { padding: 2rem; } }
-        
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Inter', serif !important;
-            color: var(--primary-color) !important;
-            margin-bottom: 1rem;
-        }
-        
-        h1 { font-size: 1.875rem !important; font-weight: 700; }
-        h2 { font-size: 1.5rem !important; font-weight: 600; }
-        h3 { font-size: 1.25rem !important; font-weight: 500; }
-        
-        p { color: var(--text-secondary); margin-bottom: 1rem; }
-        
-        input, select, textarea {
-            width: 100%;
-            background-color: #1A1510;
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-        }
-        
-        label {
-            display: block;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
-        }
-        
-        table { width: 100%; text-align: left; border-collapse: collapse; margin-bottom: 1.5rem; }
-        th { 
-            padding: 0.75rem 1rem; 
-            background-color: rgba(255, 255, 255, 0.05); 
-            font-size: 0.75rem; 
-            color: rgba(255, 255, 255, 0.5); 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em; 
-            border-bottom: 1px solid var(--border-color); 
-        }
-        td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.875rem; }
-        tr:hover { background-color: rgba(255, 255, 255, 0.05); transition: background-color 0.3s; }
-        
-        .login-container, .form-container {
-            background-color: var(--surface-color);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            border-radius: 1rem;
-            padding: 2rem;
-            max-width: 28rem;
-            margin: 0 auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .form-group { margin-bottom: 1rem; }
-        
-        .header { display: flex; flex-direction: column; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; }
-        @media (min-width: 768px) { .header { flex-direction: row; } }
-        
-        .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
-        
-        .card, .menu-item, .order-card, .table-card, .staff-card, .qr-card {
-            background-color: var(--surface-color) !important;
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color) !important;
-            border-radius: 1rem !important;
-            padding: 1.5rem !important;
-            box-shadow: 0 4px 30px rgba(99,102,241,0.05) !important;
-            margin-bottom: 1.5rem !important;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            color: var(--text-primary);
-        }
-        .card:hover, .menu-item:hover, .order-card:hover, .table-card:hover, .staff-card:hover, .qr-card:hover {
-            box-shadow: 0 8px 40px rgba(99,102,241,0.15) !important;
-            border-color: rgba(99,102,241,0.2) !important;
-            transform: translateY(-4px);
-        }
-        
-        /* Table specifics */
-        .table-card { text-align: center; justify-content: center; align-items: center; }
-        .table-card h3 { margin-bottom: 0.5rem; }
-        .table-card.occupied { border-color: rgba(239, 68, 68, 0.5) !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.2) !important; }
-        .table-card.available { border-color: rgba(34, 197, 94, 0.5) !important; box-shadow: 0 0 15px rgba(34, 197, 94, 0.2) !important; }
-
-        /* Kitchen Orders */
-        .order-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
-        .order-items { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
-        .order-item { display: flex; justify-content: space-between; font-size: 0.875rem; padding: 0.5rem; background-color: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; }
-        
-        /* Buttons */
-        button, .btn {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            transition: all 0.3s ease-out;
-            padding: 0.5rem 1.5rem;
-            border-radius: 0.75rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            border: none;
-        }
-        button:active, .btn:active { transform: scale(0.95); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        
-        .btn-primary, button[type="submit"], button[onclick*="login"], button[onclick*="generate"], .place-btn {
-            background-color: var(--primary-color) !important;
-            color: white !important;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
-        }
-        .btn-primary:hover, button[type="submit"]:hover, button[onclick*="login"]:hover, button[onclick*="generate"]:hover, .place-btn:hover {
-            background-color: #4F46E5 !important;
-        }
-        
-        .btn-danger { background-color: var(--error-color); color: #ffdad6; }
-        .btn-danger:hover { background-color: #ffb4ab; color: #690005; }
-        
-        .btn-outline, .btn-secondary {
-            background-color: transparent;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-        .btn-outline:hover, .btn-secondary:hover { background-color: rgba(99, 102, 241, 0.1); }
-        
-        .btn-small { padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 0.5rem; }
-        
-        .btn-success, .done-btn { background-color: var(--success-color) !important; color: white !important; }
-        .btn-success:hover, .done-btn:hover { background-color: #388e3c !important; }
-
-        .qty-btn { 
-            width: 2rem; height: 2rem; border-radius: 0.5rem; padding: 0; display: inline-flex; 
-            align-items: center; justify-content: center; font-weight: bold; background-color: rgba(255,255,255,0.1); color: var(--text-primary);
-        }
-        .qty-btn:hover { background-color: rgba(255,255,255,0.2); }
-        
-        .modal {
-            position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
-            background-color: rgba(8, 8, 8, 0.8); backdrop-filter: blur(4px); padding: 1rem;
-        }
-        .modal-content {
-            background-color: rgba(17, 17, 17, 0.95); backdrop-filter: blur(12px); width: 100%; max-width: 42rem;
-            border-radius: 1rem; padding: 2rem; border: 1px solid var(--border-color); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            position: relative; max-height: 90vh; overflow-y: auto; margin: auto; margin-top: 2.5rem;
-        }
-        .modal-close {
-            position: absolute; right: 1rem; top: 1rem; color: rgba(255, 255, 255, 0.5); cursor: pointer; font-size: 1.5rem; line-height: 1;
-        }
-        .modal-close:hover { color: white; }
-        
-        .badge, .timer-badge {
-            padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; display: inline-block;
-        }
-        .badge-active { background-color: rgba(34, 197, 94, 0.2); color: #4ade80; border-color: rgba(34, 197, 94, 0.3); }
-        .badge-inactive { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
-        .badge-paid, .badge-premium, .status-paid, .status-ready { background-color: rgba(99, 102, 241, 0.2); color: var(--primary-color); border-color: rgba(99, 102, 241, 0.3); }
-        .badge-trial, .status-pending, .status-preparing, .timer-badge { background-color: rgba(99, 102, 241, 0.3); color: #facc15; border-color: rgba(234, 179, 8, 0.3); }
-        .badge-free { background-color: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border-color: var(--border-color); }
-        .status-delivered { background-color: rgba(34, 197, 94, 0.2); color: #4ade80; border-color: rgba(34, 197, 94, 0.3); }
-        
-        .stats-panel, .credentials-box, .order-details, .items-list {
-            background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.05); margin-top: 1rem;
-        }
-        .stat-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label { color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        .stat-value { font-weight: 700; color: var(--primary-color); font-size: 1.125rem; }
-        
-        .tabs, .tab-bar { display: flex; overflow-x: auto; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; padding-bottom: 0.5rem; gap: 1rem; }
-        .tab { padding: 0.5rem 1rem; cursor: pointer; color: var(--text-secondary); border-bottom: 2px solid transparent; transition: color 0.3s; white-space: nowrap; }
-        .tab:hover { color: white; }
-        .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        #orders-container, #menu-container, #staff-list, .grid-cards {
-            display: grid; grid-template-columns: 1fr; gap: 1.5rem;
-        }
-        @media (min-width: 768px) { #orders-container, #menu-container, #staff-list, .grid-cards { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1024px) { #orders-container, #menu-container, #staff-list, .grid-cards { grid-template-columns: repeat(3, 1fr); } }
-        
-        .table-no { font-size: 48px; line-height: 1; font-weight: 800; color: var(--text-primary); }
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin: 14px 0; }
-        .order-id { color: var(--text-muted); font-weight: 700; }
-        .items { font-size: 1.2rem; line-height: 1.5; margin: 1rem 0; color: var(--text-primary); }
-        .done-btn { width: 100%; padding: 16px 20px !important; font-size: 1.1rem; border-radius: 12px !important; background: linear-gradient(135deg, #22C55E, #1D5A3F) !important; }
-        .timer-badge.time-ok { background: rgba(45,122,79,0.2); color: #4CAF7D; border-color: rgba(45,122,79,0.3); }
-        .timer-badge.time-warn { background: rgba(99,102,241,0.2); color: #6366F1; border-color: rgba(99,102,241,0.3); }
-        .timer-badge.time-late { background: rgba(139,26,26,0.25); color: #E85A5A; border-color: rgba(139,26,26,0.35); }
-        .delivery-tag { color: #F0F0F0; background: rgba(139,26,58,0.35); border: 1px solid rgba(139,26,58,0.45); padding: 8px 12px; border-radius: 999px; display: inline-flex; margin-bottom: 8px; font-weight: 800; }
-        .item-row, .menu-item-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .staff-card, .qr-card, .checkout-modal, .customer-card, .history-row { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
-        .item-row:last-child { border-bottom: none; }
-        .modifier-group { background-color: rgba(0, 0, 0, 0.2); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 0.75rem; }
-        
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .qr-modal-overlay {
-            position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
-            background-color: rgba(8, 8, 8, 0.8); backdrop-filter: blur(4px); padding: 1rem;
-        }
-        .qr-modal {
-            background-color: rgba(17, 17, 17, 0.95); backdrop-filter: blur(12px); border-radius: 1rem; padding: 2rem; border: 1px solid var(--border-color); text-align: center;
-        }
-        .qr-modal img { margin: 1rem auto; max-width: 200px; display: block; border-radius: 0.5rem; }
-        .qr-url { word-break: break-all; color: var(--text-secondary); font-size: 0.875rem; }
-
-        .subscription-overlay {
-            display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; text-align: center; color: #F0F0F0;
-        }
-        
-        /* Menu overrides that were lost when stripping tailwind */
-        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-color); padding: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; z-index: 50; }
-        .search-box { margin-bottom: 1rem; }
-        .ornate-divider { display: flex; align-items: center; margin: 2rem 0 1rem; text-align: center; }
-        .ornate-divider::before, .ornate-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--primary-color); opacity: 0.3; }
-        .scroll-mt-40 { scroll-margin-top: 10rem; }
-        .glass-effect { background-color: rgba(17, 17, 17, 0.9); backdrop-filter: blur(12px); }
-
+        .glass-card { background: linear-gradient(135deg, rgba(22,22,22,0.92) 0%, rgba(12,12,12,0.96) 100%); border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04); }
+        .subscription-overlay { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; text-align: center; color: #e5e2e1; }
+        #orders-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .order-card { background: #161616; border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 20px; transition: all 0.3s; }
+        .order-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .table-no { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: #eab308; }
+        .order-id { font-family: 'JetBrains Mono', monospace; color: #888; font-size: 0.85rem; }
+        .items { color: #c7c4d7; font-size: 0.9rem; line-height: 1.7; margin-bottom: 14px; }
+        .done-btn { background: linear-gradient(135deg, #4edea3, #22c55e); color: black; font-weight: 700; padding: 10px 20px; border-radius: 12px; cursor: pointer; border: none; font-family: 'Inter'; width: 100%; transition: all 0.2s; font-size: 0.9rem; }
+        .done-btn:hover { box-shadow: 0 8px 28px rgba(78,222,163,0.35); transform: translateY(-1px); }
+        .done-btn:active { transform: scale(0.97); }
+        .timer-badge { padding: 6px 14px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; display: inline-block; margin-bottom: 12px; }
+        .timer-badge.time-ok { background: rgba(78,222,163,0.15); color: #4edea3; border: 1px solid rgba(78,222,163,0.25); }
+        .timer-badge.time-warn { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.25); }
+        .timer-badge.time-late { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3); animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .delivery-tag { color: black; background: linear-gradient(135deg, #EF4444, #dc2626); padding: 6px 14px; border-radius: 999px; display: inline-flex; margin-bottom: 10px; font-weight: 800; font-size: 0.8rem; }
+        .btn-kot { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #c7c4d7; padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; font-family: 'Inter'; transition: all 0.2s; margin-bottom: 10px; display: inline-block; }
+        .btn-kot:hover { border-color: rgba(234,179,8,0.4); color: #eab308; }
     </style>
     <script>
     (function() {
@@ -303,13 +73,24 @@
     })();
     </script>
 </head>
-<body>
+<body class="bg-surface text-on-surface font-sans min-h-screen p-4 md:p-8" style="background-image: radial-gradient(ellipse at 20% 0%, rgba(192,193,255,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(234,179,8,0.04) 0%, transparent 50%);">
+
     <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#EF4444; color:white; text-align:center; padding:8px; font-size:13px; font-family:'Inter';">
       ⚡ You are offline — showing last known orders
     </div>
-    <div class="subscription-overlay" id="sub-overlay"><div class="msg"><h2>⚠️ Subscription Expired</h2><p>Your subscription has expired. Please contact Restron support.</p></div></div>
-    <div class="header"><h1>🧑‍🍳 Kitchen Live Orders</h1><span id="last-updated-label" style="color:var(--text-muted); font-size:12px;"></span></div>
-    <div id="orders-container"><p style="text-align:center; width:100%">Connecting to Kitchen...</p></div>
+    <div class="subscription-overlay" id="sub-overlay"><div class="msg"><h2 class="text-2xl font-bold text-gold mb-2">⚠️ Subscription Expired</h2><p class="text-text-muted">Your subscription has expired. Please contact Restron support.</p></div></div>
+
+    <header class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-gold text-3xl" style="font-variation-settings:'FILL' 1;">soup_kitchen</span>
+            <h1 class="font-display text-2xl md:text-3xl text-on-surface">Kitchen Live Orders</h1>
+        </div>
+        <span id="last-updated-label" class="text-text-muted text-xs"></span>
+    </header>
+
+    <div id="orders-container">
+        <p class="text-text-muted text-center col-span-full py-8">Connecting to Kitchen...</p>
+    </div>
 
     <script>
         let orders = [];
@@ -359,7 +140,7 @@
         async function fetchOrders() {
             try {
                 const response = await fetch('/kitchen-display/', {
-                    credentials: 'include'  // Include cookies for authentication
+                    credentials: 'include'
                 });
                 if (!response.ok) {
                     if (response.status === 401) {
@@ -373,7 +154,7 @@
             } catch (err) {
                 console.error("Fetch error", err);
                 document.getElementById('orders-container').innerHTML =
-                    '<p style="color:#ff5722; text-align:center;">❌ Connection Error. Check console.</p>';
+                    '<p class="text-danger text-center col-span-full py-8">❌ Connection Error. Check console.</p>';
             }
         }
 
@@ -382,20 +163,14 @@
             container.innerHTML = '';
 
             if (orders.length === 0) {
-                container.innerHTML = '<p style="color:#777;">No Pending Orders. Relax! ☕</p>';
+                container.innerHTML = '<p class="text-text-muted text-center col-span-full py-8">No Pending Orders. Relax! ☕</p>';
                 return;
             }
 
             orders.forEach(order => {
                 const deliveryTag = order.order_type === "Delivery" ? '<div class="delivery-tag">🛵 DELIVERY - PACK IT</div>' : '';
                 const tableName = order.order_type === 'Delivery' ? 'No Table' : 'Table ' + order.table_number;
-
-                // Calculate Time
-                // Note: Server sends UTC. We treat it as "Order Time".
-                // We calculate difference locally.
-                const orderTime = new Date(order.created_at + "Z"); // Append Z to treat as UTC
-
-                // HTML Placeholder for Timer (updated by updateTimers function)
+                const orderTime = new Date(order.created_at + "Z");
                 const timerHtml = `<div id="timer-${order.id}" class="timer-badge time-ok">Loading...</div>`;
 
                 const card = `
@@ -407,13 +182,13 @@
                             <span class="order-id">#${order.id}</span>
                         </div>
                         <div class="items">${order.items_summary}</div>
-                        <button onclick="printKOT(${order.id})" class="btn btn-outline btn-small" style="margin-bottom:10px;">Print KOT</button>
+                        <button onclick="printKOT(${order.id})" class="btn-kot">Print KOT</button>
                         <button class="done-btn" onclick="markDone(${order.id})">✔ Mark Ready</button>
                     </div>
                 `;
                 container.innerHTML += card;
             });
-            updateTimers(); // Run once immediately
+            updateTimers();
         }
 
         function updateTimers() {
@@ -429,18 +204,16 @@
                 const diffSec = Math.floor(diffMs / 1000);
                 const diffMin = Math.floor(diffSec / 60);
 
-                const threshold = 15; // 15 Minutes
+                const threshold = 15;
 
                 if (diffMin < threshold) {
-                    // ON TIME
-                    const leftMin = 14 - diffMin; // 14 because we are in the current minute
+                    const leftMin = 14 - diffMin;
                     const leftSec = 59 - (diffSec % 60);
                     const display = `${String(leftMin).padStart(2, '0')}:${String(leftSec).padStart(2, '0')}`;
 
                     timerEl.innerText = `⏱️ Time Left: ${display}`;
                     timerEl.className = (diffMin >= 10) ? "timer-badge time-warn" : "timer-badge time-ok";
                 } else {
-                    // LATE
                     const lateMs = diffMs - (threshold * 60 * 1000);
                     const lateSecTotal = Math.floor(lateMs / 1000);
                     const lateMin = Math.floor(lateSecTotal / 60);
@@ -495,22 +268,21 @@
                         'Content-Type': 'application/json'
                     }
                 });
-                
+
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
                     alert(`Failed to mark order as done: ${errorData.detail || 'Unknown error'}`);
                     return;
                 }
-                
+
                 const result = await response.json();
-                fetchOrders(); // Refresh orders list
+                fetchOrders();
             } catch (err) {
                 console.error('Error marking done:', err);
                 alert('Network error: ' + err.message);
             }
         }
 
-        // Initial Load
         function showExpiredOverlay(data) {
             const overlay = document.getElementById('sub-overlay');
             if (!overlay) return;
@@ -576,7 +348,6 @@
         setInterval(updateLastUpdatedLabel, 30000);
         setInterval(fetchOrders, 10000);
         setInterval(updateTimers, 1000);
-
     </script>
 </body>
 </html>

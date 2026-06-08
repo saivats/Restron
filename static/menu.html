@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <title>Restron Menu</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <title>Menu — Restron</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="Browse the restaurant menu — powered by Restron.">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#6366F1">
+    <meta name="theme-color" content="#131313">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Restron">
@@ -16,201 +18,82 @@
     }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    surface: "#0C0C0C", background: "#131313", card: "#161616", elevated: "#1A1A1A",
+                    "surface-container": "#201f1f", "surface-bright": "#3a3939",
+                    primary: "#c0c1ff", "primary-container": "#8083ff", secondary: "#d0bcff", tertiary: "#4edea3",
+                    "on-surface": "#e5e2e1", "on-surface-variant": "#c7c4d7", "text-muted": "#888888",
+                    "border-glass": "rgba(255,255,255,0.08)", outline: "#908fa0", "outline-variant": "#464554",
+                    danger: "#EF4444", error: "#ffb4ab", warning: "#F59E0B",
+                    gold: { light: "#fef08a", DEFAULT: "#eab308", dark: "#a16207" }
+                },
+                fontFamily: { display: ["Playfair Display","serif"], sans: ["Inter","sans-serif"], mono: ["JetBrains Mono","monospace"] }
+            }
+        }
+    };
+    </script>
     <style>
-        :root {
-            --bg-base: #080808;
-            --bg-surface: #111111;
-            --bg-card: #161616;
-            --primary: #6366F1;
-            --primary-dark: #4F46E5;
-            --secondary: #8B5CF6;
-            --text-primary: #F0F0F0;
-            --text-muted: #888888;
-            --border: rgba(99, 102, 241, 0.15);
-            --glow: rgba(99, 102, 241, 0.08);
-            --success: #22C55E;
-            --danger: #EF4444;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            min-height: 100vh;
-            background: var(--bg-base);
-            background-image: radial-gradient(ellipse at 20% 0%, rgba(99,102,241,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(139,92,246,0.06) 0%, transparent 50%);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            padding-bottom: 110px;
-        }
-        h1, h2, h3 { font-family: 'Inter', serif; color: var(--primary); }
-        button, .btn {
-            padding: 10px 20px;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            transition: all 0.15s ease;
-        }
-        button:active, .btn:active { transform: scale(0.97); }
-        button:disabled { opacity: 0.55; cursor: not-allowed; }
-        .btn-primary, .add-btn {
-            background: linear-gradient(135deg, #6366F1, #4F46E5);
-            color: white;
-        }
-        .btn-primary:hover, .add-btn:hover {
-            background: linear-gradient(135deg, #F09030, #D4790E);
-            box-shadow: 0 4px 16px rgba(99,102,241,0.4);
-        }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        input, select, textarea {
-            width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px 14px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            transition: border-color 0.2s ease;
-        }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
-        }
-        .app-shell { max-width: 720px; margin: 0 auto; padding: 18px 14px; }
-        .menu-header {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            margin: -18px -14px 18px;
-            padding: 18px 14px 12px;
-            background: rgba(13,10,6,0.92);
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(12px);
-        }
-        .restaurant-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-        .restaurant-name { font-size: 31px; line-height: 1; }
-        .table-badge, .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 5px 12px;
-            border-radius: 999px;
-            border: 1px solid rgba(99,102,241,0.3);
-            background: rgba(99,102,241,0.16);
-            color: var(--primary);
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-        .category-nav {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 12px 0 2px;
-            scrollbar-width: none;
-        }
+        html { scroll-behavior: smooth; }
+        .glass-card { background: linear-gradient(135deg, rgba(22,22,22,0.92) 0%, rgba(12,12,12,0.96) 100%); border: 1px solid rgba(255,255,255,0.06); }
+        .gold-btn { background: linear-gradient(135deg, #eab308 0%, #a16207 100%); transition: all 0.3s ease; }
+        .gold-btn:hover { box-shadow: 0 8px 32px rgba(234,179,8,0.35); transform: translateY(-1px); }
+        .gold-btn:active { transform: scale(0.97); }
+        .app-shell { max-width: 720px; margin: 0 auto; padding-bottom: 100px; }
+        .menu-header { position: sticky; top: 0; z-index: 30; backdrop-filter: blur(20px); background: rgba(12,12,12,0.85); padding: 16px 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .restaurant-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .restaurant-name { font-family: 'Playfair Display', serif; color: #e5e2e1; font-size: 1.4rem; font-weight: 700; }
+        .table-badge { background: rgba(234,179,8,0.15); color: #eab308; padding: 4px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; border: 1px solid rgba(234,179,8,0.25); }
+        .category-nav { display: flex; gap: 8px; overflow-x: auto; padding: 12px 0; scrollbar-width: none; }
         .category-nav::-webkit-scrollbar { display: none; }
-        .category-pill {
-            flex: 0 0 auto;
-            text-decoration: none;
-            color: var(--text-muted);
-            border: 1px solid var(--border);
-            background: rgba(255,255,255,0.04);
-            border-radius: 999px;
-            padding: 9px 14px;
-            font-size: 13px;
-            font-weight: 700;
-        }
-        .category-pill.active, .category-pill:hover { background: var(--primary); color: white; border-color: transparent; }
-        .section-title { margin: 24px 0 12px; font-size: 24px; }
-        #menu-container { display: grid; gap: 12px; }
-        .menu-item-row {
-            display: grid;
-            grid-template-columns: 96px 1fr;
-            gap: 12px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 10px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-        .food-photo, .photo-placeholder {
-            width: 96px;
-            height: 96px;
-            border-radius: 12px;
-            object-fit: cover;
-            background: linear-gradient(135deg, #6366F1, #8B5CF6);
-            color: white;
-            display: grid;
-            place-items: center;
-            font-family: 'Inter', serif;
-            font-size: 32px;
-        }
-        .item-body { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
-        .item-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-        .item-name { color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; }
-        .item-price { color: var(--primary); font-weight: 800; white-space: nowrap; }
-        .item-desc { color: var(--text-muted); font-size: 13px; line-height: 1.35; }
-        .veg-dot, .nonveg-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 7px; }
-        .veg-dot { background: #35A866; }
-        .nonveg-dot { background: #D84A4A; }
-        .item-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
-        .qty-control { display: flex; align-items: center; gap: 10px; }
-        .qty-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            padding: 0;
-            color: white;
-            background: var(--primary);
-            font-size: 18px;
-        }
-        .qty-value { min-width: 22px; text-align: center; font-weight: 800; color: var(--primary); }
-        .floating-cart {
-            position: fixed;
-            left: 12px;
-            right: 12px;
-            bottom: 12px;
-            max-width: 700px;
-            margin: 0 auto;
-            z-index: 30;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            padding: 14px;
-            border-radius: 18px;
-            background: linear-gradient(135deg, #6366F1, #4F46E5);
-            color: white;
-            box-shadow: 0 16px 44px rgba(0,0,0,0.5), 0 6px 24px rgba(99,102,241,0.35);
-        }
-        .cart-meta { display: flex; flex-direction: column; gap: 2px; }
-        .cart-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.75; }
-        #view-cart-btn { background: rgba(13,10,6,0.22); color: white; border: 1px solid rgba(255,255,255,0.22); }
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(4px);
-            align-items: flex-end;
-            justify-content: center;
-        }
+        .category-pill { white-space: nowrap; padding: 6px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.04); color: #888; text-decoration: none; transition: all 0.2s; border: 1px solid transparent; }
+        .category-pill:hover, .category-pill.active { background: rgba(234,179,8,0.12); color: #eab308; border-color: rgba(234,179,8,0.25); }
+        .section-title { font-family: 'Playfair Display', serif; color: #eab308; font-size: 1.1rem; font-weight: 700; margin: 24px 16px 12px; }
+        .menu-item-row { display: grid; grid-template-columns: 100px 1fr; gap: 14px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .food-photo { width: 100px; height: 100px; border-radius: 14px; object-fit: cover; background: #1a1a1a; }
+        .photo-placeholder { width: 100px; height: 100px; border-radius: 14px; background: linear-gradient(135deg, #1a1a1a, #222); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; color: #333; }
+        .item-body { display: flex; flex-direction: column; justify-content: space-between; }
+        .item-title-row { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+        .item-name { font-size: 0.95rem; font-weight: 700; color: #e5e2e1; line-height: 1.3; }
+        .item-price { color: #eab308; font-weight: 800; font-size: 0.95rem; white-space: nowrap; }
+        .item-desc { color: #888; font-size: 0.75rem; margin-top: 4px; line-height: 1.4; }
+        .veg-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; border: 1.5px solid #22C55E; margin-right: 6px; position: relative; top: 0; }
+        .veg-dot::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 5px; height: 5px; border-radius: 50%; background: #22C55E; }
+        .nonveg-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; border: 1.5px solid #EF4444; margin-right: 6px; position: relative; top: 0; }
+        .nonveg-dot::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 5px; height: 5px; border-radius: 50%; background: #EF4444; }
+        .add-btn { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); font-weight: 700; font-size: 13px; padding: 6px 20px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-family: 'Inter'; }
+        .add-btn:hover { background: rgba(234,179,8,0.3); }
+        .qty-control { display: flex; align-items: center; gap: 8px; }
+        .qty-btn { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: 700; font-size: 16px; cursor: pointer; border: none; transition: all 0.15s; font-family: 'Inter'; background: rgba(234,179,8,0.15); color: #eab308; }
+        .qty-btn:active { transform: scale(0.9); }
+        .qty-value { font-weight: 700; color: #eab308; font-size: 0.95rem; min-width: 16px; text-align: center; }
+        .floating-cart { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; max-width: 720px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; backdrop-filter: blur(20px); background: rgba(22,22,22,0.92); border-top: 1px solid rgba(234,179,8,0.2); }
+        .cart-meta { display: flex; flex-direction: column; }
+        .cart-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.06em; }
+        .floating-cart button { background: linear-gradient(135deg, #eab308 0%, #a16207 100%); color: black; font-weight: 700; padding: 10px 24px; border-radius: 10px; font-size: 14px; border: none; cursor: pointer; font-family: 'Inter'; transition: all 0.2s; }
+        .floating-cart button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .modal-overlay { position: fixed; inset: 0; z-index: 100; display: none; align-items: flex-end; justify-content: center; background: rgba(8,8,8,0.7); backdrop-filter: blur(6px); }
         .modal-overlay.active { display: flex; }
-        .cart-drawer {
-            width: min(100%, 720px);
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 22px 22px 0 0;
-            padding: 22px;
-            box-shadow: 0 -24px 80px rgba(0,0,0,0.6);
-        }
+        .cart-drawer { width: min(100%, 720px); background: #161616; border: 1px solid rgba(255,255,255,0.06); border-radius: 22px 22px 0 0; padding: 22px; box-shadow: 0 -24px 80px rgba(0,0,0,0.6); }
         .drawer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-        .cart-summary-line { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
-        .cart-total-line { display: flex; justify-content: space-between; padding: 14px 0; color: var(--primary); font-size: 20px; font-weight: 800; }
+        .drawer-head h2 { color: #e5e2e1; font-family: 'Playfair Display', serif; }
+        .cart-summary-line { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.04); color: #c7c4d7; font-size: 0.9rem; }
+        .cart-total-line { display: flex; justify-content: space-between; padding: 14px 0; color: #eab308; font-size: 20px; font-weight: 800; }
         .drawer-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-        .empty-state { text-align: center; color: var(--text-muted); padding: 36px 0; }
+        .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #c7c4d7; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-family: 'Inter'; font-weight: 600; transition: all 0.2s; }
+        .btn-outline:hover { border-color: rgba(234,179,8,0.4); color: #eab308; }
+        .btn-primary { background: linear-gradient(135deg, #eab308 0%, #a16207 100%); color: black; font-weight: 700; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-family: 'Inter'; border: none; transition: all 0.2s; }
+        .empty-state { text-align: center; color: #888; padding: 36px 0; }
+        input, select { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.65rem 1rem; font-size: 0.9rem; color: #e5e2e1; font-family: 'Inter', sans-serif; margin-bottom: 0.75rem; transition: border-color 0.3s, box-shadow 0.3s; }
+        input:focus { border-color: rgba(234,179,8,0.5); box-shadow: 0 0 0 3px rgba(234,179,8,0.1); outline: none; }
+        label { display: block; color: #888; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
         @media (min-width: 640px) {
             .menu-item-row { grid-template-columns: 132px 1fr; }
             .food-photo, .photo-placeholder { width: 132px; height: 132px; }
@@ -228,16 +111,18 @@
     })();
     </script>
 </head>
-<body>
+<body class="bg-surface text-on-surface font-sans min-h-screen" style="background-image: radial-gradient(ellipse at 20% 0%, rgba(192,193,255,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(234,179,8,0.04) 0%, transparent 50%);">
+
     <div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#EF4444; color:white; text-align:center; padding:8px; font-size:13px; font-family:'Inter';">
       ⚡ You are offline — orders will sync when connection returns
     </div>
+
     <div class="app-shell">
         <header class="menu-header">
             <div class="restaurant-row">
                 <div>
                     <h1 class="restaurant-name" id="restaurant-name">Restron POS</h1>
-                    <div style="color:var(--text-muted); font-size:13px; margin-top:4px;">Fresh, fast, accurate</div>
+                    <div style="color:#888; font-size:13px; margin-top:4px;">Fresh, fast, accurate</div>
                 </div>
                 <span class="table-badge" id="table-badge">Table</span>
             </div>
@@ -256,7 +141,7 @@
         <button onclick="openModal()" id="view-cart-btn" disabled>View Cart</button>
     </div>
 
-    <a id="reserve-cta" style="display:none; position:fixed; bottom:90px; right:16px; z-index:40; background:linear-gradient(135deg,#6366F1,#4F46E5); color:white; padding:12px 20px; border-radius:999px; font-family:'Inter',sans-serif; font-weight:600; font-size:0.875rem; text-decoration:none; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(99,102,241,0.35); transition:all 0.2s;" onmouseover="this.style.boxShadow='0 8px 32px rgba(99,102,241,0.5)'" onmouseout="this.style.boxShadow='0 4px 20px rgba(99,102,241,0.35)'">📅 Reserve a Table</a>
+    <a id="reserve-cta" style="display:none; position:fixed; bottom:90px; right:16px; z-index:40; background:linear-gradient(135deg,#eab308,#a16207); color:black; padding:12px 20px; border-radius:999px; font-family:'Inter',sans-serif; font-weight:700; font-size:0.875rem; text-decoration:none; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(234,179,8,0.35); transition:all 0.2s;" onmouseover="this.style.boxShadow='0 8px 32px rgba(234,179,8,0.5)'" onmouseout="this.style.boxShadow='0 4px 20px rgba(234,179,8,0.35)'">📅 Reserve a Table</a>
 
     <div id="order-modal" class="modal-overlay">
         <div class="cart-drawer">
@@ -390,7 +275,7 @@
                         : `<div class="qty-control"><button onclick="updateQty(${item.id}, -1)" class="qty-btn">-</button><span class="qty-value">${qty}</span><button onclick="updateQty(${item.id}, 1)" class="qty-btn">+</button></div>`;
                     section.innerHTML += `
                         <article class="menu-item-row">
-                            <img class="food-photo" loading="lazy" src="${imageUrl(item)}" alt="${item.name}" onerror="imageFallback(this, '${String(item.name).replace(/'/g, "\\'")}')">
+                            <img class="food-photo" loading="lazy" src="${imageUrl(item)}" alt="${item.name}" onerror="imageFallback(this, '${String(item.name).replace(/'/g, "\\'")}')" >
                             <div class="item-body">
                                 <div class="item-title-row">
                                     <div>
@@ -444,7 +329,7 @@
                 const qty = cart[item.id] || 0;
                 if (!qty) return;
                 total += qty * item.price;
-                lines.push(`<div class="cart-summary-line"><span>${qty} x ${item.name}</span><strong>₹${qty * item.price}</strong></div>`);
+                lines.push(`<div class="cart-summary-line"><span>${qty} x ${item.name}</span><strong style="color:#eab308;">₹${qty * item.price}</strong></div>`);
             });
             document.getElementById('cart-lines').innerHTML = lines.join('') || '<p class="empty-state">Your cart is empty.</p>';
             document.getElementById('drawer-total').innerText = `₹${total}`;
@@ -566,6 +451,7 @@
                             btn.href = `/r/${slug}/reserve`;
                             btn.style.display = 'flex';
                         }
+                    }
                 }
             } catch (e) {}
         }

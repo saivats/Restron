@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Restron - Order Entry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#0e0e0e",
+                    "surface": "#131313",
+                    "on-secondary": "#3c2f00",
+                    "surface-tint": "#c9c6c5",
+                    "on-surface": "#e5e2e1",
+                    "primary-fixed-dim": "#c9c6c5",
+                    "on-secondary-container": "#342800",
+                    "tertiary-container": "#080a0a",
+                    "on-secondary-fixed": "#241a00",
+                    "outline": "#8e9192",
+                    "inverse-surface": "#e5e2e1",
+                    "tertiary-fixed": "#e2e2e2",
+                    "surface-bright": "#393939",
+                    "on-error": "#690005",
+                    "on-primary-fixed": "#1c1b1b",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "background": "#131313",
+                    "surface-container": "#20201f",
+                    "primary-container": "#0a0a0a",
+                    "outline-variant": "#444748",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-tertiary": "#2f3131",
+                    "primary": "#c9c6c5",
+                    "inverse-primary": "#5f5e5e",
+                    "on-error-container": "#ffdad6",
+                    "on-primary": "#313030",
+                    "on-primary-fixed-variant": "#474646",
+                    "inverse-on-surface": "#313030",
+                    "secondary": "#e9c349",
+                    "surface-variant": "#353535",
+                    "on-primary-container": "#7b7979",
+                    "tertiary": "#c6c6c7",
+                    "on-secondary-fixed-variant": "#574500",
+                    "secondary-container": "#af8d11",
+                    "on-surface-variant": "#c4c7c7",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "surface-dim": "#131313",
+                    "secondary-fixed": "#ffe088",
+                    "surface-container-high": "#2a2a2a",
+                    "surface-container-highest": "#353535",
+                    "error-container": "#93000a",
+                    "primary-fixed": "#e5e2e1",
+                    "on-tertiary-container": "#78797a",
+                    "surface-container-low": "#1c1b1b",
+                    "secondary-fixed-dim": "#e9c349",
+                    "on-background": "#e5e2e1",
+                    "error": "#ffb4ab"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "64px",
+                    "base": "8px",
+                    "section-gap": "120px",
+                    "margin-mobile": "20px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg": [
+                            "Playfair Display"
+                    ],
+                    "label-caps": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Playfair Display"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "label-sm": [
+                            "Inter"
+                    ],
+                    "headline-lg-mobile": [
+                            "Playfair Display"
+                    ],
+                    "display-xl": [
+                            "Playfair Display"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "mono": [
+                            "JetBrains Mono"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "56px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "label-caps": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.15em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-md": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-sm": [
+                            "11px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-xl": [
+                            "80px",
+                            {
+                                    "lineHeight": "90px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "letterSpacing": "0.01em",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom scrollbar for sleekness */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 4px;
+        }
+        .magnetic {
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex flex-col overflow-hidden selection:bg-secondary/30 selection:text-secondary-fixed">
+<!-- Top AppBar / Search (Sticky) -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-b border-surface-container-high/50 pb-2">
+<div class="px-margin-mobile pt-margin-mobile pb-base flex items-center justify-between">
+<button aria-label="Back" class="text-on-surface-variant hover:text-secondary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-secondary text-center flex-1 mx-4">Table 04</h1>
+<button aria-label="More options" class="text-on-surface-variant hover:text-secondary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">more_vert</span>
+</button>
+</div>
+<div class="px-margin-mobile">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-secondary transition-colors" style="font-variation-settings: 'FILL' 0;">search</span>
+<input class="w-full bg-surface-container-low border-b border-surface-container-high text-on-surface placeholder:text-on-surface-variant/50 focus:border-secondary focus:ring-0 focus:outline-none py-3 pl-12 pr-4 font-body-lg text-body-lg transition-colors" placeholder="Search menu..." type="text"/>
+</div>
+<!-- Quick Categories -->
+<div class="flex gap-4 overflow-x-auto mt-4 pb-2 snap-x hide-scrollbar">
+<button class="snap-start whitespace-nowrap text-secondary border-b border-secondary pb-1 font-label-caps text-label-caps uppercase tracking-widest px-1">All</button>
+<button class="snap-start whitespace-nowrap text-on-surface-variant hover:text-on-surface transition-colors pb-1 font-label-caps text-label-caps uppercase tracking-widest px-1">Starters</button>
+<button class="snap-start whitespace-nowrap text-on-surface-variant hover:text-on-surface transition-colors pb-1 font-label-caps text-label-caps uppercase tracking-widest px-1">Mains</button>
+<button class="snap-start whitespace-nowrap text-on-surface-variant hover:text-on-surface transition-colors pb-1 font-label-caps text-label-caps uppercase tracking-widest px-1">Wine</button>
+<button class="snap-start whitespace-nowrap text-on-surface-variant hover:text-on-surface transition-colors pb-1 font-label-caps text-label-caps uppercase tracking-widest px-1">Desserts</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas (Menu List) -->
+<main class="flex-1 overflow-y-auto pt-[160px] pb-[140px] px-margin-mobile">
+<div class="flex flex-col gap-0">
+<!-- Item 1 -->
+<div class="py-6 border-b border-surface-container-high group hover:bg-surface-container-low/30 transition-colors -mx-margin-mobile px-margin-mobile">
+<div class="flex justify-between items-start mb-2">
+<div class="flex-1 pr-4">
+<h2 class="font-headline-md text-headline-md-mobile text-on-surface mb-1">Truffle Arancini</h2>
+<p class="font-body-sm text-on-surface-variant/70 text-sm">Wild mushroom, aged parmesan, black winter truffle</p>
+</div>
+<div class="font-mono text-secondary-fixed text-lg">$24</div>
+</div>
+<div class="flex justify-end items-center gap-4 mt-2">
+<button class="w-8 h-8 rounded border border-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-secondary hover:border-secondary transition-colors magnetic">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">remove</span>
+</button>
+<span class="font-mono text-on-surface w-4 text-center">0</span>
+<button class="w-8 h-8 rounded border border-secondary bg-secondary/10 flex items-center justify-center text-secondary hover:bg-secondary/20 transition-colors magnetic">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">add</span>
+</button>
+</div>
+</div>
+<!-- Item 2 (Active/Added) -->
+<div class="py-6 border-b border-surface-container-high group hover:bg-surface-container-low/30 transition-colors -mx-margin-mobile px-margin-mobile bg-surface-container-low/10">
+<div class="flex justify-between items-start mb-2">
+<div class="flex-1 pr-4">
+<h2 class="font-headline-md text-headline-md-mobile text-on-surface mb-1">Wagyu Ribeye</h2>
+<p class="font-body-sm text-on-surface-variant/70 text-sm">A5 grading, blistered shishito, black garlic jus</p>
+</div>
+<div class="font-mono text-secondary-fixed text-lg">$145</div>
+</div>
+<div class="flex justify-end items-center gap-4 mt-2">
+<button class="w-8 h-8 rounded border border-secondary flex items-center justify-center text-secondary hover:bg-secondary/10 transition-colors magnetic">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">remove</span>
+</button>
+<span class="font-mono text-secondary-fixed w-4 text-center">1</span>
+<button class="w-8 h-8 rounded border border-secondary bg-secondary/10 flex items-center justify-center text-secondary hover:bg-secondary/20 transition-colors magnetic">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">add</span>
+</button>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="py-6 border-b border-surface-container-high group hover:bg-surface-container-low/30 transition-colors -mx-margin-mobile px-margin-mobile">
+<div class="flex justify-between items-start mb-2">
+<div class="flex-1 pr-4">
+<h2 class="font-headline-md text-headline-md-mobile text-on-surface mb-1">Dover Sole</h2>
+<p class="font-body-sm text-on-surface-variant/70 text-sm">Meunière style, brown butter, capers, lemon</p>
+</div>
+<div class="font-mono text-secondary-fixed text-lg">$68</div>
+</div>
+<div class="flex justify-end items-center gap-4 mt-2">
+<button class="w-8 h-8 rounded border border-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-secondary hover:border-secondary transition-colors magnetic">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">remove</span>
+</button>
+<span class="font-mono text-on-surface w-4 text-center">0</span>
+<button class="w-8 h-8 rounded border border-secondary bg-secondary/10 flex items-center justify-center text-secondary hover:bg-secondary/20 transition-colors magnetic">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">add</span>
+</button>
+</div>
+</div>
+<!-- Item 4 (Active/Added) -->
+<div class="py-6 border-b border-surface-container-high group hover:bg-surface-container-low/30 transition-colors -mx-margin-mobile px-margin-mobile bg-surface-container-low/10">
+<div class="flex justify-between items-start mb-2">
+<div class="flex-1 pr-4">
+<h2 class="font-headline-md text-headline-md-mobile text-on-surface mb-1">Barolo 2015</h2>
+<p class="font-body-sm text-on-surface-variant/70 text-sm">Piedmont, Italy. Notes of dried cherry, tar, and rose</p>
+</div>
+<div class="font-mono text-secondary-fixed text-lg">$280</div>
+</div>
+<div class="flex justify-end items-center gap-4 mt-2">
+<button class="w-8 h-8 rounded border border-secondary flex items-center justify-center text-secondary hover:bg-secondary/10 transition-colors magnetic">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">remove</span>
+</button>
+<span class="font-mono text-secondary-fixed w-4 text-center">2</span>
+<button class="w-8 h-8 rounded border border-secondary bg-secondary/10 flex items-center justify-center text-secondary hover:bg-secondary/20 transition-colors magnetic">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">add</span>
+</button>
+</div>
+</div>
+<!-- Spacer for scroll -->
+<div class="h-12"></div>
+</div>
+</main>
+<!-- Bottom Cart / Action Bar (Sticky) -->
+<footer class="fixed bottom-0 w-full z-50 bg-surface-container-low/90 backdrop-blur-2xl border-t border-surface-container-high/50 px-margin-mobile py-6 shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.5)]">
+<div class="flex justify-between items-end mb-4">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-1">Current Order</p>
+<p class="font-body-sm text-on-surface text-sm">3 Items</p>
+</div>
+<div class="text-right">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-1">Total</p>
+<p class="font-mono text-secondary text-2xl font-medium">$705.00</p>
+</div>
+</div>
+<button class="w-full bg-secondary text-on-secondary font-label-caps text-label-caps py-4 uppercase tracking-[0.2em] hover:bg-secondary-fixed transition-colors flex justify-center items-center gap-2 magnetic">
+            Send to Kitchen
+            <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">send</span>
+</button>
+</footer>
+<script>
+        // Simple magnetic effect for buttons
+        document.querySelectorAll('.magnetic').forEach(elem => {
+            elem.addEventListener('mousemove', (e) => {
+                const rect = elem.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                elem.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+            });
+            elem.addEventListener('mouseleave', () => {
+                elem.style.transform = 'translate(0px, 0px)';
+            });
+        });
+    </script>
+</body></html>

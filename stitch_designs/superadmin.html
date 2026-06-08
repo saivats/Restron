@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Platform Superadmin - Restron</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface": "#131313",
+                        "on-secondary": "#3c2f00",
+                        "surface-tint": "#c9c6c5",
+                        "on-surface": "#e5e2e1",
+                        "primary-fixed-dim": "#c9c6c5",
+                        "on-secondary-container": "#342800",
+                        "tertiary-container": "#080a0a",
+                        "on-secondary-fixed": "#241a00",
+                        "outline": "#8e9192",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-bright": "#393939",
+                        "on-error": "#690005",
+                        "on-primary-fixed": "#1c1b1b",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "background": "#131313",
+                        "surface-container": "#20201f",
+                        "primary-container": "#0a0a0a",
+                        "outline-variant": "#444748",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-tertiary": "#2f3131",
+                        "primary": "#c9c6c5",
+                        "inverse-primary": "#5f5e5e",
+                        "on-error-container": "#ffdad6",
+                        "on-primary": "#313030",
+                        "on-primary-fixed-variant": "#474646",
+                        "inverse-on-surface": "#313030",
+                        "secondary": "#e9c349",
+                        "surface-variant": "#353535",
+                        "on-primary-container": "#7b7979",
+                        "tertiary": "#c6c6c7",
+                        "on-secondary-fixed-variant": "#574500",
+                        "secondary-container": "#af8d11",
+                        "on-surface-variant": "#c4c7c7",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "surface-dim": "#131313",
+                        "secondary-fixed": "#ffe088",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-highest": "#353535",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#e5e2e1",
+                        "on-tertiary-container": "#78797a",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary-fixed-dim": "#e9c349",
+                        "on-background": "#e5e2e1",
+                        "error": "#ffb4ab"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "margin-desktop": "64px",
+                        "base": "8px",
+                        "section-gap": "120px",
+                        "margin-mobile": "20px",
+                        "gutter": "24px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Playfair Display"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "display-xl": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.15em", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "display-xl": ["80px", { "lineHeight": "90px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #0A0A0A; } /* Level 0 Surface per design system */
+        .magnetic-wrap { display: inline-block; }
+        .glass-panel {
+            background: linear-gradient(180deg, rgba(34, 34, 34, 0.4) 0%, rgba(22, 22, 22, 0.8) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid #2A2A2A;
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        }
+        .table-row-hover:hover {
+            background-color: rgba(53, 53, 53, 0.4);
+        }
+        /* Custom scrollbar for data density */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #353535; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444748; }
+    </style>
+</head>
+<body class="text-on-surface antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden selection:bg-secondary selection:text-on-secondary">
+<!-- Mobile Top Navigation (md:hidden) -->
+<nav class="md:hidden bg-surface/80 dark:bg-surface/80 backdrop-blur-xl fixed top-0 w-full z-50 border-b border-outline-variant/20 flat no shadows flex justify-between items-center px-margin-mobile py-base w-full">
+<div class="text-headline-md font-headline-md text-secondary dark:text-secondary-fixed tracking-tight">Restron</div>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors duration-300">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</nav>
+<!-- Desktop Side Navigation (hidden md:flex) -->
+<aside class="hidden md:flex bg-surface-container-low/90 dark:bg-surface-container-low/90 backdrop-blur-2xl fixed left-0 top-0 h-full w-64 z-40 border-r border-outline-variant/10 flat no shadows flex-col gap-4 p-6">
+<div class="mb-8">
+<h1 class="text-headline-md font-headline-md text-secondary tracking-tight">Restron</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-1">Platform Admin</p>
+</div>
+<nav class="flex flex-col gap-2 w-full">
+<a class="flex items-center gap-3 text-secondary bg-surface-variant/20 rounded-lg p-3 hover:bg-surface-variant/10 transition-colors Active: translate-x-1 transition-transform group" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-caps text-label-caps group-hover:scale-105 transition-transform duration-300">Restaurants</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:text-on-surface transition-all hover:bg-surface-variant/10 group" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-label-caps group-hover:scale-105 transition-transform duration-300">Global Users</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:text-on-surface transition-all hover:bg-surface-variant/10 group" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-caps text-label-caps group-hover:scale-105 transition-transform duration-300">Billing</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:text-on-surface transition-all hover:bg-surface-variant/10 group mt-auto" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps group-hover:scale-105 transition-transform duration-300">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 pt-24 md:pt-0 min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="px-margin-mobile md:px-margin-desktop py-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 z-10 relative">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tight">Active Accounts</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-xl">Overview of all registered restaurant entities across the platform ecosystem.</p>
+</div>
+<button class="group relative px-6 py-3 bg-surface-container-lowest border border-[#2A2A2A] overflow-hidden rounded-DEFAULT transition-all duration-300 hover:border-secondary flex items-center gap-2 magnetic-wrap">
+<div class="absolute inset-0 bg-secondary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+<span class="material-symbols-outlined text-secondary relative z-10 text-sm">add</span>
+<span class="font-label-caps text-label-caps text-on-surface relative z-10 group-hover:text-secondary transition-colors">New Restaurant</span>
+</button>
+</header>
+<!-- Data Canvas -->
+<div class="px-margin-mobile md:px-margin-desktop pb-section-gap flex-1 flex flex-col z-10 relative">
+<!-- Filters / Search (Blueprint input style) -->
+<div class="mb-8 flex flex-col md:flex-row gap-4 items-end">
+<div class="w-full md:w-96 relative group">
+<input class="w-full bg-transparent border-0 border-b border-[#2A2A2A] px-0 py-2 font-body-md text-body-md text-on-surface focus:ring-0 focus:border-secondary transition-colors placeholder:text-on-surface-variant/50 peer" placeholder="Search by name or slug..." type="text"/>
+<span class="material-symbols-outlined absolute right-0 top-2 text-on-surface-variant peer-focus:text-secondary transition-colors">search</span>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="glass-panel rounded-lg overflow-hidden flex-1 flex flex-col">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[800px]">
+<thead>
+<tr class="border-b border-[#2A2A2A] bg-surface-container/50">
+<th class="font-label-caps text-label-caps text-on-surface-variant py-4 px-6 uppercase tracking-wider font-semibold">Restaurant</th>
+<th class="font-label-caps text-label-caps text-on-surface-variant py-4 px-6 uppercase tracking-wider font-semibold">Slug</th>
+<th class="font-label-caps text-label-caps text-on-surface-variant py-4 px-6 uppercase tracking-wider font-semibold">Plan</th>
+<th class="font-label-caps text-label-caps text-on-surface-variant py-4 px-6 uppercase tracking-wider font-semibold text-right">Orders (30d)</th>
+<th class="font-label-caps text-label-caps text-on-surface-variant py-4 px-6 uppercase tracking-wider font-semibold">Status</th>
+<th class="font-label-caps text-label-caps text-on-surface-variant py-4 px-6 uppercase tracking-wider font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md divide-y divide-[#2A2A2A]">
+<!-- Row 1 -->
+<tr class="table-row-hover transition-colors duration-200 group">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest border border-[#2A2A2A] flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">restaurant</span>
+</div>
+<span class="font-medium text-on-surface group-hover:text-secondary transition-colors">L'Artisan</span>
+</div>
+</td>
+<td class="py-4 px-6 text-on-surface-variant font-mono text-sm">l-artisan-nyc</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2 py-1 rounded-sm border border-secondary/30 bg-secondary/10 text-secondary font-label-sm text-label-sm uppercase">Pro</span>
+</td>
+<td class="py-4 px-6 text-right font-mono text-on-surface">14,203</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+<span class="text-on-surface text-sm">Active</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary transition-colors" title="Stats">
+<span class="material-symbols-outlined text-[18px]">bar_chart</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-secondary transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error transition-colors" title="Deactivate">
+<span class="material-symbols-outlined text-[18px]">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="table-row-hover transition-colors duration-200 group">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest border border-[#2A2A2A] flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">local_cafe</span>
+</div>
+<span class="font-medium text-on-surface group-hover:text-secondary transition-colors">Neon Bean Roasters</span>
+</div>
+</td>
+<td class="py-4 px-6 text-on-surface-variant font-mono text-sm">neon-bean-sea</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2 py-1 rounded-sm border border-primary/30 bg-primary/10 text-primary font-label-sm text-label-sm uppercase">Growth</span>
+</td>
+<td class="py-4 px-6 text-right font-mono text-on-surface">8,492</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+<span class="text-on-surface text-sm">Active</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary transition-colors" title="Stats">
+<span class="material-symbols-outlined text-[18px]">bar_chart</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-secondary transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error transition-colors" title="Deactivate">
+<span class="material-symbols-outlined text-[18px]">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="table-row-hover transition-colors duration-200 group">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest border border-[#2A2A2A] flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">dining</span>
+</div>
+<span class="font-medium text-on-surface-variant group-hover:text-on-surface transition-colors">Oak &amp; Ember</span>
+</div>
+</td>
+<td class="py-4 px-6 text-on-surface-variant/50 font-mono text-sm">oak-ember-tx</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2 py-1 rounded-sm border border-outline/30 text-outline font-label-sm text-label-sm uppercase">Trial</span>
+</td>
+<td class="py-4 px-6 text-right font-mono text-on-surface-variant">142</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-error"></div>
+<span class="text-on-surface-variant text-sm">Inactive</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary transition-colors" title="Stats">
+<span class="material-symbols-outlined text-[18px]">bar_chart</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-secondary transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-secondary transition-colors" title="Reactivate">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination / Footer -->
+<div class="border-t border-[#2A2A2A] p-4 flex justify-between items-center bg-surface-container/30 mt-auto">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Showing 1-3 of 2,491</span>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center border border-[#2A2A2A] rounded text-on-surface-variant hover:text-secondary hover:border-secondary transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center border border-[#2A2A2A] rounded text-on-surface hover:text-secondary hover:border-secondary transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple magnetic effect for buttons
+        document.querySelectorAll('.magnetic-wrap').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0px, 0px)';
+            });
+        });
+    </script>
+</body></html>

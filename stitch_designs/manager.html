@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Restron - Manager Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface": "#131313",
+                        "on-secondary": "#3c2f00",
+                        "surface-tint": "#c9c6c5",
+                        "on-surface": "#e5e2e1",
+                        "primary-fixed-dim": "#c9c6c5",
+                        "on-secondary-container": "#342800",
+                        "tertiary-container": "#080a0a",
+                        "on-secondary-fixed": "#241a00",
+                        "outline": "#8e9192",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-bright": "#393939",
+                        "on-error": "#690005",
+                        "on-primary-fixed": "#1c1b1b",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "background": "#131313",
+                        "surface-container": "#20201f",
+                        "primary-container": "#0a0a0a",
+                        "outline-variant": "#444748",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-tertiary": "#2f3131",
+                        "primary": "#c9c6c5",
+                        "inverse-primary": "#5f5e5e",
+                        "on-error-container": "#ffdad6",
+                        "on-primary": "#313030",
+                        "on-primary-fixed-variant": "#474646",
+                        "inverse-on-surface": "#313030",
+                        "secondary": "#e9c349",
+                        "surface-variant": "#353535",
+                        "on-primary-container": "#7b7979",
+                        "tertiary": "#c6c6c7",
+                        "on-secondary-fixed-variant": "#574500",
+                        "secondary-container": "#af8d11",
+                        "on-surface-variant": "#c4c7c7",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "surface-dim": "#131313",
+                        "secondary-fixed": "#ffe088",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-highest": "#353535",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#e5e2e1",
+                        "on-tertiary-container": "#78797a",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary-fixed-dim": "#e9c349",
+                        "on-background": "#e5e2e1",
+                        "error": "#ffb4ab"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "base": "8px",
+                        "section-gap": "120px",
+                        "margin-mobile": "20px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Playfair Display"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "display-xl": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.15em", "fontWeight": "600" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "display-xl": ["80px", { "lineHeight": "90px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(22, 22, 22, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid #2A2A2A;
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        }
+        .magnetic { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .magnetic:hover { transform: scale(1.02); }
+        .pulse-dot { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(233, 195, 73, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(233, 195, 73, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(233, 195, 73, 0); }
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface antialiased min-h-screen flex overflow-x-hidden selection:bg-secondary selection:text-on-secondary">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col gap-4 p-6 bg-surface-container-low/90 dark:bg-surface-container-low/90 backdrop-blur-2xl fixed left-0 top-0 h-full w-64 z-40 border-r border-outline-variant/10">
+<div class="mb-8">
+<h1 class="text-headline-md font-headline-md text-secondary">Restron</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2 uppercase tracking-widest">Premium Management</p>
+</div>
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-4 text-secondary bg-surface-variant/20 rounded-lg p-3 group magnetic" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant p-3 hover:text-on-surface hover:bg-surface-variant/10 transition-colors rounded-lg group magnetic" href="#">
+<span class="material-symbols-outlined" data-icon="table_restaurant">table_restaurant</span>
+<span class="font-label-caps text-label-caps">Floor Plan</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant p-3 hover:text-on-surface hover:bg-surface-variant/10 transition-colors rounded-lg group magnetic" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-caps text-label-caps">Staff</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant p-3 hover:text-on-surface hover:bg-surface-variant/10 transition-colors rounded-lg group magnetic" href="#">
+<span class="material-symbols-outlined" data-icon="qr_code">qr_code</span>
+<span class="font-label-caps text-label-caps">QR Codes</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant p-3 hover:text-on-surface hover:bg-surface-variant/10 transition-colors rounded-lg group magnetic mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</div>
+</nav>
+<!-- TopNavBar (Mobile Only) -->
+<header class="md:hidden flex justify-between items-center px-margin-mobile py-base w-full fixed top-0 z-50 bg-surface/80 dark:bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20">
+<h1 class="text-headline-md-mobile font-headline-lg-mobile text-secondary tracking-tight">Restron</h1>
+<button class="text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 p-margin-mobile md:p-margin-desktop pt-24 md:pt-margin-desktop w-full max-w-7xl mx-auto">
+<!-- Dashboard Header -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+<div>
+<h2 class="font-headline-lg text-headline-lg md:text-display-xl font-display-xl mb-2">Service Live</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Thursday, Oct 24 • Evening Service</p>
+</div>
+<div class="flex items-center gap-4 glass-panel px-6 py-3 rounded-full">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-outline-variant/30">
+<img alt="Manager Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCECLV6iDHrPYxb724SrGKdA6NQWAJ2qUkGdg22rikUHltAhcPDo7Y82tVySx8Kx9pmuNNrwwvJT-Kt63QLy-49udlLrVYPr2KNuQoDm3ckBz28s-nUb5I27XwyU9zkVNm1uzfbwPdGt00RvwdXnjxX7rluODk7DldYdT6uP-oMM09WJ_skjr5HP_TzeQIFmVv2Yl8ksAuerEImSSHjTu4l3JtWfzNuUKU1TRDHhKSyZeVEZr3tO4vN0DdaLi5H5otRSVN9NBQgJA_n"/>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps">E. Manager</span>
+<a class="font-label-sm text-label-sm text-secondary hover:text-secondary-fixed transition-colors" href="#">Logout</a>
+</div>
+</div>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Floor Plan Canvas -->
+<section class="lg:col-span-8 glass-panel rounded-xl p-8 relative min-h-[500px] flex flex-col">
+<div class="flex justify-between items-center mb-8 border-b border-outline-variant/20 pb-4">
+<h3 class="font-headline-md text-headline-md">Main Dining</h3>
+<div class="flex gap-4 items-center">
+<span class="flex items-center gap-2 font-label-sm text-label-sm"><span class="w-2 h-2 rounded-full bg-secondary pulse-dot"></span> Occupied</span>
+<span class="flex items-center gap-2 font-label-sm text-label-sm"><span class="w-2 h-2 rounded-full border border-outline"></span> Available</span>
+</div>
+</div>
+<!-- Abstract Floor Plan Grid -->
+<div class="flex-1 relative border border-outline-variant/10 rounded-lg p-6 bg-surface-container-lowest overflow-hidden">
+<!-- Subtle background grid -->
+<div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
+<!-- Tables (Simulated absolute positioning for architectural feel) -->
+<div class="absolute top-10 left-10 p-4 border border-outline-variant/30 rounded-lg bg-surface w-24 h-24 flex flex-col items-center justify-center cursor-pointer magnetic group hover:border-secondary transition-colors">
+<span class="font-mono text-lg font-bold text-on-surface group-hover:text-secondary">T1</span>
+<span class="w-2 h-2 rounded-full bg-secondary pulse-dot mt-2"></span>
+</div>
+<div class="absolute top-10 left-40 p-4 border border-outline-variant/30 rounded-lg bg-surface w-24 h-24 flex flex-col items-center justify-center cursor-pointer magnetic group hover:border-secondary transition-colors">
+<span class="font-mono text-lg font-bold text-on-surface group-hover:text-secondary">T2</span>
+<span class="w-2 h-2 rounded-full border border-outline mt-2"></span>
+</div>
+<div class="absolute top-40 left-10 p-4 border border-outline-variant/30 rounded-full bg-surface w-24 h-24 flex flex-col items-center justify-center cursor-pointer magnetic group hover:border-secondary transition-colors">
+<span class="font-mono text-lg font-bold text-on-surface group-hover:text-secondary">T3</span>
+<span class="w-2 h-2 rounded-full bg-secondary pulse-dot mt-2"></span>
+</div>
+<div class="absolute top-40 left-40 p-4 border border-outline-variant/30 rounded-full bg-surface w-24 h-24 flex flex-col items-center justify-center cursor-pointer magnetic group hover:border-secondary transition-colors">
+<span class="font-mono text-lg font-bold text-on-surface group-hover:text-secondary">T4</span>
+<span class="w-2 h-2 rounded-full bg-secondary pulse-dot mt-2"></span>
+</div>
+<!-- Large Center Table -->
+<div class="absolute top-20 right-20 p-4 border border-outline-variant/30 rounded-lg bg-surface w-48 h-32 flex flex-col items-center justify-center cursor-pointer magnetic group hover:border-secondary transition-colors">
+<span class="font-mono text-lg font-bold text-on-surface group-hover:text-secondary">C1 (VIP)</span>
+<span class="w-2 h-2 rounded-full bg-secondary pulse-dot mt-2"></span>
+</div>
+</div>
+</section>
+<!-- Sidebar Widgets -->
+<aside class="lg:col-span-4 flex flex-col gap-gutter">
+<!-- Quick Checkout Panel -->
+<div class="glass-panel rounded-xl p-6">
+<h3 class="font-headline-md text-headline-md mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="receipt_long">receipt_long</span> Quick Checkout
+                    </h3>
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/20 mb-4">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Table T1</span>
+<span class="font-mono text-secondary">01:45</span>
+</div>
+<div class="flex justify-between items-center mb-4">
+<span class="font-body-md text-body-md">Subtotal</span>
+<span class="font-mono text-lg">$185.00</span>
+</div>
+<button class="w-full bg-on-surface text-surface py-3 rounded-lg font-label-caps text-label-caps hover:bg-secondary hover:text-on-secondary transition-colors magnetic">Process Payment</button>
+</div>
+</div>
+<!-- Customer Lookup -->
+<div class="glass-panel rounded-xl p-6">
+<h3 class="font-headline-md text-headline-md mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="search">search</span> Customer Lookup
+                    </h3>
+<div class="relative mb-4">
+<input class="w-full bg-transparent border-0 border-b border-outline-variant/50 focus:border-secondary focus:ring-0 text-on-surface font-mono py-2 transition-colors placeholder:text-on-surface-variant/50" placeholder="Phone Number..." type="text"/>
+</div>
+<div class="opacity-50 text-center py-4 font-label-sm text-label-sm text-on-surface-variant">
+                        Enter number to view history
+                    </div>
+</div>
+</aside>
+<!-- Floor Status Table -->
+<section class="lg:col-span-12 glass-panel rounded-xl p-8 overflow-x-auto">
+<h3 class="font-headline-md text-headline-md mb-6 border-b border-outline-variant/20 pb-4">Floor Status</h3>
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/20">
+<th class="py-4 font-label-caps text-label-caps text-on-surface-variant">Table ID</th>
+<th class="py-4 font-label-caps text-label-caps text-on-surface-variant">Status</th>
+<th class="py-4 font-label-caps text-label-caps text-on-surface-variant">Party</th>
+<th class="py-4 font-label-caps text-label-caps text-on-surface-variant">Time Seated</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md">
+<tr class="border-b border-outline-variant/10 hover:bg-surface-variant/10 transition-colors">
+<td class="py-4 font-mono">T1</td>
+<td class="py-4"><span class="text-secondary flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-secondary pulse-dot"></span> Active</span></td>
+<td class="py-4">2 pax</td>
+<td class="py-4 font-mono">01:45</td>
+</tr>
+<tr class="border-b border-outline-variant/10 hover:bg-surface-variant/10 transition-colors">
+<td class="py-4 font-mono">T2</td>
+<td class="py-4"><span class="text-on-surface-variant flex items-center gap-2"><span class="w-2 h-2 rounded-full border border-outline"></span> Available</span></td>
+<td class="py-4">-</td>
+<td class="py-4 font-mono">-</td>
+</tr>
+<tr class="border-b border-outline-variant/10 hover:bg-surface-variant/10 transition-colors">
+<td class="py-4 font-mono">C1</td>
+<td class="py-4"><span class="text-secondary flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-secondary pulse-dot"></span> Active</span></td>
+<td class="py-4">6 pax</td>
+<td class="py-4 font-mono">00:30</td>
+</tr>
+</tbody>
+</table>
+</section>
+</div>
+</main>
+</body></html>

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Restron Receipt</title>
+    <title>Receipt — Restron</title>
+    <meta name="description" content="Your Restron receipt — digital invoice with GST breakdown.">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#6366F1">
+    <meta name="theme-color" content="#131313">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Restron">
@@ -16,39 +17,39 @@
         .catch(err => console.log('SW failed:', err));
     }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #080808;
-            --bg-surface: #111111;
+            --bg-base: #0C0C0C;
+            --bg-surface: #131313;
             --bg-card: #161616;
-            --primary: #6366F1;
-            --primary-dark: #4F46E5;
-            --secondary: #8B5CF6;
-            --text-primary: #F0F0F0;
+            --primary: #eab308;
+            --primary-dark: #a16207;
+            --secondary: #d0bcff;
+            --text-primary: #e5e2e1;
             --text-muted: #888888;
-            --border: rgba(99, 102, 241, 0.15);
-            --glow: rgba(99, 102, 241, 0.08);
-            --success: #22C55E;
+            --border: rgba(234, 179, 8, 0.15);
+            --glow: rgba(234, 179, 8, 0.08);
+            --success: #4edea3;
             --danger: #EF4444;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             min-height: 100vh;
             background: var(--bg-base);
-            background-image: radial-gradient(ellipse at top, #2A1A08 0%, #080808 70%);
+            background-image: radial-gradient(ellipse at 20% 0%, rgba(192,193,255,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(234,179,8,0.04) 0%, transparent 50%);
             color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             padding: 24px 14px;
         }
-        h1, h2, h3 { font-family: 'Inter', serif; color: var(--primary); }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; color: var(--primary); }
         .receipt-shell { max-width: 600px; margin: 0 auto; }
         .receipt-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 20px;
             padding: 28px;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.55), 0 0 80px rgba(99,102,241,0.08);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.55), 0 0 80px rgba(234,179,8,0.06);
         }
         .brand { text-align: center; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
         #restaurant-name { font-size: 36px; margin-bottom: 8px; }
@@ -59,7 +60,7 @@
         table { width: 100%; border-collapse: collapse; margin: 16px 0; }
         th { padding: 12px 10px; text-align: left; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); }
         td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-primary); }
-        tr:hover td { background: rgba(99,102,241,0.04); }
+        tr:hover td { background: rgba(234,179,8,0.04); }
         .right { text-align: right; }
         .center { text-align: center; }
         .totals { margin-top: 16px; background: rgba(0,0,0,0.22); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
@@ -76,8 +77,8 @@
             transition: all 0.15s ease;
         }
         .btn:active { transform: scale(0.97); }
-        .btn-primary { background: linear-gradient(135deg, #6366F1, #4F46E5); color: white; }
-        .btn-primary:hover { background: linear-gradient(135deg, #F09030, #D4790E); box-shadow: 0 4px 16px rgba(99,102,241,0.4); }
+        .btn-primary { background: linear-gradient(135deg, #eab308, #a16207); color: black; }
+        .btn-primary:hover { box-shadow: 0 4px 16px rgba(234,179,8,0.4); }
         .btn-success { background: linear-gradient(135deg, #22C55E, #1D5A3F); color: white; }
         @media print {
             body { background: white; color: #111; padding: 0; }

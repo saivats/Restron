@@ -1,289 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html class="dark" lang="en">
 <head>
-    <title>Restron Super Admin Login</title>
+    <meta charset="utf-8">
+    <title>Super Admin Login — Restron</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="description" content="Restron platform super admin login.">
+    <meta name="theme-color" content="#131313">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    surface: "#0C0C0C", background: "#131313", card: "#161616", elevated: "#1A1A1A",
+                    "surface-container": "#201f1f", "surface-bright": "#3a3939",
+                    primary: "#c0c1ff", "primary-container": "#8083ff", secondary: "#d0bcff", tertiary: "#4edea3",
+                    "on-surface": "#e5e2e1", "on-surface-variant": "#c7c4d7", "text-muted": "#888888",
+                    "border-glass": "rgba(255,255,255,0.08)", outline: "#908fa0", "outline-variant": "#464554",
+                    danger: "#EF4444", error: "#ffb4ab",
+                    gold: { light: "#fef08a", DEFAULT: "#eab308", dark: "#a16207" }
+                },
+                fontFamily: { display: ["Playfair Display","serif"], sans: ["Inter","sans-serif"], mono: ["JetBrains Mono","monospace"] }
+            }
+        }
+    };
+    </script>
     <style>
-        :root {
-            --bg-base: #080808;
-            --bg-surface: #111111;
-            --bg-card: #161616;
-            --primary: #6366F1;
-            --primary-dark: #4F46E5;
-            --secondary: #8B5CF6;
-            --text-primary: #F0F0F0;
-            --text-muted: #888888;
-            --border: rgba(99, 102, 241, 0.15);
-            --glow: rgba(99, 102, 241, 0.08);
-            --success: #22C55E;
-            --danger: #EF4444;
-            --bg-color: #080808;
-            --surface-color: rgba(17, 17, 17, 0.8);
-            --primary-color: #6366F1;
-            --secondary-color: #8B5CF6;
-            --success-color: #22C55E;
-            --error-color: #EF4444;
-            --text-primary: #F0F0F0;
-            --text-secondary: #888888;
-            --border-color: rgba(255, 255, 255, 0.1);
+        .glass-card {
+            background: linear-gradient(135deg, rgba(22,22,22,0.92) 0%, rgba(12,12,12,0.96) 100%);
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 0 80px rgba(192,193,255,0.06), 0 24px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04);
         }
-        
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body {
-            background-color: var(--bg-color) !important;
-            color: var(--text-primary) !important;
-            font-family: 'Inter', sans-serif !important;
-            min-height: 100vh;
-            padding: 1rem;
-            background-image: radial-gradient(ellipse at 20% 0%, rgba(99,102,241,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(139,92,246,0.06) 0%, transparent 50%) !important;
-        }
-        @media (min-width: 768px) { body { padding: 2rem; } }
-        
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Inter', serif !important;
-            color: var(--primary-color) !important;
-            margin-bottom: 1rem;
-        }
-        
-        h1 { font-size: 1.875rem !important; font-weight: 700; }
-        h2 { font-size: 1.5rem !important; font-weight: 600; }
-        h3 { font-size: 1.25rem !important; font-weight: 500; }
-        
-        p { color: var(--text-secondary); margin-bottom: 1rem; }
-        
-        input, select, textarea {
-            width: 100%;
-            background-color: #1A1510;
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-        }
-        
-        label {
-            display: block;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
-        }
-        
-        table { width: 100%; text-align: left; border-collapse: collapse; margin-bottom: 1.5rem; }
-        th { 
-            padding: 0.75rem 1rem; 
-            background-color: rgba(255, 255, 255, 0.05); 
-            font-size: 0.75rem; 
-            color: rgba(255, 255, 255, 0.5); 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em; 
-            border-bottom: 1px solid var(--border-color); 
-        }
-        td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.875rem; }
-        tr:hover { background-color: rgba(255, 255, 255, 0.05); transition: background-color 0.3s; }
-        
-        .login-container, .form-container {
-            background-color: var(--surface-color);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            border-radius: 1rem;
-            padding: 2rem;
-            max-width: 28rem;
-            margin: 0 auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .form-group { margin-bottom: 1rem; }
-        
-        .header { display: flex; flex-direction: column; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; }
-        @media (min-width: 768px) { .header { flex-direction: row; } }
-        
-        .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
-        
-        .card, .menu-item, .order-card, .table-card, .staff-card, .qr-card {
-            background-color: var(--surface-color) !important;
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color) !important;
-            border-radius: 1rem !important;
-            padding: 1.5rem !important;
-            box-shadow: 0 4px 30px rgba(99,102,241,0.05) !important;
-            margin-bottom: 1.5rem !important;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            color: var(--text-primary);
-        }
-        .card:hover, .menu-item:hover, .order-card:hover, .table-card:hover, .staff-card:hover, .qr-card:hover {
-            box-shadow: 0 8px 40px rgba(99,102,241,0.15) !important;
-            border-color: rgba(99,102,241,0.2) !important;
-            transform: translateY(-4px);
-        }
-        
-        /* Table specifics */
-        .table-card { text-align: center; justify-content: center; align-items: center; }
-        .table-card h3 { margin-bottom: 0.5rem; }
-        .table-card.occupied { border-color: rgba(239, 68, 68, 0.5) !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.2) !important; }
-        .table-card.available { border-color: rgba(34, 197, 94, 0.5) !important; box-shadow: 0 0 15px rgba(34, 197, 94, 0.2) !important; }
-
-        /* Kitchen Orders */
-        .order-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
-        .order-items { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
-        .order-item { display: flex; justify-content: space-between; font-size: 0.875rem; padding: 0.5rem; background-color: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; }
-        
-        /* Buttons */
-        button, .btn {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            transition: all 0.3s ease-out;
-            padding: 0.5rem 1.5rem;
-            border-radius: 0.75rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            border: none;
-        }
-        button:active, .btn:active { transform: scale(0.95); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        
-        .btn-primary, button[type="submit"], button[onclick*="login"], button[onclick*="generate"], .place-btn {
-            background-color: var(--primary-color) !important;
-            color: white !important;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
-        }
-        .btn-primary:hover, button[type="submit"]:hover, button[onclick*="login"]:hover, button[onclick*="generate"]:hover, .place-btn:hover {
-            background-color: #4F46E5 !important;
-        }
-        
-        .btn-danger { background-color: var(--error-color); color: #ffdad6; }
-        .btn-danger:hover { background-color: #ffb4ab; color: #690005; }
-        
-        .btn-outline, .btn-secondary {
-            background-color: transparent;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-        .btn-outline:hover, .btn-secondary:hover { background-color: rgba(99, 102, 241, 0.1); }
-        
-        .btn-small { padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 0.5rem; }
-        
-        .btn-success, .done-btn { background-color: var(--success-color) !important; color: white !important; }
-        .btn-success:hover, .done-btn:hover { background-color: #388e3c !important; }
-
-        .qty-btn { 
-            width: 2rem; height: 2rem; border-radius: 0.5rem; padding: 0; display: inline-flex; 
-            align-items: center; justify-content: center; font-weight: bold; background-color: rgba(255,255,255,0.1); color: var(--text-primary);
-        }
-        .qty-btn:hover { background-color: rgba(255,255,255,0.2); }
-        
-        .modal {
-            position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
-            background-color: rgba(8, 8, 8, 0.8); backdrop-filter: blur(4px); padding: 1rem;
-        }
-        .modal-content {
-            background-color: rgba(17, 17, 17, 0.95); backdrop-filter: blur(12px); width: 100%; max-width: 42rem;
-            border-radius: 1rem; padding: 2rem; border: 1px solid var(--border-color); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            position: relative; max-height: 90vh; overflow-y: auto; margin: auto; margin-top: 2.5rem;
-        }
-        .modal-close {
-            position: absolute; right: 1rem; top: 1rem; color: rgba(255, 255, 255, 0.5); cursor: pointer; font-size: 1.5rem; line-height: 1;
-        }
-        .modal-close:hover { color: white; }
-        
-        .badge, .timer-badge {
-            padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid transparent; display: inline-block;
-        }
-        .badge-active { background-color: rgba(34, 197, 94, 0.2); color: #4ade80; border-color: rgba(34, 197, 94, 0.3); }
-        .badge-inactive { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
-        .badge-paid, .badge-premium, .status-paid, .status-ready { background-color: rgba(99, 102, 241, 0.2); color: var(--primary-color); border-color: rgba(99, 102, 241, 0.3); }
-        .badge-trial, .status-pending, .status-preparing, .timer-badge { background-color: rgba(99, 102, 241, 0.3); color: #facc15; border-color: rgba(234, 179, 8, 0.3); }
-        .badge-free { background-color: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border-color: var(--border-color); }
-        .status-delivered { background-color: rgba(34, 197, 94, 0.2); color: #4ade80; border-color: rgba(34, 197, 94, 0.3); }
-        
-        .stats-panel, .credentials-box, .order-details, .items-list {
-            background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.05); margin-top: 1rem;
-        }
-        .stat-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label { color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        .stat-value { font-weight: 700; color: var(--primary-color); font-size: 1.125rem; }
-        
-        .tabs, .tab-bar { display: flex; overflow-x: auto; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; padding-bottom: 0.5rem; gap: 1rem; }
-        .tab { padding: 0.5rem 1rem; cursor: pointer; color: var(--text-secondary); border-bottom: 2px solid transparent; transition: color 0.3s; white-space: nowrap; }
-        .tab:hover { color: white; }
-        .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        #orders-container, #menu-container, #staff-list, .grid-cards {
-            display: grid; grid-template-columns: 1fr; gap: 1.5rem;
-        }
-        @media (min-width: 768px) { #orders-container, #menu-container, #staff-list, .grid-cards { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1024px) { #orders-container, #menu-container, #staff-list, .grid-cards { grid-template-columns: repeat(3, 1fr); } }
-        
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .item-row:last-child { border-bottom: none; }
-        .modifier-group { background-color: rgba(0, 0, 0, 0.2); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 0.75rem; }
-        
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .box { max-width: 400px; margin: 12vh auto 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 32px; box-shadow: 0 0 80px rgba(99,102,241,0.15), 0 24px 80px rgba(0,0,0,0.55); }
-        .box h2 { font-size: 34px !important; text-align: center; }
-        .box button { width: 100%; background: linear-gradient(135deg, #6366F1, #4F46E5) !important; color: white !important; padding: 12px 18px; }
-        .subtitle { text-align: center; }
-        .table-card, .occupied, .available, .order-card, .done-btn, .timer-badge, .item-row, .qty-btn, .staff-card, .qr-card, .checkout-modal, .customer-card, .history-row, .menu-item-row { border-radius: 12px; }
-
-        .qr-modal-overlay {
-            position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
-            background-color: rgba(8, 8, 8, 0.8); backdrop-filter: blur(4px); padding: 1rem;
-        }
-        .qr-modal {
-            background-color: rgba(17, 17, 17, 0.95); backdrop-filter: blur(12px); border-radius: 1rem; padding: 2rem; border: 1px solid var(--border-color); text-align: center;
-        }
-        .qr-modal img { margin: 1rem auto; max-width: 200px; display: block; border-radius: 0.5rem; }
-        .qr-url { word-break: break-all; color: var(--text-secondary); font-size: 0.875rem; }
-
-        .subscription-overlay {
-            display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; text-align: center; color: #F0F0F0;
-        }
-        
-        /* Menu overrides that were lost when stripping tailwind */
-        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-color); padding: 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; z-index: 50; }
-        .search-box { margin-bottom: 1rem; }
-        .ornate-divider { display: flex; align-items: center; margin: 2rem 0 1rem; text-align: center; }
-        .ornate-divider::before, .ornate-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--primary-color); opacity: 0.3; }
-        .scroll-mt-40 { scroll-margin-top: 10rem; }
-        .glass-effect { background-color: rgba(17, 17, 17, 0.9); backdrop-filter: blur(12px); }
-
+        .gold-glow { box-shadow: 0 0 60px rgba(234,179,8,0.15), 0 4px 24px rgba(0,0,0,0.4); }
+        .gold-btn { background: linear-gradient(135deg, #eab308 0%, #a16207 100%); transition: all 0.3s ease; }
+        .gold-btn:hover { box-shadow: 0 8px 32px rgba(234,179,8,0.35); transform: translateY(-1px); }
+        .gold-btn:active { transform: scale(0.97); }
+        .input-field { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); transition: border-color 0.3s, box-shadow 0.3s; }
+        .input-field:focus { border-color: rgba(234,179,8,0.5); box-shadow: 0 0 0 3px rgba(234,179,8,0.1); outline: none; }
+        .ornate-line { height: 1px; background: linear-gradient(90deg, transparent, rgba(234,179,8,0.3), transparent); }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-up { animation: fadeUp 0.6s ease forwards; }
     </style>
 </head>
-<body>
-    <div class="box">
-        <h2>🔑 Super Admin</h2>
-        <p class="subtitle">Restron Platform Management</p>
-        <input id="u" placeholder="Username">
-        <input id="p" type="password" placeholder="Password">
-        <button onclick="login()">Access Dashboard</button>
-        <p id="msg" style="color:#e74c3c; margin-top:10px; font-size:0.9em;"></p>
+<body class="bg-surface text-on-surface font-sans min-h-screen flex flex-col items-center justify-center p-4"
+      style="background-image: radial-gradient(ellipse at 20% 0%, rgba(192,193,255,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(234,179,8,0.04) 0%, transparent 50%);">
+
+    <div class="w-full max-w-md animate-fade-up">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-gold text-3xl" style="font-variation-settings:'FILL' 1;">admin_panel_settings</span>
+            </div>
+            <h1 class="font-display text-4xl text-on-surface tracking-tight mb-2">Super Admin</h1>
+            <div class="ornate-line w-24 mx-auto mb-3"></div>
+            <p class="text-text-muted text-sm">Restron Platform Management</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 gold-glow">
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Username</label>
+                    <input id="u" type="text" placeholder="Enter admin username"
+                           class="input-field w-full rounded-xl px-4 py-3 text-on-surface font-sans placeholder:text-text-muted/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">Password</label>
+                    <input id="p" type="password" placeholder="Enter admin password"
+                           class="input-field w-full rounded-xl px-4 py-3 text-on-surface font-sans placeholder:text-text-muted/50">
+                </div>
+                <button onclick="login()" class="gold-btn w-full rounded-xl py-3.5 text-black font-bold text-sm uppercase tracking-wider">
+                    Access Dashboard
+                </button>
+                <p id="msg" class="text-danger text-sm text-center min-h-[20px]"></p>
+            </div>
+        </div>
+
+        <p class="text-center text-text-muted/50 text-xs mt-6">Secured by Restron · Platform Administration</p>
     </div>
+
     <script>
         async function login() {
             const u = document.getElementById('u').value;

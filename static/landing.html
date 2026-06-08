@@ -1,730 +1,165 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
     <meta charset="utf-8">
     <title>Restron — Run your restaurant from a single link</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Restron is the modern restaurant management platform. POS, orders, menu, kitchen display — all from one link.">
-    <meta name="theme-color" content="#6366F1">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#131313">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    surface: "#0C0C0C", background: "#131313", card: "#161616", elevated: "#1A1A1A",
+                    "surface-container": "#201f1f", "surface-bright": "#3a3939",
+                    primary: "#c0c1ff", "primary-container": "#8083ff", secondary: "#d0bcff", tertiary: "#4edea3",
+                    "on-surface": "#e5e2e1", "on-surface-variant": "#c7c4d7", "text-muted": "#888888",
+                    "border-glass": "rgba(255,255,255,0.08)", outline: "#908fa0", "outline-variant": "#464554",
+                    danger: "#EF4444", error: "#ffb4ab", warning: "#F59E0B",
+                    gold: { light: "#fef08a", DEFAULT: "#eab308", dark: "#a16207" }
+                },
+                fontFamily: { display: ["Playfair Display","serif"], sans: ["Inter","sans-serif"], mono: ["JetBrains Mono","monospace"] }
+            }
+        }
+    };
+    </script>
     <style>
-        :root {
-            --bg-base: #080808;
-            --bg-surface: #111111;
-            --bg-card: #161616;
-            --primary: #6366F1;
-            --primary-dark: #4F46E5;
-            --primary-light: #818CF8;
-            --secondary: #8B5CF6;
-            --text-primary: #F0F0F0;
-            --text-muted: #888888;
-            --border: rgba(99,102,241,0.15);
-            --glow: rgba(99,102,241,0.08);
-            --success: #22C55E;
-            --danger: #EF4444;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
         html { scroll-behavior: smooth; }
-
-        body {
-            background: var(--bg-base);
-            background-image:
-                radial-gradient(ellipse at 20% 0%, rgba(99,102,241,0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 100%, rgba(139,92,246,0.06) 0%, transparent 50%);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
-
-        nav {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(8,8,8,0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 0 2rem;
-        }
-
-        .nav-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 64px;
-        }
-
-        .nav-brand {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: var(--primary);
-            text-decoration: none;
-            letter-spacing: -0.02em;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .nav-links a:hover { color: var(--text-primary); }
-
-        .nav-links .nav-login {
-            background: var(--primary);
-            color: white;
-            padding: 0.5rem 1.25rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: background 0.2s, box-shadow 0.2s;
-        }
-
-        .nav-links .nav-login:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 4px 16px rgba(99,102,241,0.3);
-        }
-
-        section {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 5rem 2rem;
-        }
-
-        .hero {
-            text-align: center;
-            padding-top: 6rem;
-            padding-bottom: 4rem;
-            position: relative;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            background: rgba(99,102,241,0.1);
-            border: 1px solid rgba(99,102,241,0.25);
-            border-radius: 999px;
-            padding: 0.375rem 1rem;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--primary-light);
-            margin-bottom: 1.5rem;
-        }
-
-        .hero h1 {
-            font-size: clamp(2.25rem, 5vw, 4rem);
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -0.03em;
-            margin-bottom: 1.25rem;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 1.125rem;
-            color: var(--text-muted);
-            max-width: 520px;
-            margin: 0 auto 2rem;
-            line-height: 1.6;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 4rem;
-        }
-
-        .btn-hero {
-            padding: 0.875rem 2rem;
-            border-radius: 0.75rem;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            text-decoration: none;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-        }
-
-        .btn-hero:active { transform: scale(0.97); }
-
-        .btn-hero-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            box-shadow: 0 4px 20px rgba(99,102,241,0.3);
-        }
-
-        .btn-hero-primary:hover { box-shadow: 0 8px 32px rgba(99,102,241,0.45); }
-
-        .btn-hero-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-        }
-
-        .btn-hero-outline:hover { border-color: var(--primary); color: var(--primary); }
-
-        .phone-mockup {
-            width: 280px;
-            margin: 0 auto;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 2rem;
-            padding: 1.5rem 1rem 1rem;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.08);
-            position: relative;
-        }
-
-        .phone-notch {
-            width: 100px;
-            height: 6px;
-            background: var(--bg-surface);
-            border-radius: 999px;
-            margin: 0 auto 1rem;
-        }
-
-        .phone-menu-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            transition: transform 0.2s;
-        }
-
-        .phone-menu-item:hover { transform: translateX(4px); }
-
-        .pmi-left {
-            display: flex;
-            align-items: center;
-            gap: 0.625rem;
-        }
-
-        .pmi-emoji { font-size: 1.5rem; }
-
-        .pmi-name {
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-
-        .pmi-price {
-            color: var(--primary-light);
-            font-weight: 700;
-            font-size: 0.8rem;
-        }
-
-        .pmi-badge {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-            border: 1.5px solid #22C55E;
-            display: inline-block;
-        }
-
-        .pmi-badge.non-veg { border-color: #EF4444; }
-
-        .social-proof {
-            text-align: center;
-            padding: 2.5rem 2rem;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .social-proof span { font-size: 1.25rem; margin: 0 0.15rem; }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .section-title h2 {
-            font-size: clamp(1.75rem, 3vw, 2.5rem);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.5rem;
-        }
-
-        .section-title p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.25rem;
-        }
-
-        .bento-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 1.25rem;
-            padding: 2rem;
-            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-        }
-
-        .bento-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(99,102,241,0.35);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 20px var(--glow);
-        }
-
-        .bento-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .bento-card h3 {
-            font-size: 1.125rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .bento-card p {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            line-height: 1.6;
-        }
-
-        .steps-section {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-        }
-
-        .step-item {
-            text-align: center;
-            padding: 2rem 1rem;
-        }
-
-        .step-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            font-weight: 800;
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .step-item h3 {
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .step-item p {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.25rem;
-            align-items: start;
-        }
-
-        .price-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 1.25rem;
-            padding: 2rem 1.5rem;
-            text-align: center;
-            transition: transform 0.3s, border-color 0.3s;
-            position: relative;
-        }
-
-        .price-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(99,102,241,0.35);
-        }
-
-        .price-card.popular {
-            border-color: var(--primary);
-            box-shadow: 0 0 40px rgba(99,102,241,0.15);
-        }
-
-        .popular-badge {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 0.25rem 0.875rem;
-            border-radius: 999px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .price-card h3 {
-            font-size: 1.125rem;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-        }
-
-        .price-amount {
-            font-size: 2.25rem;
-            font-weight: 800;
-            color: var(--primary-light);
-            margin-bottom: 0.25rem;
-        }
-
-        .price-period {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .price-features {
-            list-style: none;
-            text-align: left;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .price-features li {
-            padding: 0.375rem 0;
-            border-bottom: 1px solid rgba(99,102,241,0.08);
-        }
-
-        .price-features li::before {
-            content: "✓ ";
-            color: var(--success);
-            font-weight: 700;
-        }
-
-        .login-section {
-            text-align: center;
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 5rem 2rem;
-        }
-
-        .login-section h2 {
-            font-size: 1.75rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-        }
-
-        .login-section p {
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-        }
-
-        .slug-form {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .slug-form input {
-            flex: 1;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 0.75rem;
-            padding: 0.875rem 1rem;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-        }
-
-        .slug-form input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
-        }
-
-        .slug-form button {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 0.75rem;
-            padding: 0.875rem 1.5rem;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: box-shadow 0.2s;
-        }
-
-        .slug-form button:hover {
-            box-shadow: 0 4px 20px rgba(99,102,241,0.35);
-        }
-
-        footer {
-            text-align: center;
-            padding: 3rem 2rem;
-            border-top: 1px solid var(--border);
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
-
-        footer a {
-            color: var(--primary-light);
-            text-decoration: none;
-        }
-
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.7s ease, transform 0.7s ease;
-        }
-
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @media (max-width: 900px) {
-            .bento-grid { grid-template-columns: repeat(2, 1fr); }
-            .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-            .steps-section { grid-template-columns: 1fr; gap: 1rem; }
-        }
-
-        @media (max-width: 600px) {
-            .bento-grid { grid-template-columns: 1fr; }
-            .pricing-grid { grid-template-columns: 1fr; }
-            .nav-links { gap: 1rem; }
-            .nav-links a:not(.nav-login) { display: none; }
-            .hero-buttons { flex-direction: column; align-items: center; }
-            .slug-form { flex-direction: column; }
-        }
+        .glass-card { background: linear-gradient(135deg, rgba(22,22,22,0.92) 0%, rgba(12,12,12,0.96) 100%); border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04); }
+        .gold-glow { box-shadow: 0 0 60px rgba(234,179,8,0.12), 0 4px 24px rgba(0,0,0,0.4); }
+        .gold-btn { background: linear-gradient(135deg, #eab308 0%, #a16207 100%); transition: all 0.3s ease; }
+        .gold-btn:hover { box-shadow: 0 8px 32px rgba(234,179,8,0.35); transform: translateY(-1px); }
+        .ornate-line { height: 1px; background: linear-gradient(90deg, transparent, rgba(234,179,8,0.3), transparent); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .feature-card { transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; }
+        .feature-card:hover { transform: translateY(-4px); border-color: rgba(234,179,8,0.3); box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 20px rgba(234,179,8,0.08); }
     </style>
 </head>
-<body>
+<body class="bg-surface text-on-surface font-sans overflow-x-hidden" style="background-image: radial-gradient(ellipse at 20% 0%, rgba(192,193,255,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(234,179,8,0.04) 0%, transparent 50%);">
 
-<nav>
-    <div class="nav-inner">
-        <a href="/" class="nav-brand">◈ Restron</a>
-        <ul class="nav-links">
-            <li><a href="#features">Features</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-            <li><a href="#login" class="nav-login">Login →</a></li>
-        </ul>
+<nav class="sticky top-0 z-50 backdrop-blur-xl border-b border-border-glass" style="background: rgba(12,12,12,0.7);">
+    <div class="max-w-6xl mx-auto flex items-center justify-between h-16 px-6">
+        <a href="/" class="flex items-center gap-2 text-gold font-display text-xl font-semibold">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">restaurant</span> Restron
+        </a>
+        <div class="flex items-center gap-6">
+            <a href="#features" class="hidden sm:inline text-text-muted hover:text-on-surface text-sm font-medium transition-colors">Features</a>
+            <a href="#pricing" class="hidden sm:inline text-text-muted hover:text-on-surface text-sm font-medium transition-colors">Pricing</a>
+            <a href="#login" class="gold-btn px-5 py-2 rounded-lg text-black font-bold text-sm">Login →</a>
+        </div>
     </div>
 </nav>
 
-<section class="hero">
-    <div class="hero-badge">✦ Built for independent restaurants</div>
-    <h1>Run your restaurant<br>from a single link.</h1>
-    <p>Orders, menu, kitchen display, billing, analytics — everything your restaurant needs, accessible from any device. No hardware, no downloads.</p>
-
-    <div class="hero-buttons">
-        <a href="#login" class="btn-hero btn-hero-primary">Get Started Free →</a>
-        <a href="#features" class="btn-hero btn-hero-outline">See Features</a>
+<section class="max-w-6xl mx-auto text-center pt-24 pb-16 px-6">
+    <div class="inline-block bg-gold/10 border border-gold/25 rounded-full px-4 py-1.5 text-xs font-medium text-gold-light mb-6">✦ Built for independent restaurants</div>
+    <h1 class="font-display text-5xl md:text-7xl font-semibold tracking-tight mb-5 bg-gradient-to-br from-on-surface to-gold bg-clip-text text-transparent leading-tight">Run your restaurant<br>from a single link.</h1>
+    <p class="text-text-muted text-lg max-w-xl mx-auto mb-8 leading-relaxed">Orders, menu, kitchen display, billing, analytics — everything your restaurant needs, accessible from any device. No hardware, no downloads.</p>
+    <div class="flex gap-4 justify-center flex-wrap mb-16">
+        <a href="#login" class="gold-btn px-8 py-3.5 rounded-xl text-black font-bold">Get Started Free →</a>
+        <a href="#features" class="px-8 py-3.5 rounded-xl border border-border-glass text-on-surface font-semibold hover:border-gold hover:text-gold transition-all">See Features</a>
     </div>
-
-    <div class="phone-mockup">
-        <div class="phone-notch"></div>
-        <div class="phone-menu-item">
-            <div class="pmi-left">
-                <span class="pmi-emoji">🍛</span>
-                <div>
-                    <div class="pmi-name">Butter Chicken</div>
-                    <span class="pmi-badge"></span>
-                </div>
-            </div>
-            <span class="pmi-price">₹320</span>
-        </div>
-        <div class="phone-menu-item">
-            <div class="pmi-left">
-                <span class="pmi-emoji">🥗</span>
-                <div>
-                    <div class="pmi-name">Garden Salad</div>
-                    <span class="pmi-badge non-veg"></span>
-                </div>
-            </div>
-            <span class="pmi-price">₹180</span>
-        </div>
-        <div class="phone-menu-item">
-            <div class="pmi-left">
-                <span class="pmi-emoji">🍕</span>
-                <div>
-                    <div class="pmi-name">Margherita Pizza</div>
-                    <span class="pmi-badge"></span>
-                </div>
-            </div>
-            <span class="pmi-price">₹250</span>
-        </div>
-        <div class="phone-menu-item">
-            <div class="pmi-left">
-                <span class="pmi-emoji">🧁</span>
-                <div>
-                    <div class="pmi-name">Choco Lava Cake</div>
-                    <span class="pmi-badge"></span>
-                </div>
-            </div>
-            <span class="pmi-price">₹150</span>
+    <div class="glass-card rounded-3xl p-6 max-w-xs mx-auto gold-glow">
+        <div class="w-24 h-1.5 bg-surface-container rounded-full mx-auto mb-4"></div>
+        <div class="space-y-2">
+            <div class="flex items-center justify-between bg-surface-container border border-border-glass rounded-xl p-3 hover:translate-x-1 transition-transform"><div class="flex items-center gap-2.5"><span class="text-2xl">🍛</span><div><div class="font-semibold text-sm">Butter Chicken</div></div></div><span class="text-gold font-bold text-sm">₹320</span></div>
+            <div class="flex items-center justify-between bg-surface-container border border-border-glass rounded-xl p-3 hover:translate-x-1 transition-transform"><div class="flex items-center gap-2.5"><span class="text-2xl">🥗</span><div><div class="font-semibold text-sm">Garden Salad</div></div></div><span class="text-gold font-bold text-sm">₹180</span></div>
+            <div class="flex items-center justify-between bg-surface-container border border-border-glass rounded-xl p-3 hover:translate-x-1 transition-transform"><div class="flex items-center gap-2.5"><span class="text-2xl">🍕</span><div><div class="font-semibold text-sm">Margherita Pizza</div></div></div><span class="text-gold font-bold text-sm">₹250</span></div>
         </div>
     </div>
 </section>
 
-<div class="social-proof">
-    Trusted by restaurants in <span>🇺🇸</span> <span>🇬🇧</span> <span>🇦🇺</span> <span>🇨🇦</span> <span>🇦🇪</span>
-</div>
+<div class="text-center py-8 text-text-muted text-sm border-t border-b border-border-glass">Trusted by restaurants in <span class="text-lg mx-0.5">🇺🇸</span> <span class="text-lg mx-0.5">🇬🇧</span> <span class="text-lg mx-0.5">🇦🇺</span> <span class="text-lg mx-0.5">🇨🇦</span> <span class="text-lg mx-0.5">🇦🇪</span> <span class="text-lg mx-0.5">🇮🇳</span></div>
 
-<section id="features">
-    <div class="section-title reveal">
-        <h2>Everything you need, nothing you don't</h2>
-        <p>Powerful features designed to run your restaurant effortlessly</p>
+<section id="features" class="max-w-6xl mx-auto py-20 px-6">
+    <div class="text-center mb-12 reveal">
+        <h2 class="font-display text-3xl md:text-4xl font-semibold mb-2">Everything you need, nothing you don't</h2>
+        <p class="text-text-muted max-w-lg mx-auto">Powerful features designed to run your restaurant effortlessly</p>
     </div>
-    <div class="bento-grid">
-        <div class="bento-card reveal">
-            <span class="bento-icon">📱</span>
-            <h3>QR Code Ordering</h3>
-            <p>Customers scan, browse your menu, and place orders from their own phones. Zero contact, zero wait.</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="feature-card glass-card rounded-2xl p-7 reveal"><span class="text-3xl mb-3 block">📱</span><h3 class="text-lg font-bold mb-1.5 text-on-surface">QR Code Ordering</h3><p class="text-text-muted text-sm leading-relaxed">Customers scan, browse your menu, and place orders from their own phones. Zero contact, zero wait.</p></div>
+        <div class="feature-card glass-card rounded-2xl p-7 reveal"><span class="text-3xl mb-3 block">🖥️</span><h3 class="text-lg font-bold mb-1.5 text-on-surface">Kitchen Display</h3><p class="text-text-muted text-sm leading-relaxed">Real-time order tickets for your kitchen. Auto-prioritized, color-coded, and always in sync.</p></div>
+        <div class="feature-card glass-card rounded-2xl p-7 reveal"><span class="text-3xl mb-3 block">🧾</span><h3 class="text-lg font-bold mb-1.5 text-on-surface">GST-Ready Billing</h3><p class="text-text-muted text-sm leading-relaxed">Auto-calculated GST, CGST/SGST split, digital receipts with HSN codes. Tax compliance built in.</p></div>
+        <div class="feature-card glass-card rounded-2xl p-7 reveal"><span class="text-3xl mb-3 block">📊</span><h3 class="text-lg font-bold mb-1.5 text-on-surface">Live Analytics</h3><p class="text-text-muted text-sm leading-relaxed">Revenue, top dishes, peak hours, average ticket size — real-time dashboards that help you grow.</p></div>
+        <div class="feature-card glass-card rounded-2xl p-7 reveal"><span class="text-3xl mb-3 block">📅</span><h3 class="text-lg font-bold mb-1.5 text-on-surface">Table Reservations</h3><p class="text-text-muted text-sm leading-relaxed">Customers book tables online. You manage slots, party sizes, and no-shows from your dashboard.</p></div>
+        <div class="feature-card glass-card rounded-2xl p-7 reveal"><span class="text-3xl mb-3 block">👥</span><h3 class="text-lg font-bold mb-1.5 text-on-surface">Multi-Role Staff</h3><p class="text-text-muted text-sm leading-relaxed">Owner, manager, waiter, chef, cashier — each gets their own optimized dashboard with role-based access.</p></div>
+    </div>
+</section>
+
+<section class="max-w-6xl mx-auto py-20 px-6">
+    <div class="text-center mb-12 reveal">
+        <h2 class="font-display text-3xl md:text-4xl font-semibold mb-2">How it works</h2>
+        <p class="text-text-muted">Up and running in under 5 minutes</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="text-center p-6 reveal">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-gold to-gold-dark text-black font-bold text-lg mb-4">1</div>
+            <h3 class="font-bold mb-2 text-on-surface">Create Your Restaurant</h3>
+            <p class="text-text-muted text-sm">Sign up, name your restaurant, and get your unique link instantly.</p>
         </div>
-        <div class="bento-card reveal">
-            <span class="bento-icon">🖥️</span>
-            <h3>Kitchen Display</h3>
-            <p>Real-time order tickets for your kitchen. Auto-prioritized, color-coded, and always in sync.</p>
+        <div class="text-center p-6 reveal">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-gold to-gold-dark text-black font-bold text-lg mb-4">2</div>
+            <h3 class="font-bold mb-2 text-on-surface">Add Your Menu</h3>
+            <p class="text-text-muted text-sm">Add dishes, set prices, categories, and veg/non-veg tags. Bulk upload supported.</p>
         </div>
-        <div class="bento-card reveal">
-            <span class="bento-icon">🧾</span>
-            <h3>GST-Ready Billing</h3>
-            <p>Auto-calculated GST, CGST/SGST split, digital receipts with HSN codes. Tax compliance built in.</p>
-        </div>
-        <div class="bento-card reveal">
-            <span class="bento-icon">📊</span>
-            <h3>Live Analytics</h3>
-            <p>Revenue, top dishes, peak hours, average ticket size — real-time dashboards that help you grow.</p>
-        </div>
-        <div class="bento-card reveal">
-            <span class="bento-icon">📅</span>
-            <h3>Table Reservations</h3>
-            <p>Customers book tables online. You manage slots, party sizes, and no-shows from your dashboard.</p>
-        </div>
-        <div class="bento-card reveal">
-            <span class="bento-icon">👥</span>
-            <h3>Multi-Role Staff</h3>
-            <p>Owner, manager, waiter, chef, cashier — each gets their own optimized dashboard with role-based access.</p>
+        <div class="text-center p-6 reveal">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-gold to-gold-dark text-black font-bold text-lg mb-4">3</div>
+            <h3 class="font-bold mb-2 text-on-surface">Start Taking Orders</h3>
+            <p class="text-text-muted text-sm">Share your QR code or link. Orders flow to your kitchen display in real time.</p>
         </div>
     </div>
 </section>
 
-<section>
-    <div class="section-title reveal">
-        <h2>How it works</h2>
-        <p>Up and running in under 5 minutes</p>
+<section id="pricing" class="max-w-6xl mx-auto py-20 px-6">
+    <div class="text-center mb-12 reveal">
+        <h2 class="font-display text-3xl md:text-4xl font-semibold mb-2">Simple, transparent pricing</h2>
+        <p class="text-text-muted">Start free, upgrade when you grow</p>
     </div>
-    <div class="steps-section">
-        <div class="step-item reveal">
-            <div class="step-number">1</div>
-            <h3>Create Your Restaurant</h3>
-            <p>Sign up, name your restaurant, and get your unique link instantly.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-start">
+        <div class="glass-card rounded-2xl p-6 text-center reveal feature-card">
+            <h3 class="text-lg font-bold mb-2 text-on-surface">Free</h3>
+            <div class="text-3xl font-extrabold text-gold mb-1">₹0</div>
+            <div class="text-text-muted text-xs mb-5">forever</div>
+            <ul class="text-left text-sm text-text-muted space-y-2"><li class="border-b border-border-glass pb-2">✓ Up to 10 tables</li><li class="border-b border-border-glass pb-2">✓ Basic menu</li><li class="border-b border-border-glass pb-2">✓ QR ordering</li><li>✓ 1 staff account</li></ul>
         </div>
-        <div class="step-item reveal">
-            <div class="step-number">2</div>
-            <h3>Add Your Menu</h3>
-            <p>Add dishes, set prices, categories, and veg/non-veg tags. Bulk upload supported.</p>
+        <div class="glass-card rounded-2xl p-6 text-center reveal feature-card">
+            <h3 class="text-lg font-bold mb-2 text-on-surface">Starter</h3>
+            <div class="text-3xl font-extrabold text-gold mb-1">₹499</div>
+            <div class="text-text-muted text-xs mb-5">per month</div>
+            <ul class="text-left text-sm text-text-muted space-y-2"><li class="border-b border-border-glass pb-2">✓ Up to 25 tables</li><li class="border-b border-border-glass pb-2">✓ Full menu + modifiers</li><li class="border-b border-border-glass pb-2">✓ Kitchen display</li><li class="border-b border-border-glass pb-2">✓ 3 staff accounts</li><li>✓ Basic analytics</li></ul>
         </div>
-        <div class="step-item reveal">
-            <div class="step-number">3</div>
-            <h3>Start Taking Orders</h3>
-            <p>Share your QR code or link. Orders flow to your kitchen display in real time.</p>
+        <div class="glass-card rounded-2xl p-6 text-center reveal feature-card border-gold/30 relative" style="box-shadow: 0 0 40px rgba(234,179,8,0.15);">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-gold to-gold-dark text-black text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Most Popular</div>
+            <h3 class="text-lg font-bold mb-2 text-on-surface">Growth</h3>
+            <div class="text-3xl font-extrabold text-gold mb-1">₹999</div>
+            <div class="text-text-muted text-xs mb-5">per month</div>
+            <ul class="text-left text-sm text-text-muted space-y-2"><li class="border-b border-border-glass pb-2">✓ Up to 50 tables</li><li class="border-b border-border-glass pb-2">✓ Everything in Starter</li><li class="border-b border-border-glass pb-2">✓ Table reservations</li><li class="border-b border-border-glass pb-2">✓ 10 staff accounts</li><li class="border-b border-border-glass pb-2">✓ Advanced analytics</li><li>✓ Inventory tracking</li></ul>
         </div>
-    </div>
-</section>
-
-<section id="pricing">
-    <div class="section-title reveal">
-        <h2>Simple, transparent pricing</h2>
-        <p>Start free, upgrade when you grow</p>
-    </div>
-    <div class="pricing-grid">
-        <div class="price-card reveal">
-            <h3>Free</h3>
-            <div class="price-amount">₹0</div>
-            <div class="price-period">forever</div>
-            <ul class="price-features">
-                <li>Up to 10 tables</li>
-                <li>Basic menu</li>
-                <li>QR ordering</li>
-                <li>1 staff account</li>
-            </ul>
-        </div>
-        <div class="price-card reveal">
-            <h3>Starter</h3>
-            <div class="price-amount">₹499</div>
-            <div class="price-period">per month</div>
-            <ul class="price-features">
-                <li>Up to 25 tables</li>
-                <li>Full menu + modifiers</li>
-                <li>Kitchen display</li>
-                <li>3 staff accounts</li>
-                <li>Basic analytics</li>
-            </ul>
-        </div>
-        <div class="price-card popular reveal">
-            <div class="popular-badge">Most Popular</div>
-            <h3>Growth</h3>
-            <div class="price-amount">₹999</div>
-            <div class="price-period">per month</div>
-            <ul class="price-features">
-                <li>Up to 50 tables</li>
-                <li>Everything in Starter</li>
-                <li>Table reservations</li>
-                <li>10 staff accounts</li>
-                <li>Advanced analytics</li>
-                <li>Inventory tracking</li>
-            </ul>
-        </div>
-        <div class="price-card reveal">
-            <h3>Enterprise</h3>
-            <div class="price-amount">Custom</div>
-            <div class="price-period">contact us</div>
-            <ul class="price-features">
-                <li>Unlimited tables</li>
-                <li>Everything in Growth</li>
-                <li>Multi-outlet support</li>
-                <li>Unlimited staff</li>
-                <li>Priority support</li>
-                <li>Custom integrations</li>
-            </ul>
+        <div class="glass-card rounded-2xl p-6 text-center reveal feature-card">
+            <h3 class="text-lg font-bold mb-2 text-on-surface">Enterprise</h3>
+            <div class="text-3xl font-extrabold text-gold mb-1">Custom</div>
+            <div class="text-text-muted text-xs mb-5">contact us</div>
+            <ul class="text-left text-sm text-text-muted space-y-2"><li class="border-b border-border-glass pb-2">✓ Unlimited tables</li><li class="border-b border-border-glass pb-2">✓ Everything in Growth</li><li class="border-b border-border-glass pb-2">✓ Multi-outlet support</li><li class="border-b border-border-glass pb-2">✓ Unlimited staff</li><li class="border-b border-border-glass pb-2">✓ Priority support</li><li>✓ Custom integrations</li></ul>
         </div>
     </div>
 </section>
 
-<section id="login" class="login-section">
-    <h2>Access Your Dashboard</h2>
-    <p>Enter your restaurant slug to log in</p>
-    <div class="slug-form">
-        <input type="text" id="slug-input" placeholder="e.g. my-restaurant" autocomplete="off">
-        <button onclick="goToLogin()">Go →</button>
+<section id="login" class="max-w-lg mx-auto text-center py-20 px-6">
+    <h2 class="font-display text-2xl font-bold mb-2 text-on-surface">Access Your Dashboard</h2>
+    <p class="text-text-muted mb-6">Enter your restaurant slug to log in</p>
+    <div class="flex gap-3 flex-col sm:flex-row">
+        <input type="text" id="slug-input" placeholder="e.g. my-restaurant" autocomplete="off" class="flex-1 bg-surface-container border border-border-glass rounded-xl px-4 py-3.5 text-on-surface font-sans focus:outline-none focus:border-gold focus:shadow-[0_0_0_3px_rgba(234,179,8,0.15)]">
+        <button onclick="goToLogin()" class="gold-btn px-6 py-3.5 rounded-xl text-black font-bold whitespace-nowrap">Go →</button>
     </div>
 </section>
 
-<footer>
-    <p>Restron · <a href="mailto:restronsupport@gmail.com">restronsupport@gmail.com</a> · Made in India 🇮🇳</p>
+<footer class="text-center py-10 border-t border-border-glass text-text-muted text-xs">
+    <p>Restron · <a href="mailto:restronsupport@gmail.com" class="text-gold hover:underline">restronsupport@gmail.com</a> · Made in India 🇮🇳</p>
 </footer>
 
 <script>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Restron - Mobile Menu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface": "#131313",
+                        "on-secondary": "#3c2f00",
+                        "surface-tint": "#c9c6c5",
+                        "on-surface": "#e5e2e1",
+                        "primary-fixed-dim": "#c9c6c5",
+                        "on-secondary-container": "#342800",
+                        "tertiary-container": "#080a0a",
+                        "on-secondary-fixed": "#241a00",
+                        "outline": "#8e9192",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-bright": "#393939",
+                        "on-error": "#690005",
+                        "on-primary-fixed": "#1c1b1b",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "background": "#131313",
+                        "surface-container": "#20201f",
+                        "primary-container": "#0a0a0a",
+                        "outline-variant": "#444748",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-tertiary": "#2f3131",
+                        "primary": "#c9c6c5",
+                        "inverse-primary": "#5f5e5e",
+                        "on-error-container": "#ffdad6",
+                        "on-primary": "#313030",
+                        "on-primary-fixed-variant": "#474646",
+                        "inverse-on-surface": "#313030",
+                        "secondary": "#e9c349",
+                        "surface-variant": "#353535",
+                        "on-primary-container": "#7b7979",
+                        "tertiary": "#c6c6c7",
+                        "on-secondary-fixed-variant": "#574500",
+                        "secondary-container": "#af8d11",
+                        "on-surface-variant": "#c4c7c7",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "surface-dim": "#131313",
+                        "secondary-fixed": "#ffe088",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-highest": "#353535",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#e5e2e1",
+                        "on-tertiary-container": "#78797a",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary-fixed-dim": "#e9c349",
+                        "on-background": "#e5e2e1",
+                        "error": "#ffb4ab"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "base": "8px",
+                        "section-gap": "120px",
+                        "margin-mobile": "20px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Playfair Display"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "display-xl": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "mono-price": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.15em", "fontWeight": "600"}],
+                        "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "display-xl": ["80px", {"lineHeight": "90px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .magnetic-hover {
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .magnetic-hover:hover {
+            transform: scale(1.02);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen font-body-md overflow-x-hidden pb-32">
+<!-- Header Section -->
+<header class="sticky top-0 z-50 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/20 pt-8 pb-4 px-margin-mobile flex flex-col gap-4">
+<div class="flex justify-between items-center w-full">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-secondary tracking-tight">Restron</h1>
+<div class="px-3 py-1 rounded-full bg-surface-container-highest border border-outline-variant flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-caps text-label-caps text-on-surface">Table 12</span>
+</div>
+</div>
+<!-- Category Scroll -->
+<div class="flex overflow-x-auto hide-scrollbar gap-3 pb-2 -mx-margin-mobile px-margin-mobile">
+<button class="px-5 py-2 rounded-full bg-secondary text-on-secondary font-label-caps text-label-caps whitespace-nowrap shrink-0 magnetic-hover transition-colors">
+                Signature Rolls
+            </button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap shrink-0 magnetic-hover hover:border-secondary hover:text-secondary transition-colors">
+                Nigiri
+            </button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap shrink-0 magnetic-hover hover:border-secondary hover:text-secondary transition-colors">
+                Robata Grill
+            </button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap shrink-0 magnetic-hover hover:border-secondary hover:text-secondary transition-colors">
+                Small Plates
+            </button>
+</div>
+</header>
+<!-- Menu Content -->
+<main class="px-margin-mobile py-8 flex flex-col gap-8">
+<!-- Category Section: Signature Rolls -->
+<section class="flex flex-col gap-6">
+<h2 class="font-headline-md text-headline-md text-on-surface border-b border-outline-variant/20 pb-2">Signature Rolls</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Menu Item Card 1 -->
+<div class="bg-surface-container-low border border-surface-container-high rounded-xl p-4 flex gap-4 magnetic-hover">
+<img alt="Dragon Roll" class="w-24 h-24 object-cover rounded-lg shrink-0 border border-outline-variant/20" data-alt="A close up shot of an exquisite dragon sushi roll plated on dark slate. The roll is topped with thinly sliced avocado resembling dragon scales, drizzled with a glossy dark soy reduction. The lighting is cinematic and moody, highlighting the fresh textures of the fish and rice against the stark black background. The overall aesthetic is high-end Japanese dining with a focus on dark atmospheric tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEEP3GJgNXSn57XZA2D8ragsQTR-kxeCs-r61NawnkvmyRjv3N__E_3nEUY0rYL0WC0NdDn6EQB37V1DmDxK-JHw26l0YVq8JH8Sa2l6rIAqwUHCj-6OEnNufUxw7L0qMGwRCx2Bza8G1hfMVAq4mnffqVSro9DUNEAeRaUtyrkkV8p9K7XlqHkWczO56E2q-sWot7gTUyJPc4mN6p9K3CaSJpnE7WnzuQp-2eGlkOOtaaDAJZf6VZeXNzh7yx6cV8DuLLWFQV_ifb"/>
+<div class="flex flex-col justify-between flex-grow">
+<div>
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-lg text-body-lg text-on-surface font-medium">Dragon Roll</h3>
+<div class="w-3 h-3 rounded-full border border-red-500 flex items-center justify-center shrink-0 mt-1">
+<div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant line-clamp-2">Shrimp tempura, cucumber, topped with thinly sliced avocado, eel sauce.</p>
+</div>
+<div class="flex justify-between items-center mt-3">
+<span class="font-mono text-secondary font-medium tracking-tight">$24.00</span>
+<div class="flex items-center gap-3 bg-surface border border-outline-variant rounded-full px-2 py-1">
+<button class="text-on-surface-variant hover:text-secondary p-1">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</button>
+<span class="font-body-md text-body-md text-on-surface font-medium w-4 text-center">1</span>
+<button class="text-on-surface-variant hover:text-secondary p-1">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Menu Item Card 2 -->
+<div class="bg-surface-container-low border border-surface-container-high rounded-xl p-4 flex gap-4 magnetic-hover">
+<img alt="Spicy Tuna Crunch" class="w-24 h-24 object-cover rounded-lg shrink-0 border border-outline-variant/20" data-alt="A beautifully presented spicy tuna roll cut into even pieces on a textured dark ceramic plate. The rolls are generously coated in crispy tempura flakes and dotted with a bright orange spicy mayo. The shot uses shallow depth of field to focus on the intricate textures, bathed in warm, directional lighting that enhances the golden hues against the deep black shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChTYaEK0pIlrbI76ulznGxkFURJn21R0-Kf9HTelm9KP44mbawUDc-071e3swz_tDj91EvZVy0d-Na2f0QoaWI_LFU6yI7wQJ1KaeavAtaTIA8wJUh-83VucF-4V4yDtMbEObFX5NMkCxYvE5nLDReS1qggc2DLysM0rykvQWGhbFAGAfmnCDc-tWU0YI1Rss6sw3Sg71XlU-NTVt_VrpTtaR5uQy9CaaLXVaRfOiFzKfJqp9sKYclWNIa4TyITeFQlRIVMZw4hfNO"/>
+<div class="flex flex-col justify-between flex-grow">
+<div>
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-lg text-body-lg text-on-surface font-medium">Spicy Tuna Crunch</h3>
+<div class="w-3 h-3 rounded-full border border-red-500 flex items-center justify-center shrink-0 mt-1">
+<div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant line-clamp-2">Spicy bigeye tuna, avocado, tenkasu, spicy mayo, scallion.</p>
+</div>
+<div class="flex justify-between items-center mt-3">
+<span class="font-mono text-secondary font-medium tracking-tight">$22.00</span>
+<button class="bg-surface border border-outline-variant hover:border-secondary hover:text-secondary text-on-surface rounded-full px-4 py-1.5 font-label-caps text-label-caps transition-colors">
+                                ADD
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Category Section: Robata Grill -->
+<section class="flex flex-col gap-6 mt-4">
+<h2 class="font-headline-md text-headline-md text-on-surface border-b border-outline-variant/20 pb-2">Robata Grill</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Menu Item Card 3 -->
+<div class="bg-surface-container-low border border-surface-container-high rounded-xl p-4 flex gap-4 magnetic-hover">
+<img alt="Wagyu Skewers" class="w-24 h-24 object-cover rounded-lg shrink-0 border border-outline-variant/20" data-alt="Premium Wagyu beef skewers grilling over open charcoal. The meat has a rich, charred crust glistening with savory glaze. The lighting captures the ambient glow of the embers, creating a warm, intense atmosphere. The setting emphasizes a luxurious, authentic Japanese robata experience with a cinematic dark aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvYtijorq_xdVyn2hQs9sOx2GE9fA5bDSEaP_tUuO9Pk1WWHyrXN1NQUJ3PAZfS_SnH8hH7I8F11JsXMGK_dOecT7suEPxngQtLSTc4794sAgsSZql6rqi-LHJR98lIMDd7mbkquy1hKb5EcbewisEWOpshMW5--wdAKYYFj0qWMjMnm4eGvE6DYlzz7rJJX73bkKgr3LWsa5iMQM_NfliiU2G0NFNwfhPsHxxBOT2-nae_tPe7LH-oJKPNMOLMNQYM40yCKZxao5n"/>
+<div class="flex flex-col justify-between flex-grow">
+<div>
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-lg text-body-lg text-on-surface font-medium">A5 Wagyu Skewers</h3>
+<div class="w-3 h-3 rounded-full border border-red-500 flex items-center justify-center shrink-0 mt-1">
+<div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant line-clamp-2">Miyazaki beef, yuzu kosho, black garlic tare, shishito.</p>
+</div>
+<div class="flex justify-between items-center mt-3">
+<span class="font-mono text-secondary font-medium tracking-tight">$45.00</span>
+<button class="bg-surface border border-outline-variant hover:border-secondary hover:text-secondary text-on-surface rounded-full px-4 py-1.5 font-label-caps text-label-caps transition-colors">
+                                ADD
+                            </button>
+</div>
+</div>
+</div>
+<!-- Menu Item Card 4 (Veg) -->
+<div class="bg-surface-container-low border border-surface-container-high rounded-xl p-4 flex gap-4 magnetic-hover">
+<img alt="King Oyster Mushrooms" class="w-24 h-24 object-cover rounded-lg shrink-0 border border-outline-variant/20" data-alt="Thick-cut king oyster mushrooms scored in a crosshatch pattern and glazed with soy butter, sitting on a dark matte plate. Wisps of steam rise delicately in the moody lighting. The composition is minimal and elegant, fitting for a high-end dining establishment focused on architectural plating and deep shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6uV7VX0BsWiBG6PbovaexRXb014PA255G6apvzIZLPR5UURHJq1tqwgxklTWuHpqGSKA-fA4ZdFD22s8ngs8XjA_g-6Gr2IzANJ0gllyU7xEfXQqzt4Evi3jJHa3Xp1cHh3Ux1wxu6E04yzjGTv0Bn0y4WFV5ObiivgwrY3ltu2zPB5HViJIBpZquX6P_TKIJmL6G0OXevsNNH5gM04fgt0g4wlbs7hrtpfY4qMBD7Biwtl1MdfwU1Ky7D99x0YUB1WcVKTtoLw1m"/>
+<div class="flex flex-col justify-between flex-grow">
+<div>
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-lg text-body-lg text-on-surface font-medium">King Oyster Mushroom</h3>
+<div class="w-3 h-3 rounded-full border border-green-500 flex items-center justify-center shrink-0 mt-1">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant line-clamp-2">Charcoal grilled, truffle soy butter, crispy garlic.</p>
+</div>
+<div class="flex justify-between items-center mt-3">
+<span class="font-mono text-secondary font-medium tracking-tight">$16.00</span>
+<div class="flex items-center gap-3 bg-surface border border-outline-variant rounded-full px-2 py-1">
+<button class="text-on-surface-variant hover:text-secondary p-1">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</button>
+<span class="font-body-md text-body-md text-on-surface font-medium w-4 text-center">2</span>
+<button class="text-on-surface-variant hover:text-secondary p-1">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating View Cart Button -->
+<div class="fixed bottom-0 left-0 w-full p-4 pb-8 bg-gradient-to-t from-background via-background/90 to-transparent pointer-events-none z-50 flex justify-center">
+<button class="pointer-events-auto bg-secondary text-on-secondary rounded-full py-4 px-6 w-full max-w-md flex justify-between items-center shadow-[0_8px_32px_rgba(233,195,73,0.15)] magnetic-hover transition-transform duration-300">
+<div class="flex items-center gap-3">
+<span class="flex items-center justify-center w-8 h-8 rounded-full bg-on-secondary text-secondary font-label-caps text-label-caps">3</span>
+<span class="font-label-caps text-label-caps tracking-widest uppercase">View Cart</span>
+</div>
+<span class="font-mono font-medium tracking-tight">$56.00</span>
+</button>
+</div>
+<script>
+        // Simple magnetic effect script for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                if(btn.classList.contains('magnetic-hover')) {
+                     btn.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px) scale(1.02)`;
+                }
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                 if(btn.classList.contains('magnetic-hover')) {
+                     btn.style.transform = '';
+                 }
+            });
+        });
+    </script>
+</body></html>

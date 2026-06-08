@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="dark scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Restron | The Art of Restoration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-fixed-variant": "#454747",
+                        "on-primary": "#313030",
+                        "error-container": "#93000a",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#c9c6c5",
+                        "surface-dim": "#131313",
+                        "on-secondary-container": "#342800",
+                        "on-secondary": "#3c2f00",
+                        "primary-container": "#0a0a0a",
+                        "outline": "#8e9192",
+                        "inverse-on-surface": "#313030",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-secondary-fixed-variant": "#574500",
+                        "surface-container-low": "#1c1b1b",
+                        "error": "#ffb4ab",
+                        "outline-variant": "#444748",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-tint": "#c9c6c5",
+                        "on-primary-container": "#7b7979",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-container": "#78797a",
+                        "on-background": "#e5e2e1",
+                        "on-surface-variant": "#c4c7c7",
+                        "on-secondary-fixed": "#241a00",
+                        "background": "#131313",
+                        "primary-fixed-dim": "#c9c6c5",
+                        "secondary-fixed": "#ffe088",
+                        "primary-fixed": "#e5e2e1",
+                        "surface-container": "#20201f",
+                        "surface-variant": "#353535",
+                        "tertiary-container": "#080a0a",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-bright": "#393939",
+                        "secondary": "#e9c349",
+                        "inverse-primary": "#5f5e5e",
+                        "surface-container-high": "#2a2a2a",
+                        "surface": "#131313",
+                        "secondary-container": "#af8d11",
+                        "on-tertiary": "#2f3131",
+                        "on-primary-fixed-variant": "#474646",
+                        "on-primary-fixed": "#1c1b1b",
+                        "tertiary": "#c6c6c7",
+                        "secondary-fixed-dim": "#e9c349",
+                        "surface-container-highest": "#353535",
+                        "soft-gold": "#e9c349",
+                        "obsidian-deep": "#0a0a0a",
+                        "atmospheric-glow": "rgba(255, 255, 255, 0.05)"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
+                    spacing: {
+                        gutter: "24px",
+                        "section-gap": "120px",
+                        "margin-mobile": "20px",
+                        "base": "8px",
+                        "margin-desktop": "64px"
+                    },
+                    fontFamily: {
+                        "label-caps": ["Inter"],
+                        "display-xl": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Playfair Display"]
+                    },
+                    fontSize: {
+                        "label-caps": ["12px", { lineHeight: "16px", letterSpacing: "0.15em", fontWeight: "600" }],
+                        "display-xl": ["80px", { lineHeight: "90px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "headline-md": ["32px", { lineHeight: "40px", fontWeight: "500" }],
+                        "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.05em", fontWeight: "500" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "headline-lg-mobile": ["32px", { lineHeight: "40px", fontWeight: "600" }],
+                        "body-lg": ["18px", { lineHeight: "28px", letterSpacing: "0.01em", fontWeight: "400" }],
+                        "headline-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.01em", fontWeight: "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .reveal-text {
+                opacity: 0;
+                transform: translateY(20px);
+                transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+            }
+            .reveal-text.active {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            .magnetic-wrap {
+                display: inline-block;
+                transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            }
+            .glass-panel {
+                background: linear-gradient(145deg, rgba(22,22,22,0.6) 0%, rgba(10,10,10,0.8) 100%);
+                backdrop-filter: blur(20px);
+                border: 1px solid #2A2A2A;
+                border-top: 1px solid rgba(255,255,255,0.05);
+            }
+            .slider-handle {
+                cursor: ew-resize;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden selection:bg-soft-gold selection:text-on-secondary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl dark:bg-obsidian-deep/80 border-b border-white/10 shadow-none transition-all duration-300" id="global-nav">
+<div class="flex justify-between items-center h-24 px-gutter max-w-[1440px] mx-auto">
+<a class="font-display-lg text-headline-lg-mobile md:text-headline-md text-on-surface tracking-tighter magnetic-wrap hover:text-soft-gold transition-colors duration-300" href="#">
+                Restron
+            </a>
+<div class="hidden md:flex items-center space-x-12">
+<a class="font-label-caps text-label-caps tracking-[0.3em] uppercase text-soft-gold border-b border-soft-gold pb-1 magnetic-wrap" href="#experience">Experience</a>
+<a class="font-label-caps text-label-caps tracking-[0.3em] uppercase text-on-surface-variant hover:text-soft-gold transition-colors duration-300 magnetic-wrap" href="#platform">Platform</a>
+<a class="font-label-caps text-label-caps tracking-[0.3em] uppercase text-on-surface-variant hover:text-soft-gold transition-colors duration-300 magnetic-wrap" href="#gallery">Gallery</a>
+<a class="font-label-caps text-label-caps tracking-[0.3em] uppercase text-on-surface-variant hover:text-soft-gold transition-colors duration-300 magnetic-wrap" href="#access">Access</a>
+</div>
+<div class="hidden md:block">
+<button class="bg-on-surface text-surface px-8 py-4 font-label-caps text-label-caps tracking-[0.1em] uppercase hover:bg-soft-gold transition-colors duration-300 magnetic-wrap">
+                    Start Free — 15 Days
+                </button>
+</div>
+<!-- Mobile Menu Toggle -->
+<button class="md:hidden text-on-surface p-2">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</button>
+</div>
+</nav>
+<!-- Hero Section -->
+<header class="relative w-full h-[100vh] flex items-center justify-center overflow-hidden" id="experience">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-background z-10"></div>
+<img alt="Hero Background" class="w-full h-full object-cover scale-105 transform origin-center transition-transform duration-[20s] ease-out hover:scale-110" src="https://lh3.googleusercontent.com/aida/AP1WRLtF5NWyizMISGkItaTvoCjUleosZCnq2xr0MPTyRlZmsuHhrYLC4sZ6E-lXl_zlKmEad-Kh4TkTGuSi0VpkRl0klPCLimwfkVrRpN5AEYNlPHCVQbO5eVJKEjMxF3xlyh6rVJt9wIgmtEfRWliXC3fDcKuXMDySwQpQyaB6vuuboRyb6JYOsV-pjB8GchyajTuqmyH7XSRTT5fn4er8hqgMm_Mh3yMDgo1-xJbXJSeeetTj8aUZgiP6nfXC"/>
+</div>
+<div class="relative z-20 text-center px-gutter flex flex-col items-center max-w-4xl mx-auto mt-24">
+<span class="font-label-caps text-label-caps tracking-[0.4em] uppercase text-soft-gold mb-8 block reveal-text">Architectural OS</span>
+<h1 class="font-display-xl text-headline-lg-mobile md:text-display-xl text-on-surface tracking-tighter mb-8 reveal-text leading-tight">
+                Run your restaurant from a single link.
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto reveal-text mb-12">
+                QR ordering. Kitchen display. Live analytics. No hardware. No downloads. Just a URL.
+            </p>
+<div class="reveal-text flex flex-col md:flex-row items-center gap-6">
+<button class="glass-panel text-on-surface px-10 py-5 font-label-caps text-label-caps tracking-[0.2em] uppercase hover:text-soft-gold transition-all duration-300 flex items-center gap-3 magnetic-wrap">
+                    Start Free — 15 Days
+</button>
+<a class="text-on-surface px-10 py-5 font-label-caps text-label-caps tracking-[0.2em] uppercase hover:text-soft-gold transition-all duration-300 magnetic-wrap border border-transparent hover:border-white/10" href="#platform">
+                    See Features
+                </a>
+</div>
+</div>
+</header>
+<!-- Chaos to Precision (Image Comparison) -->
+<section class="py-section-gap px-gutter md:px-margin-desktop bg-background relative" id="platform">
+<div class="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
+<div class="md:col-span-4 md:col-start-2 z-10 mb-12 md:mb-0">
+<h2 class="font-headline-md text-headline-lg-mobile md:text-headline-lg mb-6 reveal-text">From Chaos to <span class="text-soft-gold">Precision</span></h2>
+<p class="font-body-lg text-on-surface-variant mb-8 reveal-text">
+                    Replace fragmented paper trails with a seamless digital nervous system. Restron brings absolute clarity to the most demanding high-volume environments.
+                </p>
+<div class="h-[1px] w-12 bg-soft-gold mb-8 reveal-text"></div>
+<ul class="space-y-4 font-body-md text-on-surface-variant reveal-text">
+<li class="flex items-start gap-3"><span class="material-symbols-outlined text-soft-gold text-lg">check_circle</span> Real-time ticket parsing</li>
+<li class="flex items-start gap-3"><span class="material-symbols-outlined text-soft-gold text-lg">check_circle</span> Predictive inventory routing</li>
+<li class="flex items-start gap-3"><span class="material-symbols-outlined text-soft-gold text-lg">check_circle</span> Silent communication protocols</li>
+</ul>
+</div>
+<div class="md:col-span-6 md:col-start-7 relative">
+<div class="relative w-full aspect-[4/3] glass-panel overflow-hidden group select-none" id="compare-container">
+<!-- Before Image (Chaos) -->
+<div class="absolute inset-0 z-0">
+<img alt="Comparison Image" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLtM7dZ0p9HZ5LnDpGziabbmbpezhRUoswo5-HbGgoeWJCAT1il2IBtTEiDrk4oUQ5AEzVXzoZmXwvlnxul1vYxVEF5Cl5f_KjX9V4R1C1101sPOSeUK9RSdEPwynID5vIfFT6ag4dDxiZfj95qjrQsWlH1vDDXJc-rgWbvtCJ2tYtmDL20osATWG-RIYDrMOGh4mtCFevpaTJfs-96RENgV6qes3K_qehhPhAfrXBApNbpjz5fyu8RagIkN"/>
+</div>
+</div>
+<p class="text-center font-label-caps text-label-caps tracking-widest text-on-surface-variant mt-6 uppercase">Swipe to reveal UI</p>
+</div>
+</div>
+</section>
+<!-- Editorial Single Image Section -->
+<section class="py-section-gap px-gutter bg-surface-dim relative" id="gallery">
+<div class="max-w-[1440px] mx-auto flex flex-col items-center text-center">
+<div class="w-full max-w-5xl aspect-[16/9] mb-24 overflow-hidden border border-[#2A2A2A]">
+<div class="w-full h-full bg-surface-container-high relative" data-alt="A pristine, minimalist high-end restaurant dining room at dusk. Cinematic low-key lighting highlighting dark wood tables, obsidian leather seating, and subtle gold accents. The atmosphere is quiet, luxurious, and perfectly ordered, reflecting the precision of a high-end culinary operation." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAFT4iLJGLb_LHumCj9AQiHQGygtWTfjJYnmhXOl2AL6MwA-PG5SqfRn8SaeELjsfSe24GzXxYPqFm-qRNJ7m-gXwFsAVlLf3MTDl_cMY1IKfXr9SWd7V7djdVyxDcmq64A3vAshDIC0nu0g5Hyuu8ihqEiQBacdOYkrvufO55cjAs3vUHdcFp-kl_gLZimeOGYCVDlmZbF-ZtObxI0yFVwLMP0XG8k_N1BdQ1pOvlZkWhXvfgqciPlrMv_xn6t8oGHyddbB9CBB66h'); background-size: cover; background-position: center;">
+<div class="absolute inset-0 bg-black/20"></div>
+</div>
+</div>
+<div class="max-w-2xl">
+<span class="material-symbols-outlined text-soft-gold text-4xl mb-8 block">restaurant</span>
+<h3 class="font-headline-md text-headline-md mb-6 reveal-text">Invisible Architecture</h3>
+<p class="font-body-lg text-on-surface-variant leading-relaxed reveal-text">
+                    The best technology is felt, not seen. We designed an interface so intuitive it disappears into the workflow of your staff, allowing them to focus entirely on the craft of hospitality.
+                </p>
+</div>
+</div>
+</section>
+<!-- Pricing / Access Section -->
+<section class="py-section-gap px-gutter bg-background relative" id="access">
+<div class="max-w-[1440px] mx-auto">
+<div class="text-center mb-24">
+<h2 class="font-headline-md text-headline-lg-mobile md:text-headline-lg mb-4 reveal-text">Tiered Access</h2>
+<p class="font-body-lg text-on-surface-variant max-w-xl mx-auto reveal-text">Select the architectural foundation for your operation.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+<!-- Tier 1 -->
+<div class="glass-panel p-10 flex flex-col items-start group hover:-translate-y-2 transition-transform duration-500 reveal-text">
+<span class="font-label-caps text-label-caps tracking-[0.2em] uppercase text-on-surface-variant mb-4">Boutique</span>
+<div class="flex items-baseline gap-1 mb-8">
+<span class="font-mono text-xl text-soft-gold">$</span>
+<span class="font-display-xl text-[48px] text-soft-gold font-bold tracking-tight">450</span>
+<span class="font-body-md text-on-surface-variant">/mo</span>
+</div>
+<ul class="space-y-4 font-body-md text-on-surface-variant mb-12 flex-grow w-full border-t border-[#2A2A2A] pt-8">
+<li>Core Operating System</li>
+<li>Single Venue License</li>
+<li>Standard Telemetry</li>
+</ul>
+<button class="w-full py-4 border border-[#2A2A2A] text-on-surface font-label-caps text-label-caps uppercase tracking-widest hover:border-soft-gold hover:text-soft-gold transition-colors duration-300">Select</button>
+</div>
+<!-- Tier 2 -->
+<div class="glass-panel p-10 flex flex-col items-start relative overflow-hidden group hover:-translate-y-2 transition-transform duration-500 reveal-text" style="border-color: rgba(233, 195, 73, 0.3);">
+<div class="absolute top-0 right-0 bg-soft-gold text-background text-[10px] font-bold px-3 py-1 uppercase tracking-widest">Recommended</div>
+<span class="font-label-caps text-label-caps tracking-[0.2em] uppercase text-soft-gold mb-4">Enterprise</span>
+<div class="flex items-baseline gap-1 mb-8">
+<span class="font-mono text-xl text-soft-gold">$</span>
+<span class="font-display-xl text-[48px] text-soft-gold font-bold tracking-tight">1200</span>
+<span class="font-body-md text-on-surface-variant">/mo</span>
+</div>
+<ul class="space-y-4 font-body-md text-on-surface-variant mb-12 flex-grow w-full border-t border-[#2A2A2A] pt-8">
+<li>Multi-Venue Sync</li>
+<li>Advanced Predictive Analytics</li>
+<li>Priority White-Glove Support</li>
+<li>Custom Integrations</li>
+</ul>
+<button class="w-full py-4 bg-on-surface text-surface font-label-caps text-label-caps uppercase tracking-widest hover:bg-soft-gold transition-colors duration-300">Select</button>
+</div>
+<!-- Tier 3 -->
+<div class="glass-panel p-10 flex flex-col items-start group hover:-translate-y-2 transition-transform duration-500 reveal-text">
+<span class="font-label-caps text-label-caps tracking-[0.2em] uppercase text-on-surface-variant mb-4">Syndicate</span>
+<div class="flex items-baseline gap-1 mb-8">
+<span class="font-display-xl text-[32px] text-on-surface font-bold tracking-tight pt-3">Bespoke</span>
+</div>
+<ul class="space-y-4 font-body-md text-on-surface-variant mb-12 flex-grow w-full border-t border-[#2A2A2A] pt-8">
+<li>Global Network Architecture</li>
+<li>On-Premise Deployment Options</li>
+<li>Dedicated Engineering Pod</li>
+</ul>
+<button class="w-full py-4 border border-[#2A2A2A] text-on-surface font-label-caps text-label-caps uppercase tracking-widest hover:border-soft-gold hover:text-soft-gold transition-colors duration-300">Inquire</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="relative w-full py-section-gap px-gutter bg-obsidian-deep dark:bg-surface-container-lowest border-t border-soft-gold/30 flex flex-col items-center space-y-12">
+<div class="font-display-lg text-headline-md text-on-surface opacity-50">
+            Restron
+        </div>
+<div class="flex flex-wrap justify-center gap-8 md:gap-12">
+<a class="font-label-caps text-label-caps tracking-[0.4em] uppercase text-on-surface-variant hover:text-primary transition-opacity duration-300" href="#">Privacy</a>
+<a class="font-label-caps text-label-caps tracking-[0.4em] uppercase text-on-surface-variant hover:text-primary transition-opacity duration-300" href="#">Terms</a>
+<a class="font-label-caps text-label-caps tracking-[0.4em] uppercase text-on-surface-variant hover:text-primary transition-opacity duration-300" href="#">Security</a>
+<a class="font-label-caps text-label-caps tracking-[0.4em] uppercase text-on-surface-variant hover:text-primary transition-opacity duration-300" href="#">Contact</a>
+</div>
+<div class="font-label-caps text-label-caps tracking-[0.4em] uppercase text-on-surface-variant text-center opacity-50 mt-12">
+            © 2024 Restron. Architectural OS for High-End Hospitality.
+        </div>
+</footer>
+<script>
+        // Scroll Reveal Logic
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-text').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Magnetic Hover Effect
+        const magneticElements = document.querySelectorAll('.magnetic-wrap');
+        magneticElements.forEach(elem => {
+            elem.addEventListener('mousemove', (e) => {
+                const rect = elem.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                // Limit the movement
+                const moveX = x * 0.2;
+                const moveY = y * 0.2;
+                
+                elem.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            });
+
+            elem.addEventListener('mouseleave', () => {
+                elem.style.transform = 'translate(0px, 0px)';
+            });
+        });
+
+        // Nav Background on Scroll
+        const nav = document.getElementById('global-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.style.backgroundColor = 'rgba(10, 10, 10, 0.95)';
+            } else {
+                nav.style.backgroundColor = 'rgba(10, 10, 10, 0.8)';
+            }
+        });
+    </script>
+</body></html>
