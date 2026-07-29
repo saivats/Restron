@@ -2,10 +2,11 @@ import secrets
 import string
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_role, user_restaurant_id
+from app.core.rate_limit import enforce_rate_limit, record_failed_attempt
 from app.models import models
 from app.schemas.schemas import ReservationCreate, ReservationUpdate
 
@@ -130,8 +131,13 @@ def get_available_slots(
 def create_reservation(
     slug: str,
     payload: ReservationCreate,
+    request: Request,
     db: Session = Depends(get_db),
 ):
+    client_ip = request.client.host if request.client else None
+    enforce_rate_limit("reservation_book", client_ip, client_ip, max_attempts=10)
+    record_failed_attempt("reservation_book", client_ip, client_ip)
+
     restaurant = db.query(models.Restaurant).filter(models.Restaurant.slug == slug).first()
     if not restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
@@ -206,7 +212,11 @@ def create_reservation(
 
 
 @router.get("/lookup/{confirmation_code}")
-def lookup_reservation(confirmation_code: str, db: Session = Depends(get_db)):
+def lookup_reservation(confirmation_code: str, request: Request, db: Session = Depends(get_db)):
+    client_ip = request.client.host if request.client else None
+    enforce_rate_limit("reservation_lookup", client_ip, client_ip, max_attempts=20)
+    record_failed_attempt("reservation_lookup", client_ip, client_ip)
+
     reservation = (
         db.query(models.Reservation)
         .filter(models.Reservation.confirmation_code == confirmation_code)

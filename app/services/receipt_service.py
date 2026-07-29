@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
@@ -5,11 +7,14 @@ from app.core.config import PUBLIC_BASE_URL
 from app.core.security import receipt_token, verify_receipt_token
 from app.models import models
 
+logger = logging.getLogger(__name__)
+
 
 def _business_profile(db: Session, restaurant_id: int) -> dict:
     restaurant = db.get(models.Restaurant, restaurant_id)
     if not restaurant:
-        raise HTTPException(status_code=500, detail=f"Restaurant {restaurant_id} not found — cannot generate receipt")
+        logger.error("Receipt generation failed: restaurant_id=%s not found", restaurant_id)
+        raise HTTPException(status_code=500, detail="Unable to generate receipt.")
 
     return {
         "name": restaurant.name,
