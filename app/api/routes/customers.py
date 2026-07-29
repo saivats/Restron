@@ -91,7 +91,7 @@ def create_customer(
     except Exception as exc:
         db.rollback()
         logger.exception("Customer create/update failed phone=%s restaurant_id=%s: %s", c.phone, restaurant_id, exc)
-        raise HTTPException(status_code=500, detail=f"Customer save error: {exc}") from exc
+        raise HTTPException(status_code=500, detail="Failed to save customer. Please try again.") from exc
 
 
 @router.put("/")
@@ -106,10 +106,23 @@ def update_customer(
 @router.get("/lookup/{phone}")
 def lookup_customer(
     phone: str,
+    slug: str | None = None,
     db: Session = Depends(get_db),
     user: models.User | None = Depends(get_current_user),
 ):
-    restaurant_id = user_restaurant_id(user)
+    if user:
+        restaurant_id = user_restaurant_id(user)
+    elif slug:
+        restaurant = db.query(models.Restaurant).filter(models.Restaurant.slug == slug).first()
+        if not restaurant:
+            raise HTTPException(status_code=404, detail="Restaurant not found")
+        restaurant_id = restaurant.id
+    else:
+        # No session and no slug to resolve the correct tenant — refuse
+        # rather than silently falling back to the default restaurant's
+        # customer data.
+        raise HTTPException(status_code=400, detail="Restaurant context required")
+
     cust = db.query(models.Customer).filter(
         models.Customer.restaurant_id == restaurant_id,
         models.Customer.phone == phone,
@@ -130,10 +143,20 @@ def lookup_customer(
 @router.get("/{phone}")
 def get_customer(
     phone: str,
+    slug: str | None = None,
     db: Session = Depends(get_db),
     user: models.User | None = Depends(get_current_user),
 ):
-    restaurant_id = user_restaurant_id(user)
+    if user:
+        restaurant_id = user_restaurant_id(user)
+    elif slug:
+        restaurant = db.query(models.Restaurant).filter(models.Restaurant.slug == slug).first()
+        if not restaurant:
+            raise HTTPException(status_code=404, detail="Restaurant not found")
+        restaurant_id = restaurant.id
+    else:
+        raise HTTPException(status_code=400, detail="Restaurant context required")
+
     cust = db.query(models.Customer).filter(
         models.Customer.restaurant_id == restaurant_id,
         models.Customer.phone == phone,

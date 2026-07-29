@@ -25,7 +25,7 @@ def checkout_order(
         raise
     except Exception as exc:
         logger.exception("Checkout failed for order_id=%s restaurant_id=%s: %s", data.order_id, user_restaurant_id(user), exc)
-        raise HTTPException(status_code=500, detail=f"Checkout error: {exc}") from exc
+        raise HTTPException(status_code=500, detail="Checkout failed. Please try again.") from exc
 
 
 @router.post("/split")

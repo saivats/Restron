@@ -1,12 +1,13 @@
 from datetime import timedelta
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, user_restaurant_id
 from app.core.config import ACCESS_TOKEN_EXPIRE_MINUTES
+from app.core.rate_limit import enforce_rate_limit, record_failed_attempt, reset_attempts
 from app.core.security import create_access_token, verify_password
 from app.models import models
 
@@ -15,11 +16,15 @@ router = APIRouter()
 
 @router.post("/token")
 async def login(
+    request: Request,
     response: Response,
     slug: Optional[str] = None,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
+    client_ip = request.client.host if request.client else None
+    enforce_rate_limit("login", form_data.username, client_ip)
+
     restaurant = None
     restaurant_id = None
 
@@ -42,7 +47,10 @@ async def login(
 
     user = user_query.first()
     if not user or not verify_password(form_data.password, user.password_hash):
+        record_failed_attempt("login", form_data.username, client_ip)
         raise HTTPException(status_code=400, detail="Incorrect username or password")
+
+    reset_attempts("login", form_data.username, client_ip)
 
     if not restaurant and user.restaurant_id:
         restaurant = db.get(models.Restaurant, user.restaurant_id)

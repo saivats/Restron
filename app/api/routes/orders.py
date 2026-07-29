@@ -76,10 +76,16 @@ def kitchen_orders(
 @router.get("/{order_id}/receipt")
 def get_receipt(
     order_id: int,
+    token: str | None = None,
     db: Session = Depends(get_db),
     user: models.User | None = Depends(get_current_user),
 ):
-    return generate_receipt_logic(order_id, db, restaurant_id=user_restaurant_id(user) if user else None)
+    return generate_receipt_logic(
+        order_id,
+        db,
+        restaurant_id=user_restaurant_id(user) if user else None,
+        token=token,
+    )
 
 
 @router.post("/{order_id}/status")
@@ -121,14 +127,19 @@ async def cancel_order(
 
 @router.websocket("/ws/kitchen")
 async def kitchen_ws(websocket: WebSocket):
-    restaurant_id = DEFAULT_RESTAURANT_ID
     token = websocket.cookies.get("access_token")
+    restaurant_id = None
     if token:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             restaurant_id = int(payload.get("restaurant_id", DEFAULT_RESTAURANT_ID))
-        except (JWTError, Exception):
-            pass
+        except JWTError:
+            restaurant_id = None
+
+    if restaurant_id is None:
+        await websocket.close(code=4401)
+        return
+
     await kitchen_ws_manager.connect(restaurant_id, websocket)
     try:
         while True:

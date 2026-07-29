@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 class OrderItemSchema(BaseModel):
     menu_item_id: int
     quantity: int = Field(gt=0)
-    modifiers: Optional[List[dict[str, Any]]] = None
+    modifier_ids: Optional[List[int]] = None
 
 
 class OrderCreate(BaseModel):

@@ -40,10 +40,16 @@ def kitchen_display(
 @router.get("/receipt/{order_id}")
 def receipt(
     order_id: int,
+    token: str | None = None,
     db: Session = Depends(get_db),
     user: models.User | None = Depends(get_current_user),
 ):
-    return generate_receipt_logic(order_id, db, restaurant_id=user_restaurant_id(user) if user else None)
+    return generate_receipt_logic(
+        order_id,
+        db,
+        restaurant_id=user_restaurant_id(user) if user else None,
+        token=token,
+    )
 
 
 @router.get("/manager/tables/")

@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy import func
@@ -9,6 +11,8 @@ from app.core.security import get_password_hash
 from app.models import models
 from app.schemas.schemas import StaffCreate
 from app.services.audit_service import write_audit_log
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -92,7 +96,8 @@ def create_staff(
         return {"status": "Created", "id": new_user.id, "username": new_user.username, "role": new_user.role}
     except Exception as exc:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Failed to create staff: {exc}") from exc
+        logger.exception("Failed to create staff restaurant_id=%s: %s", restaurant_id, exc)
+        raise HTTPException(status_code=500, detail="Failed to create staff account.") from exc
 
 
 @router.delete("/{user_id}")
@@ -131,4 +136,5 @@ def remove_staff(
         return {"status": "Removed", "id": target.id, "username": target.username}
     except Exception as exc:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Failed to remove staff: {exc}") from exc
+        logger.exception("Failed to remove staff user_id=%s restaurant_id=%s: %s", user_id, restaurant_id, exc)
+        raise HTTPException(status_code=500, detail="Failed to remove staff member.") from exc

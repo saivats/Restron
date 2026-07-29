@@ -1,7 +1,8 @@
 import secrets
+import logging
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -9,22 +10,32 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db, require_superadmin
 from app.core.config import PUBLIC_BASE_URL
 from app.core.plans import PLAN_LIMITS
+from app.core.rate_limit import enforce_rate_limit, record_failed_attempt, reset_attempts
 from app.core.security import create_access_token, get_password_hash, verify_password
 from app.models import models
 from app.schemas.schemas import RestaurantCreate, RestaurantUpdate
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
 @router.post("/token")
 def superadmin_login(
+    request: Request,
     response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
+    client_ip = request.client.host if request.client else None
+    enforce_rate_limit("superadmin_login", form_data.username, client_ip)
+
     admin = db.query(models.SuperAdmin).filter(models.SuperAdmin.username == form_data.username).first()
     if not admin or not verify_password(form_data.password, admin.password_hash):
+        record_failed_attempt("superadmin_login", form_data.username, client_ip)
         raise HTTPException(status_code=400, detail="Invalid superadmin credentials")
+
+    reset_attempts("superadmin_login", form_data.username, client_ip)
 
     token = create_access_token(
         data={"sub": admin.username, "role": "superadmin"},
@@ -153,7 +164,8 @@ def create_restaurant(
         }
     except Exception as exc:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Failed to create restaurant: {exc}") from exc
+        logger.exception("Failed to create restaurant slug=%s: %s", payload.slug, exc)
+        raise HTTPException(status_code=500, detail="Failed to create restaurant.") from exc
 
 
 @router.patch("/restaurants/{restaurant_id}")
@@ -183,7 +195,8 @@ def update_restaurant(
         return {"status": "Updated", "updated_fields": list(updates.keys())}
     except Exception as exc:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Failed to update restaurant: {exc}") from exc
+        logger.exception("Failed to update restaurant_id=%s: %s", restaurant_id, exc)
+        raise HTTPException(status_code=500, detail="Failed to update restaurant.") from exc
 
 
 @router.delete("/restaurants/{restaurant_id}")

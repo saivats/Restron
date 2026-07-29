@@ -120,12 +120,22 @@ async def slug_reserve_page(slug: str):
 
 
 @app.get("/r/{slug}/receipt/{order_id}/data")
-async def slug_receipt_data(slug: str, order_id: int, user: models.User | None = Depends(get_current_user)):
+async def slug_receipt_data(
+    slug: str,
+    order_id: int,
+    t: str | None = None,
+    user: models.User | None = Depends(get_current_user),
+):
     from app.api.deps import user_restaurant_id
     from app.services.receipt_service import generate_receipt_logic
     db = SessionLocal()
     try:
-        return generate_receipt_logic(order_id, db, restaurant_id=user_restaurant_id(user) if user else None)
+        return generate_receipt_logic(
+            order_id,
+            db,
+            restaurant_id=user_restaurant_id(user) if user else None,
+            token=t,
+        )
     finally:
         db.close()
 

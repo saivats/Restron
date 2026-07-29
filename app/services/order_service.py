@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import logging
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -8,6 +9,8 @@ from app.models import models
 from app.schemas.schemas import OrderCreate
 from app.services.audit_service import write_audit_log
 from app.services.billing_service import calculate_order_totals, normalize_gst_rate
+
+logger = logging.getLogger(__name__)
 
 
 ORDER_PLACED = "PLACED"
@@ -163,13 +166,32 @@ def place_order_logic(
             if not menu_item.is_available:
                 raise HTTPException(status_code=400, detail=f"{menu_item.name} is currently unavailable")
 
-            modifier_price_delta = sum(float(modifier.get("price_delta", 0)) for modifier in (item.modifiers or []))
-            modifier_percent_delta = sum(float(modifier.get("percent_delta", 0)) for modifier in (item.modifiers or []))
+            resolved_modifiers = []
+            if item.modifier_ids:
+                db_modifiers = db.query(models.ItemModifier).filter(
+                    models.ItemModifier.id.in_(item.modifier_ids),
+                    models.ItemModifier.restaurant_id == restaurant_id,
+                    models.ItemModifier.is_available == True,
+                    (models.ItemModifier.menu_item_id == menu_item.id)
+                    | (models.ItemModifier.menu_item_id.is_(None)),
+                ).all()
+                found_ids = {modifier.id for modifier in db_modifiers}
+                missing = set(item.modifier_ids) - found_ids
+                if missing:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Invalid modifier selection for {menu_item.name}",
+                    )
+                resolved_modifiers = db_modifiers
+
+            modifier_price_delta = sum(modifier.price_delta or 0.0 for modifier in resolved_modifiers)
+            modifier_percent_delta = sum(modifier.percent_delta or 0.0 for modifier in resolved_modifiers)
             unit_price = round((menu_item.price + modifier_price_delta) * (1 + modifier_percent_delta / 100), 2)
+            unit_price = max(unit_price, 0.0)
             gst_rate = normalize_gst_rate(menu_item.gst_rate)
 
             line_items.append({"price": unit_price, "quantity": item.quantity, "gst_rate": gst_rate})
-            modifier_names = [modifier.get("name") for modifier in (item.modifiers or []) if modifier.get("name")]
+            modifier_names = [modifier.name for modifier in resolved_modifiers]
             modifier_label = f" ({', '.join(modifier_names)})" if modifier_names else ""
             summary_list.append(f"{item.quantity}x {menu_item.name}{modifier_label}")
             new_order_items.append(
@@ -182,7 +204,15 @@ def place_order_logic(
                     line_total=round(unit_price * item.quantity, 2),
                     gst_rate=gst_rate,
                     hsn_code=menu_item.hsn_code,
-                    modifiers_json=item.modifiers,
+                    modifiers_json=[
+                        {
+                            "id": modifier.id,
+                            "name": modifier.name,
+                            "price_delta": modifier.price_delta,
+                            "percent_delta": modifier.percent_delta,
+                        }
+                        for modifier in resolved_modifiers
+                    ],
                     is_veg=menu_item.is_veg,
                     category=menu_item.category,
                 )
@@ -272,7 +302,8 @@ def place_order_logic(
         raise
     except Exception as exc:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Order placement error: {exc}") from exc
+        logger.exception("Order placement failed restaurant_id=%s: %s", restaurant_id, exc)
+        raise HTTPException(status_code=500, detail="Order placement failed. Please try again.") from exc
 
 
 def update_order_status(

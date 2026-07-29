@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
@@ -10,6 +11,8 @@ from app.core.plans import limits_for_plan
 from app.models import models
 from app.schemas.schemas import RestaurantSettingsUpdate
 from app.services.audit_service import write_audit_log
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -118,7 +121,8 @@ def update_restaurant_settings(
         return {"status": "Updated", "updated_fields": list(updates.keys())}
     except Exception as exc:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Failed to update settings: {exc}") from exc
+        logger.exception("Failed to update settings restaurant_id=%s: %s", restaurant_id, exc)
+        raise HTTPException(status_code=500, detail="Failed to update settings.") from exc
 
 
 @router.get("/status/")

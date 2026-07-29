@@ -166,8 +166,12 @@
             const pathParts = window.location.pathname.split('/');
             const slug = pathParts[2] || 'default';
             const orderId = pathParts[4] || pathParts[pathParts.length - 1];
+            const token = new URLSearchParams(window.location.search).get('t');
             try {
-                const res = await fetch(`/r/${slug}/receipt/${orderId}/data`);
+                const url = token
+                    ? `/r/${slug}/receipt/${orderId}/data?t=${encodeURIComponent(token)}`
+                    : `/r/${slug}/receipt/${orderId}/data`;
+                const res = await fetch(url);
                 if (!res.ok) {
                     alert('Failed to load receipt.');
                     return;

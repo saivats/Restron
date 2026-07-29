@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.config import PUBLIC_BASE_URL
+from app.core.security import receipt_token, verify_receipt_token
 from app.models import models
 
 
@@ -35,14 +36,32 @@ def generate_whatsapp_text(receipt: dict) -> str:
     )
 
 
-def generate_receipt_logic(order_id: int, db: Session, *, restaurant_id: int | None = None):
+def generate_receipt_logic(
+    order_id: int,
+    db: Session,
+    *,
+    restaurant_id: int | None = None,
+    token: str | None = None,
+):
     order = db.query(models.Order).filter(models.Order.id == order_id).first()
-    if not order or (restaurant_id is not None and order.restaurant_id != restaurant_id):
+    if not order:
         raise HTTPException(status_code=404, detail="Order not found")
+
+    if restaurant_id is not None:
+        # Authenticated staff request — already tenant-scoped by the caller.
+        if order.restaurant_id != restaurant_id:
+            raise HTTPException(status_code=404, detail="Order not found")
+    else:
+        # Unauthenticated (customer-facing) request — must present the
+        # signed token issued when the receipt link was created, so raw
+        # order_id enumeration can't pull other customers'/tenants' receipts.
+        if not verify_receipt_token(order.id, order.restaurant_id, token):
+            raise HTTPException(status_code=404, detail="Order not found")
 
     business = _business_profile(db, order.restaurant_id)
     slug = business["slug"]
     currency = business["currency_symbol"]
+    token_value = receipt_token(order.id, order.restaurant_id)
 
     items_list = [
         {
@@ -56,13 +75,14 @@ def generate_receipt_logic(order_id: int, db: Session, *, restaurant_id: int | N
         }
         for item in order.items
     ]
-    digital_url = f"{PUBLIC_BASE_URL}/r/{slug}/receipt/{order.id}"
+    digital_url = f"{PUBLIC_BASE_URL}/r/{slug}/receipt/{order.id}?t={token_value}"
     menu_url = f"{PUBLIC_BASE_URL}/r/{slug}/mobile"
     receipt_upload_path = f"receipts/{order.restaurant_id}/receipt_{order.id}.pdf"
 
     receipt = {
         "business": business,
         "order_id": order.id,
+        "receipt_token": token_value,
         "invoice_number": order.invoice_number,
         "kot_number": order.kot_number,
         "date": order.created_at.strftime("%Y-%m-%d %H:%M:%S") if order.created_at else "",

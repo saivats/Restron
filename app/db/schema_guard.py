@@ -148,8 +148,52 @@ def _seed_foundation_rows() -> None:
         db.close()
 
 
+def _secure_tables() -> None:
+    """Enable RLS + restrict anon/authenticated grants on every managed table.
+
+    Runs on every startup so newly added models are locked down automatically —
+    no manual SQL needed in Supabase when a new feature table is added.
+    Postgres/Supabase only; skipped for local sqlite.
+    """
+    if engine.dialect.name != "postgresql":
+        return
+
+    table_names = [t.name for t in Base.metadata.sorted_tables]
+
+    with engine.begin() as conn:
+        for table_name in table_names:
+            conn.execute(text(f'ALTER TABLE public."{table_name}" ENABLE ROW LEVEL SECURITY'))
+
+            existing = conn.execute(
+                text(
+                    "SELECT 1 FROM pg_policies WHERE schemaname = 'public' "
+                    "AND tablename = :t AND policyname = 'Service role full access'"
+                ),
+                {"t": table_name},
+            ).first()
+            if not existing:
+                conn.execute(
+                    text(
+                        f'CREATE POLICY "Service role full access" ON public."{table_name}" '
+                        f"FOR ALL TO service_role USING (true) WITH CHECK (true)"
+                    )
+                )
+
+            conn.execute(
+                text(f'REVOKE ALL ON public."{table_name}" FROM anon, authenticated')
+            )
+
+        conn.execute(
+            text(
+                "ALTER DEFAULT PRIVILEGES IN SCHEMA public "
+                "REVOKE ALL ON TABLES FROM anon, authenticated"
+            )
+        )
+
+
 def ensure_schema() -> None:
     Base.metadata.create_all(bind=engine)
     _ensure_columns()
     Base.metadata.create_all(bind=engine)
     _seed_foundation_rows()
+    _secure_tables()
