@@ -425,18 +425,58 @@
                 }
             }
 
+            const checkoutPayload = {
+                order_id: currentOrder.order_id,
+                payment_method: paymentMethod,
+                customer_phone: phone || null,
+                customer_name: customerName,
+                customer_discount: customerDiscount,
+                save_customer: saveCustomer
+            };
+
+            // Offline: only Cash can be safely queued — Card/UPI require a
+            // live payment confirmation that can't have actually happened
+            // without connectivity, so recording those as "paid" while
+            // offline would misrepresent what happened.
+            if (!navigator.onLine) {
+                if (paymentMethod !== 'Cash') {
+                    alert('You\'re offline. Only Cash payments can be checked out without a connection — switch payment method to Cash, or wait until connectivity returns for Card/UPI.');
+                    return;
+                }
+                try {
+                    const db = await openRestronDB();
+                    await new Promise((resolve, reject) => {
+                        const tx = db.transaction('pending_checkouts', 'readwrite');
+                        tx.objectStore('pending_checkouts').add({
+                            data: checkoutPayload,
+                            timestamp: Date.now()
+                        });
+                        tx.oncomplete = resolve;
+                        tx.onerror = reject;
+                    });
+                    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                        const sw = await navigator.serviceWorker.ready;
+                        await sw.sync.register('sync-checkouts');
+                    }
+                    lastCheckoutPhone = phone || null;
+                    lastCheckoutOrderId = currentOrder.order_id;
+                    closeCheckoutModal();
+                    receiptData = null;
+                    alert('Checkout saved offline (Cash). It will sync automatically once connection is restored.');
+                    loadTables();
+                    loadDashboard();
+                } catch (queueError) {
+                    console.error('Offline checkout queue error:', queueError);
+                    alert('Could not save checkout offline. Please try again.');
+                }
+                return;
+            }
+
             try {
                 const res = await fetch('/manager/checkout/', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        order_id: currentOrder.order_id,
-                        payment_method: paymentMethod,
-                        customer_phone: phone || null,
-                        customer_name: customerName,
-                        customer_discount: customerDiscount,
-                        save_customer: saveCustomer
-                    })
+                    body: JSON.stringify(checkoutPayload)
                 });
 
                 if (res.ok) {

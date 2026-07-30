@@ -111,9 +111,12 @@ async function syncPendingOrders() {
         credentials: 'include',
         body: JSON.stringify(order.data)
       });
-      if (response.ok) {
-        await deletePending(db, 'pending_orders', order.id);
-      }
+      // Any real HTTP response — success or a definitive rejection like a
+      // validation error — means the server has spoken; retrying an
+      // identical request won't change that outcome, so clear it either
+      // way. Only a genuine network failure (fetch throwing) should leave
+      // it queued for the next sync attempt.
+      await deletePending(db, 'pending_orders', order.id);
     } catch (e) {
       break;
     }
@@ -132,9 +135,7 @@ async function syncPendingCheckouts() {
         credentials: 'include',
         body: JSON.stringify(checkout.data)
       });
-      if (response.ok) {
-        await deletePending(db, 'pending_checkouts', checkout.id);
-      }
+      await deletePending(db, 'pending_checkouts', checkout.id);
     } catch (e) {
       break;
     }
